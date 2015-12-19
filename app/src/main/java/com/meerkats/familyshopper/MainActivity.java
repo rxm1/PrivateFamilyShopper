@@ -26,13 +26,9 @@ public class MainActivity extends Activity {
         enterItemEditTxt = (EditText)findViewById(R.id.enterItemTxt);
 
         shoppingList = new ShoppingList("firstList");
-        shoppingList.add("aa");
-        shoppingList.add("xx");
-        shoppingList.add("cc");
-
-        ListView shoppingListTextView = (ListView)findViewById(R.id.shoppingListView);
         shoppingListAdapter = new ShoppingListAdapter(this, shoppingList);
-        shoppingListTextView.setAdapter(shoppingListAdapter);
+        ListView shoppingListView = (ListView)findViewById(R.id.shoppingListView);
+        shoppingListView.setAdapter(shoppingListAdapter);
     }
 
     public void addBtnClick(View view){
