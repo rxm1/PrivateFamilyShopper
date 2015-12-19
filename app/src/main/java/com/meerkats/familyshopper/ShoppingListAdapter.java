@@ -10,6 +10,8 @@ import android.widget.Toast;
 
 import com.meerkats.familyshopper.model.ShoppingList;
 
+import java.util.ArrayList;
+
 /**
  * Created by Rez on 18/12/2015.
  */
@@ -19,7 +21,7 @@ public class ShoppingListAdapter extends ArrayAdapter<String> {
 
 
     public ShoppingListAdapter(Context context, ShoppingList shoppingList){
-        super(context, R.layout.shopping_list, shoppingList.toStringArray());
+        super(context, R.layout.shopping_list, shoppingList);
         this.context = context;
         this.shoppingList = shoppingList;
     }
@@ -29,7 +31,7 @@ public class ShoppingListAdapter extends ArrayAdapter<String> {
         LayoutInflater inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View rowView = inflater.inflate(R.layout.shopping_list, parent, false);
         TextView textView = (TextView)rowView.findViewById(R.id.shoppingListTextView);
-        textView.setText(shoppingList.toStringArray()[position]);
+        textView.setText(shoppingList.get(position));
 
         //Toast.makeText(getContext(), "in Adapter getView" + position, Toast.LENGTH_SHORT).show();
         return rowView;

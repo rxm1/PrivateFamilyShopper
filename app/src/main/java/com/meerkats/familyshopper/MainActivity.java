@@ -36,21 +36,10 @@ public class MainActivity extends Activity {
     }
 
     public void addBtnClick(View view){
-        Toast.makeText(this, ("first length " + shoppingList.size()), Toast.LENGTH_LONG).show();
-
-        ShoppingList shoppingListnew = new ShoppingList("firstList");
-        shoppingListnew.add("bb");
-        shoppingListnew.add("oo");
-        shoppingListnew.add("hdh");
-        shoppingList.clear();
-        shoppingList.addAll(shoppingListnew);
-
-
         shoppingList.add(enterItemEditTxt.getText().toString());
-        Toast.makeText(this, ("second length " + shoppingList.size()), Toast.LENGTH_LONG).show();
-        shoppingListAdapter.clear();
-        shoppingListAdapter.addAll(shoppingList);
-                shoppingListAdapter.notifyDataSetChanged();
+        //Toast.makeText(this, ("second length " + shoppingList.size()), Toast.LENGTH_LONG).show();
+
+        shoppingListAdapter.notifyDataSetChanged();
     }
     public void enterItemClick(View view){
 
