@@ -7,7 +7,7 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:text="Small Text"
-        android:id="@+id/textView"
+        android:id="@+id/shoppingListTextView"
         android:layout_gravity="center|left"
         android:textSize="30dp"
         android:textStyle="normal" />
