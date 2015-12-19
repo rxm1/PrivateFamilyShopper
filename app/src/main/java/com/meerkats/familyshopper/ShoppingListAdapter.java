@@ -6,11 +6,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.meerkats.familyshopper.model.ShoppingList;
-
-import java.util.ArrayList;
 
 /**
  * Created by Rez on 18/12/2015.
@@ -30,7 +27,7 @@ public class ShoppingListAdapter extends ArrayAdapter<String> {
     public View getView(int position, View convertView, ViewGroup parent){
         LayoutInflater inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View rowView = inflater.inflate(R.layout.shopping_list, parent, false);
-        TextView textView = (TextView)rowView.findViewById(R.id.shoppingListTextView);
+        TextView textView = (TextView)rowView.findViewById(R.id.shoppingListItemTextView);
         textView.setText(shoppingList.get(position));
 
         //Toast.makeText(getContext(), "in Adapter getView" + position, Toast.LENGTH_SHORT).show();

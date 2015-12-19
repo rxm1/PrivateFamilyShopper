@@ -6,6 +6,7 @@ import android.support.v7.app.ActionBarActivity;
 
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -26,9 +27,18 @@ public class MainActivity extends Activity {
         enterItemEditTxt = (EditText)findViewById(R.id.enterItemTxt);
 
         shoppingList = new ShoppingList("firstList");
+        shoppingList.add("aa");
+        shoppingList.add("bb");
         shoppingListAdapter = new ShoppingListAdapter(this, shoppingList);
         ListView shoppingListView = (ListView)findViewById(R.id.shoppingListView);
         shoppingListView.setAdapter(shoppingListAdapter);
+        shoppingListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+                Toast.makeText(getApplicationContext(), ("Item Clicked " + position + " " + adapterView.getSelectedItemId()), Toast.LENGTH_SHORT).show();
+            }
+        });
+
     }
 
     public void addBtnClick(View view){
@@ -37,7 +47,14 @@ public class MainActivity extends Activity {
 
         shoppingListAdapter.notifyDataSetChanged();
     }
-    public void enterItemClick(View view){
+    public void addItemTextEntered(View view){
 
+    }
+
+    public void deleteImgClick(View view){
+        Toast.makeText(this, "Delete clicked", Toast.LENGTH_LONG).show();
+    }
+    public void shoppingListItemClick(View view){
+        Toast.makeText(this, "List item clicked", Toast.LENGTH_LONG).show();
     }
 }
