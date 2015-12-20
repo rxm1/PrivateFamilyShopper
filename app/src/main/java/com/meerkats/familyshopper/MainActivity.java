@@ -1,16 +1,17 @@
 package com.meerkats.familyshopper;
 
 import android.app.Activity;
-import android.app.ListActivity;
-import android.graphics.Paint;
-import android.support.v7.app.ActionBarActivity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 
 import android.os.Bundle;
+import android.view.ContextMenu;
+import android.view.MenuItem;
+import android.view.Menu;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.meerkats.familyshopper.model.ShoppingList;
@@ -21,6 +22,7 @@ public class MainActivity extends Activity {
     EditText enterItemEditTxt;
     ShoppingList shoppingList;
     ShoppingListAdapter shoppingListAdapter;
+    ListView shoppingListView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,8 +34,31 @@ public class MainActivity extends Activity {
         shoppingList.add("aa");
         shoppingList.add("bb");
         shoppingListAdapter = new ShoppingListAdapter(this, shoppingList);
-        ListView shoppingListView = (ListView)findViewById(R.id.shoppingListView);
+        shoppingListView = (ListView)findViewById(R.id.shoppingListView);
         shoppingListView.setAdapter(shoppingListAdapter);
+
+        setShoppingListOnItemClick();
+        setShoppingListOnItemLongClick();
+    }
+
+    private void setShoppingListOnItemLongClick(){
+        shoppingListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View v, int position, long id) {
+                new AlertDialog.Builder(MainActivity.this)
+                        .setTitle(shoppingList.get(position)).setCancelable(true).setItems(R.array.shoppingListContextMenuValues,
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialoginterface, int i) {
+                                //take actions here according to what the user has selected
+                            }
+                        }
+                )
+                        .show();
+                return true;
+            }
+        });
+    }
+    private void setShoppingListOnItemClick(){
         shoppingListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
@@ -44,8 +69,8 @@ public class MainActivity extends Activity {
                 shoppingListAdapter.notifyDataSetChanged();
             }
         });
-
     }
+
 
     public void addBtnClick(View view){
         shoppingList.add(enterItemEditTxt.getText().toString());
