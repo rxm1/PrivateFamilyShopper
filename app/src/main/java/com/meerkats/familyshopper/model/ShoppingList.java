@@ -25,4 +25,11 @@ public class ShoppingList extends ArrayList<String>{
         return true;
     }
 
+    public ShoppingListItem getShoppingListItem(int index){
+        return shoppingListItems.get(index);
+    }
+    public void setShoppingListItem(int index, ShoppingListItem shoppingListItem){
+        shoppingListItems.set(index, shoppingListItem);
+        this.set(index, shoppingListItem.toString());
+    }
 }

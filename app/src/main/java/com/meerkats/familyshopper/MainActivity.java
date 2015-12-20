@@ -2,6 +2,7 @@ package com.meerkats.familyshopper;
 
 import android.app.Activity;
 import android.app.ListActivity;
+import android.graphics.Paint;
 import android.support.v7.app.ActionBarActivity;
 
 import android.os.Bundle;
@@ -13,6 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.meerkats.familyshopper.model.ShoppingList;
+import com.meerkats.familyshopper.model.ShoppingListItem;
 
 public class MainActivity extends Activity {
 
@@ -35,7 +37,11 @@ public class MainActivity extends Activity {
         shoppingListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                Toast.makeText(getApplicationContext(), ("Item Clicked " + position + " " + adapterView.getSelectedItemId()), Toast.LENGTH_SHORT).show();
+
+                ShoppingListItem shoppingListItem = shoppingList.getShoppingListItem(position);
+                shoppingListItem.setIsCrossedOff(!shoppingListItem.isCrossedOff());
+                shoppingList.setShoppingListItem(position, shoppingListItem);
+                shoppingListAdapter.notifyDataSetChanged();
             }
         });
 
@@ -51,10 +57,5 @@ public class MainActivity extends Activity {
 
     }
 
-    public void deleteImgClick(View view){
-        Toast.makeText(this, "Delete clicked", Toast.LENGTH_LONG).show();
-    }
-    public void shoppingListItemClick(View view){
-        Toast.makeText(this, "List item clicked", Toast.LENGTH_LONG).show();
-    }
+
 }
