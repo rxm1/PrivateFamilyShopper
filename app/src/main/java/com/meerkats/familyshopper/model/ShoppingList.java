@@ -24,6 +24,12 @@ public class ShoppingList extends ArrayList<String>{
         shoppingListItems.add(new ShoppingListItem(item));
         return true;
     }
+    @Override
+    public String remove(int position){
+        String item = super.remove(position);
+        shoppingListItems.remove(position);
+        return item;
+    }
 
     public ShoppingListItem getShoppingListItem(int index){
         return shoppingListItems.get(index);

@@ -44,12 +44,17 @@ public class MainActivity extends Activity {
     private void setShoppingListOnItemLongClick(){
         shoppingListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View v, int position, long id) {
+            public boolean onItemLongClick(AdapterView<?> parent, View v, final int position, long id) {
                 new AlertDialog.Builder(MainActivity.this)
                         .setTitle(shoppingList.get(position)).setCancelable(true).setItems(R.array.shoppingListContextMenuValues,
                         new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialoginterface, int i) {
-                                //take actions here according to what the user has selected
+                            public void onClick(DialogInterface dialoginterface, int index) {
+                                switch (index){
+                                    case 0:
+                                        setShoppingListItemDelete(position);
+                                    case 1:
+                                        setShoppingListItemEdit();
+                                }
                             }
                         }
                 )
@@ -58,6 +63,14 @@ public class MainActivity extends Activity {
             }
         });
     }
+    private void setShoppingListItemDelete(int position){
+        shoppingList.remove(position);
+        shoppingListAdapter.notifyDataSetChanged();
+    }
+    private void setShoppingListItemEdit(){
+
+    }
+
     private void setShoppingListOnItemClick(){
         shoppingListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
