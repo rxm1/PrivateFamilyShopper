@@ -20,7 +20,7 @@
         android:textSize="30dp"
         android:textStyle="normal"
         android:id="@+id/shoppingListItemEditText"
-        android:visibility="invisible"
+        android:visibility="gone"
         />
     <ImageButton
         android:layout_width="wrap_content"
@@ -28,7 +28,7 @@
         android:layout_gravity="bottom"
         android:src="@mipmap/ok"
         android:id="@+id/shoppingListItemOKButton"
-        android:visibility="invisible"
+        android:visibility="gone"
         android:onClick="okItemEditClickButton"/>
     <ImageButton
         android:layout_width="wrap_content"
@@ -36,6 +36,6 @@
         android:layout_gravity="bottom"
         android:src="@mipmap/cancel"
         android:id="@+id/shoppingListItemCancelButton"
-        android:visibility="invisible"
+        android:visibility="gone"
         android:onClick="cancelItemEditClickButton"/>
 </LinearLayout>

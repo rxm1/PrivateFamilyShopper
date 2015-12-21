@@ -52,10 +52,10 @@ public class ShoppingListAdapter extends ArrayAdapter<String> {
 
     }
 
-    public void setItemEdited(int position, View convertView, ViewGroup parent, TextView textView, View rowView, ShoppingListItem shoppingListItem) {
-        EditText editText = (EditText) rowView.findViewById(R.id.shoppingListItemEditText);
-        ImageButton cancelButton = (ImageButton) rowView.findViewById(R.id.shoppingListItemCancelButton);
-        ImageButton okButton = (ImageButton) rowView.findViewById(R.id.shoppingListItemOKButton);
+    public void setItemEdited(int position, View convertView, ViewGroup parent, final TextView textView, View rowView, final ShoppingListItem shoppingListItem) {
+        final EditText editText = (EditText) rowView.findViewById(R.id.shoppingListItemEditText);
+        final ImageButton cancelButton = (ImageButton) rowView.findViewById(R.id.shoppingListItemCancelButton);
+        final ImageButton okButton = (ImageButton) rowView.findViewById(R.id.shoppingListItemOKButton);
 
         editText.setText(shoppingListItem.getShoppingListItem());
         textView.setVisibility(View.GONE);
@@ -67,7 +67,7 @@ public class ShoppingListAdapter extends ArrayAdapter<String> {
         editText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             public void onFocusChange(View v, boolean hasFocus) {
                 if (!hasFocus) {
-                    Toast.makeText(context, "Lost focus adapter", Toast.LENGTH_SHORT).show();
+                    shoppingListItem.setSelectedForEdit(false);
                 }
             }
         });
@@ -79,7 +79,11 @@ public class ShoppingListAdapter extends ArrayAdapter<String> {
         });
         cancelButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                Toast.makeText(context, "cancel adapter", Toast.LENGTH_SHORT).show();
+                shoppingListItem.setSelectedForEdit(false);
+                textView.setVisibility(View.VISIBLE);
+                editText.setVisibility(View.GONE);
+                cancelButton.setVisibility(View.GONE);
+                okButton.setVisibility(View.GONE);
             }
 
         });
