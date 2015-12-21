@@ -16,24 +16,25 @@
 
     </ListView>
 <LinearLayout
-    android:layout_width="wrap_content"
+    android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
     >
     <EditText
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-
+        android:layout_gravity="center"
         android:id="@+id/enterItemTxt"
         android:textSize="30dp"
         android:textStyle="normal"
         android:onClick="addItemTextEntered"
         android:layout_weight="1"
+        android:gravity="left"
         android:hint="Enter Item"/>
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-
+        android:gravity="right"
         android:text="Add"
         android:id="@+id/addBtn"
         android:textSize="30dp"
