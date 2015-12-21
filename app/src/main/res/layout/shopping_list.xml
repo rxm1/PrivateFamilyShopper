@@ -5,43 +5,33 @@
     android:orientation="horizontal"
     >
     <TextView
-
         android:layout_width="wrap_content"
-        android:layout_height="fill_parent"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
+        android:layout_height="wrap_content"
         android:id="@+id/shoppingListItemTextView"
         android:textSize="30dp"
         android:textStyle="normal"
+        android:visibility="invisible"
         />
     <EditText
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
         android:textSize="30dp"
         android:textStyle="normal"
         android:id="@+id/shoppingListItemEditText"
-        android:visibility="invisible"/>
-    <ImageButton
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentBottom="true"
-
-
-        android:src="@mipmap/ok"
-        android:id="@+id/shoppingListItemOKButton"
-        android:visibility="invisible"/>
+        android:visibility="visible"/>
     <ImageButton
         android:layout_width="wrap_content"
-        android:layout_height="fill_parent"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentBottom="true"
-
+        android:layout_height="wrap_content"
+        android:gravity="right"
+        android:src="@mipmap/ok"
+        android:id="@+id/shoppingListItemOKButton"
+        android:visibility="visible"/>
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="right"
         android:src="@mipmap/cancel"
         android:id="@+id/shoppingListItemCancelButton"
-        android:visibility="invisible"/>
+        android:visibility="visible"/>
 </LinearLayout>
