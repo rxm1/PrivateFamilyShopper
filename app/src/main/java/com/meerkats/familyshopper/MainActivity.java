@@ -1,7 +1,9 @@
 package com.meerkats.familyshopper;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 
 import android.media.Image;
@@ -10,6 +12,8 @@ import android.view.ContextMenu;
 import android.view.MenuItem;
 import android.view.Menu;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -77,13 +81,20 @@ public class MainActivity extends Activity {
         ImageButton cancelButton = (ImageButton)v.findViewById(R.id.shoppingListItemCancelButton);
         ImageButton okButton = (ImageButton)v.findViewById(R.id.shoppingListItemOKButton);
         editText.setText(textView.getText());
-        textView.setVisibility(View.INVISIBLE);
+        //textView.setWidth(0);
 
-        editText.setX(textView.getX());
-        editText.setY(textView.getY());
+
+        //editText.setX(textView.getX());
+        //editText.setY(textView.getY());
+        textView.setVisibility(View.GONE);
+
         editText.setVisibility(View.VISIBLE);
+        editText.requestFocus();
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.showSoftInput(editText, InputMethodManager.SHOW_FORCED);
         cancelButton.setVisibility(View.VISIBLE);
         okButton.setVisibility(View.VISIBLE);
+
         Toast.makeText(getApplicationContext(), v.getId()+"", Toast.LENGTH_SHORT).show();
     }
 
