@@ -6,6 +6,7 @@ package com.meerkats.familyshopper.model;
 public class ShoppingListItem {
     private String shoppingListItem;
     private boolean isCrossedOff;
+    private boolean isSelectedForEdit;
 
     public ShoppingListItem(){
         shoppingListItem = "";
@@ -21,18 +22,13 @@ public class ShoppingListItem {
         return shoppingListItem;
     }
 
-    public String getShoppingListItem() {
-        return shoppingListItem;
-    }
+    public String getShoppingListItem() { return shoppingListItem; }
+    public void setShoppingListItem(String shoppingListItem) { this.shoppingListItem = shoppingListItem; }
 
-    public void setShoppingListItem(String shoppingListItem) {
-        this.shoppingListItem = shoppingListItem;
-    }
+    public boolean isSelectedForEdit(){return isSelectedForEdit;}
+    public void setSelectedForEdit(boolean selectedForEdit){isSelectedForEdit = selectedForEdit;}
 
-    public boolean isCrossedOff() {
-        return isCrossedOff;
-    }
-
+    public boolean isCrossedOff() { return isCrossedOff; }
     public void setIsCrossedOff(boolean isCrossedOff) {
         this.isCrossedOff = isCrossedOff;
     }

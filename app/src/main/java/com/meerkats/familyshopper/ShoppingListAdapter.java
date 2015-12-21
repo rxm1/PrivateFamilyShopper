@@ -5,8 +5,12 @@ import android.graphics.Paint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.meerkats.familyshopper.model.ShoppingList;
 import com.meerkats.familyshopper.model.ShoppingListItem;
@@ -32,6 +36,10 @@ public class ShoppingListAdapter extends ArrayAdapter<String> {
         TextView textView = (TextView)rowView.findViewById(R.id.shoppingListItemTextView);
         ShoppingListItem shoppingListItem = shoppingList.getShoppingListItem(position);
 
+        if(shoppingListItem.isSelectedForEdit()) {
+            setItemEdited(position, convertView, parent, textView, rowView, shoppingListItem);
+        }
+
         if(shoppingListItem.isCrossedOff()) {
             textView.setPaintFlags(textView.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
         }
@@ -44,4 +52,36 @@ public class ShoppingListAdapter extends ArrayAdapter<String> {
 
     }
 
+    public void setItemEdited(int position, View convertView, ViewGroup parent, TextView textView, View rowView, ShoppingListItem shoppingListItem) {
+        EditText editText = (EditText) rowView.findViewById(R.id.shoppingListItemEditText);
+        ImageButton cancelButton = (ImageButton) rowView.findViewById(R.id.shoppingListItemCancelButton);
+        ImageButton okButton = (ImageButton) rowView.findViewById(R.id.shoppingListItemOKButton);
+
+        editText.setText(shoppingListItem.getShoppingListItem());
+        textView.setVisibility(View.GONE);
+        editText.setVisibility(View.VISIBLE);
+        cancelButton.setVisibility(View.VISIBLE);
+        okButton.setVisibility(View.VISIBLE);
+        editText.requestFocus();
+
+        editText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (!hasFocus) {
+                    Toast.makeText(context, "Lost focus adapter", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+        okButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Toast.makeText(context, "ok adapter", Toast.LENGTH_SHORT).show();
+            }
+
+        });
+        cancelButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Toast.makeText(context, "cancel adapter", Toast.LENGTH_SHORT).show();
+            }
+
+        });
+    }
 }

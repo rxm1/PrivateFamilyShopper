@@ -38,4 +38,15 @@ public class ShoppingList extends ArrayList<String>{
         shoppingListItems.set(index, shoppingListItem);
         this.set(index, shoppingListItem.toString());
     }
+
+    public void setShoppingListItemIsEditing(int position){
+        ShoppingListItem shoppingListItem = shoppingListItems.get(position);
+        shoppingListItem.setSelectedForEdit(true);
+        shoppingListItems.set(position, shoppingListItem);
+    }
+    public void setShoppingListItemIsNotEditing(int position){
+        ShoppingListItem shoppingListItem = shoppingListItems.get(position);
+        shoppingListItem.setSelectedForEdit(false);
+        shoppingListItems.set(position, shoppingListItem);
+    }
 }

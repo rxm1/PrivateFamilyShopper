@@ -8,6 +8,7 @@ import android.content.DialogInterface;
 
 import android.media.Image;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.ContextMenu;
 import android.view.MenuItem;
 import android.view.Menu;
@@ -47,6 +48,7 @@ public class MainActivity extends Activity {
 
         setShoppingListOnItemClick();
         setShoppingListOnItemLongClick();
+
     }
 
     private void setShoppingListOnItemLongClick(){
@@ -57,7 +59,7 @@ public class MainActivity extends Activity {
                         .setTitle(shoppingList.get(position)).setCancelable(true).setItems(R.array.shoppingListContextMenuValues,
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialoginterface, int index) {
-                                switch (index){
+                                switch (index) {
                                     case 0:
                                         setShoppingListItemDelete(position);
                                     case 1:
@@ -76,26 +78,8 @@ public class MainActivity extends Activity {
         shoppingListAdapter.notifyDataSetChanged();
     }
     private void setShoppingListItemEdit(final AdapterView<?> parent, View v, final int position, long id){
-        TextView textView = (TextView)v.findViewById(R.id.shoppingListItemTextView);
-        EditText editText = (EditText)v.findViewById(R.id.shoppingListItemEditText);
-        ImageButton cancelButton = (ImageButton)v.findViewById(R.id.shoppingListItemCancelButton);
-        ImageButton okButton = (ImageButton)v.findViewById(R.id.shoppingListItemOKButton);
-        editText.setText(textView.getText());
-        //textView.setWidth(0);
-
-
-        //editText.setX(textView.getX());
-        //editText.setY(textView.getY());
-        textView.setVisibility(View.GONE);
-
-        editText.setVisibility(View.VISIBLE);
-        editText.requestFocus();
-        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.showSoftInput(editText, InputMethodManager.SHOW_FORCED);
-        cancelButton.setVisibility(View.VISIBLE);
-        okButton.setVisibility(View.VISIBLE);
-
-        Toast.makeText(getApplicationContext(), v.getId()+"", Toast.LENGTH_SHORT).show();
+        shoppingList.setShoppingListItemIsEditing(position);
+        shoppingListAdapter.notifyDataSetChanged();
     }
 
     private void setShoppingListOnItemClick(){
