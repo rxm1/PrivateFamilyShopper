@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 
+import android.media.Image;
 import android.os.Bundle;
 import android.view.ContextMenu;
 import android.view.MenuItem;
@@ -11,7 +12,10 @@ import android.view.Menu;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.meerkats.familyshopper.model.ShoppingList;
@@ -44,7 +48,7 @@ public class MainActivity extends Activity {
     private void setShoppingListOnItemLongClick(){
         shoppingListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View v, final int position, long id) {
+            public boolean onItemLongClick(final AdapterView<?> parent, final View v, final int position, final long id) {
                 new AlertDialog.Builder(MainActivity.this)
                         .setTitle(shoppingList.get(position)).setCancelable(true).setItems(R.array.shoppingListContextMenuValues,
                         new DialogInterface.OnClickListener() {
@@ -53,7 +57,7 @@ public class MainActivity extends Activity {
                                     case 0:
                                         setShoppingListItemDelete(position);
                                     case 1:
-                                        setShoppingListItemEdit();
+                                        setShoppingListItemEdit(parent, v, position, id);
                                 }
                             }
                         }
@@ -67,8 +71,20 @@ public class MainActivity extends Activity {
         shoppingList.remove(position);
         shoppingListAdapter.notifyDataSetChanged();
     }
-    private void setShoppingListItemEdit(){
+    private void setShoppingListItemEdit(final AdapterView<?> parent, View v, final int position, long id){
+        TextView textView = (TextView)v.findViewById(R.id.shoppingListItemTextView);
+        EditText editText = (EditText)v.findViewById(R.id.shoppingListItemEditText);
+        ImageButton cancelButton = (ImageButton)v.findViewById(R.id.shoppingListItemCancelButton);
+        ImageButton okButton = (ImageButton)v.findViewById(R.id.shoppingListItemOKButton);
+        editText.setText(textView.getText());
+        textView.setVisibility(View.INVISIBLE);
 
+        editText.setX(textView.getX());
+        editText.setY(textView.getY());
+        editText.setVisibility(View.VISIBLE);
+        cancelButton.setVisibility(View.VISIBLE);
+        okButton.setVisibility(View.VISIBLE);
+        Toast.makeText(getApplicationContext(), v.getId()+"", Toast.LENGTH_SHORT).show();
     }
 
     private void setShoppingListOnItemClick(){

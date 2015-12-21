@@ -1,16 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
+    android:orientation="horizontal"
     >
-
-
     <TextView
 
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="fill_parent"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
         android:id="@+id/shoppingListItemTextView"
         android:textSize="30dp"
         android:textStyle="normal"
         />
+    <EditText
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:textSize="30dp"
+        android:textStyle="normal"
+        android:id="@+id/shoppingListItemEditText"
+        android:visibility="invisible"/>
+    <ImageButton
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentBottom="true"
+
+
+        android:src="@mipmap/ok"
+        android:id="@+id/shoppingListItemOKButton"
+        android:visibility="invisible"/>
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="fill_parent"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentBottom="true"
+
+        android:src="@mipmap/cancel"
+        android:id="@+id/shoppingListItemCancelButton"
+        android:visibility="invisible"/>
 </LinearLayout>
