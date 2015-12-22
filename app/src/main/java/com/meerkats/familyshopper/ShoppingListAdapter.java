@@ -1,6 +1,8 @@
 package com.meerkats.familyshopper;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -39,10 +41,11 @@ public class ShoppingListAdapter extends ArrayAdapter<String> {
         textView.setText(shoppingListItem.getShoppingListItem());
 
         if(shoppingListItem.isCrossedOff()) {
-            textView.setPaintFlags(textView.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+            textView.setPaintFlags(textView.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG );
+            textView.setTextColor(textView.getTextColors().withAlpha(50));
         }
         else {
-            textView.setPaintFlags(textView.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
+            //textView.setPaintFlags(textView.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
         }
         //Toast.makeText(getContext(), "in Adapter getView" + position, Toast.LENGTH_SHORT).show();
         return rowView;

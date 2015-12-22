@@ -9,8 +9,6 @@
         android:layout_weight="1"
         android:layout_height="wrap_content"
         android:id="@+id/shoppingListItemTextView"
-        android:textSize="30dp"
-        android:textStyle="normal"
         android:visibility="visible"
         />
 </LinearLayout>
