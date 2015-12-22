@@ -35,13 +35,15 @@ public class MainActivity extends Activity {
     ShoppingListAdapter shoppingListAdapter;
     ListView shoppingListView;
 
+    public MainActivity(){
+    shoppingList = new ShoppingList("firstList");
+}
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         enterItemEditTxt = (EditText)findViewById(R.id.enterItemTxt);
 
-        shoppingList = new ShoppingList("firstList");
         shoppingList.add("aa");
         shoppingList.add("bb");
         shoppingListAdapter = new ShoppingListAdapter(this, shoppingList);
@@ -50,7 +52,6 @@ public class MainActivity extends Activity {
 
         setShoppingListOnItemClick();
         setShoppingListOnItemLongClick();
-
     }
 
     private void setShoppingListOnItemLongClick(){
