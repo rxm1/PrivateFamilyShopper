@@ -9,11 +9,13 @@ import android.content.DialogInterface;
 import android.media.Image;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.InputType;
 import android.view.ContextMenu;
 import android.view.MenuItem;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.EditText;
@@ -52,6 +54,7 @@ public class MainActivity extends Activity {
     }
 
     private void setShoppingListOnItemLongClick(){
+
         shoppingListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(final AdapterView<?> parent, final View v, final int position, final long id) {
@@ -72,6 +75,7 @@ public class MainActivity extends Activity {
                 return true;
             }
         });
+
     }
 
     private void setShoppingListItemDelete(int position){
@@ -89,10 +93,10 @@ public class MainActivity extends Activity {
                     return;
 
                 String newData = ((EditShoppingItemDialog) dialog).getNewData();
-                TextView textView = (TextView) v.findViewById(R.id.shoppingListItemTextView);
-                textView.setText(newData);
                 shoppingListItem.setShoppingListItem(newData);
                 shoppingList.setShoppingListItem(position, shoppingListItem);
+                //getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_UNCHANGED);
+                shoppingListAdapter.notifyDataSetChanged();
             }
         });
         cdd.show();
@@ -109,13 +113,14 @@ public class MainActivity extends Activity {
                 shoppingListAdapter.notifyDataSetChanged();
             }
         });
+
     }
 
 
     public void addBtnClick(View view){
         shoppingList.add(enterItemEditTxt.getText().toString());
         shoppingListAdapter.notifyDataSetChanged();
-        shoppingListView.setSelection(shoppingListAdapter.getCount()-1);
+        shoppingListView.setSelection(shoppingListAdapter.getCount() - 1);
         enterItemEditTxt.setText("");
     }
     public void addItemTextEntered(View view){
