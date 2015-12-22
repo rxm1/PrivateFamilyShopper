@@ -2,8 +2,11 @@ package com.meerkats.familyshopper;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -19,10 +22,12 @@ public class EditShoppingItemDialog extends Dialog implements
     private String newData;
     private String oldData;
     private boolean isCanceled = false;
+    private Activity activity;
 
     public EditShoppingItemDialog(Activity activity, String oldData) {
         super(activity);
         this.oldData = oldData;
+        this.activity = activity;
     }
 
     public String getNewData(){
@@ -43,8 +48,9 @@ public class EditShoppingItemDialog extends Dialog implements
         okBtn.setOnClickListener(this);
         cancelBtn.setOnClickListener(this);
         setCancelable(true);
-        setTitle(oldData);
+        setTitle("Edit: " + oldData);
         editText.setText(oldData);
+        this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
     }
 
     @Override

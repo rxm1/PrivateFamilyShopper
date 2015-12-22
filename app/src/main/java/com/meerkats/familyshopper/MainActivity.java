@@ -116,6 +116,7 @@ public class MainActivity extends Activity {
         shoppingList.add(enterItemEditTxt.getText().toString());
         shoppingListAdapter.notifyDataSetChanged();
         shoppingListView.setSelection(shoppingListAdapter.getCount()-1);
+        enterItemEditTxt.setText("");
     }
     public void addItemTextEntered(View view){
 
