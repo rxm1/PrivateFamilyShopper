@@ -73,19 +73,29 @@ public class MainActivity extends Activity {
             }
         });
     }
+
     private void setShoppingListItemDelete(int position){
         shoppingList.remove(position);
         shoppingListAdapter.notifyDataSetChanged();
     }
-    private void setShoppingListItemEdit(final AdapterView<?> parent, View v, final int position, long id){
-        shoppingList.setShoppingListItemIsEditing(position);
 
-        shoppingListAdapter.notifyDataSetChanged();
+    private void setShoppingListItemEdit(final AdapterView<?> parent, final View v, final int position, long id){
+        final ShoppingListItem shoppingListItem = shoppingList.getShoppingListItem(position);
+        EditShoppingItemDialog cdd=new EditShoppingItemDialog(MainActivity.this, shoppingListItem.getShoppingListItem());
+        cdd.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                if (((EditShoppingItemDialog) dialog).isCanceled())
+                    return;
 
-        final EditText editText = (EditText) v.findViewById(R.id.shoppingListItemEditText);
-        InputMethodManager imm = (InputMethodManager)
-                getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.showSoftInput(editText, InputMethodManager.SHOW_IMPLICIT);
+                String newData = ((EditShoppingItemDialog) dialog).getNewData();
+                TextView textView = (TextView) v.findViewById(R.id.shoppingListItemTextView);
+                textView.setText(newData);
+                shoppingListItem.setShoppingListItem(newData);
+                shoppingList.setShoppingListItem(position, shoppingListItem);
+            }
+        });
+        cdd.show();
     }
 
     private void setShoppingListOnItemClick(){
@@ -104,9 +114,8 @@ public class MainActivity extends Activity {
 
     public void addBtnClick(View view){
         shoppingList.add(enterItemEditTxt.getText().toString());
-        //Toast.makeText(this, ("second length " + shoppingList.size()), Toast.LENGTH_LONG).show();
-
         shoppingListAdapter.notifyDataSetChanged();
+        shoppingListView.setSelection(shoppingListAdapter.getCount()-1);
     }
     public void addItemTextEntered(View view){
 

@@ -38,10 +38,6 @@ public class ShoppingListAdapter extends ArrayAdapter<String> {
         ShoppingListItem shoppingListItem = shoppingList.getShoppingListItem(position);
         textView.setText(shoppingListItem.getShoppingListItem());
 
-        if(shoppingListItem.isSelectedForEdit()) {
-            setItemEdited(position, convertView, parent, textView, rowView, shoppingListItem);
-        }
-
         if(shoppingListItem.isCrossedOff()) {
             textView.setPaintFlags(textView.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
         }
@@ -53,58 +49,5 @@ public class ShoppingListAdapter extends ArrayAdapter<String> {
 
     }
 
-    public void setItemEdited(final int position, View convertView, ViewGroup parent, final TextView textView, View rowView, final ShoppingListItem shoppingListItem) {
-        final EditText editText = (EditText) rowView.findViewById(R.id.shoppingListItemEditText);
-        final ImageButton cancelButton = (ImageButton) rowView.findViewById(R.id.shoppingListItemCancelButton);
-        final ImageButton okButton = (ImageButton) rowView.findViewById(R.id.shoppingListItemOKButton);
 
-        editText.setText(shoppingListItem.getShoppingListItem());
-        setEditing(true, editText, textView, shoppingListItem, cancelButton, okButton);
-        editText.requestFocus();
-
-        editText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (!hasFocus) {
-                    //shoppingListItem.setSelectedForEdit(false);
-                    //setEditing(false, editText, textView, shoppingListItem, cancelButton, okButton);
-                    Toast.makeText(getContext(), "focus changed", Toast.LENGTH_SHORT).show();
-                }
-                else {
-                    //editText.input.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
-                }
-            }
-        });
-        okButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                Toast.makeText(getContext(), "ok button", Toast.LENGTH_SHORT).show();                textView.setText(editText.getText());
-                shoppingListItem.setShoppingListItem(editText.getText().toString());
-                shoppingList.setShoppingListItem(position, shoppingListItem);
-
-                setEditing(false, editText, textView, shoppingListItem, cancelButton, okButton);
-            }
-
-        });
-        cancelButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                Toast.makeText(getContext(), "cancel button", Toast.LENGTH_SHORT).show();
-                setEditing(false, editText, textView, shoppingListItem, cancelButton, okButton);
-            }
-
-        });
-    }
-
-    private void setEditing(boolean isEditing, final EditText editText, final TextView textView, final ShoppingListItem shoppingListItem, ImageButton cancelButton, ImageButton okButton) {
-        int textViewVisibility = View.VISIBLE;
-        int editingVisibility = View.GONE;
-        if (isEditing) {
-            textViewVisibility = View.GONE;
-            editingVisibility = View.VISIBLE;
-        }
-
-        shoppingListItem.setSelectedForEdit(isEditing);
-        textView.setVisibility(textViewVisibility);
-        editText.setVisibility(editingVisibility);
-        cancelButton.setVisibility(editingVisibility);
-        okButton.setVisibility(editingVisibility);
-    }
 }

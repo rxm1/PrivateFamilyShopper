@@ -13,29 +13,4 @@
         android:textStyle="normal"
         android:visibility="visible"
         />
-    <EditText
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:textSize="30dp"
-        android:textStyle="normal"
-        android:id="@+id/shoppingListItemEditText"
-        android:visibility="gone"
-        />
-    <ImageButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:src="@mipmap/ok"
-        android:id="@+id/shoppingListItemOKButton"
-        android:visibility="gone"
-        android:onClick="okItemEditClickButton"/>
-    <ImageButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:src="@mipmap/cancel"
-        android:id="@+id/shoppingListItemCancelButton"
-        android:visibility="gone"
-        android:onClick="cancelItemEditClickButton"/>
 </LinearLayout>
