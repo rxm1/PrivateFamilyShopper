@@ -5,6 +5,7 @@ import android.graphics.Paint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
@@ -35,6 +36,7 @@ public class ShoppingListAdapter extends ArrayAdapter<String> {
         View rowView = inflater.inflate(R.layout.shopping_list, parent, false);
         TextView textView = (TextView)rowView.findViewById(R.id.shoppingListItemTextView);
         ShoppingListItem shoppingListItem = shoppingList.getShoppingListItem(position);
+        textView.setText(shoppingListItem.getShoppingListItem());
 
         if(shoppingListItem.isSelectedForEdit()) {
             setItemEdited(position, convertView, parent, textView, rowView, shoppingListItem);
@@ -46,46 +48,63 @@ public class ShoppingListAdapter extends ArrayAdapter<String> {
         else {
             textView.setPaintFlags(textView.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
         }
-        textView.setText(shoppingList.get(position));
         //Toast.makeText(getContext(), "in Adapter getView" + position, Toast.LENGTH_SHORT).show();
         return rowView;
 
     }
 
-    public void setItemEdited(int position, View convertView, ViewGroup parent, final TextView textView, View rowView, final ShoppingListItem shoppingListItem) {
+    public void setItemEdited(final int position, View convertView, ViewGroup parent, final TextView textView, View rowView, final ShoppingListItem shoppingListItem) {
         final EditText editText = (EditText) rowView.findViewById(R.id.shoppingListItemEditText);
         final ImageButton cancelButton = (ImageButton) rowView.findViewById(R.id.shoppingListItemCancelButton);
         final ImageButton okButton = (ImageButton) rowView.findViewById(R.id.shoppingListItemOKButton);
 
         editText.setText(shoppingListItem.getShoppingListItem());
-        textView.setVisibility(View.GONE);
-        editText.setVisibility(View.VISIBLE);
-        cancelButton.setVisibility(View.VISIBLE);
-        okButton.setVisibility(View.VISIBLE);
+        setEditing(true, editText, textView, shoppingListItem, cancelButton, okButton);
         editText.requestFocus();
 
         editText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             public void onFocusChange(View v, boolean hasFocus) {
                 if (!hasFocus) {
-                    shoppingListItem.setSelectedForEdit(false);
+                    //shoppingListItem.setSelectedForEdit(false);
+                    //setEditing(false, editText, textView, shoppingListItem, cancelButton, okButton);
+                    Toast.makeText(getContext(), "focus changed", Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    //editText.input.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
                 }
             }
         });
         okButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                Toast.makeText(context, "ok adapter", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "ok button", Toast.LENGTH_SHORT).show();                textView.setText(editText.getText());
+                shoppingListItem.setShoppingListItem(editText.getText().toString());
+                shoppingList.setShoppingListItem(position, shoppingListItem);
+
+                setEditing(false, editText, textView, shoppingListItem, cancelButton, okButton);
             }
 
         });
         cancelButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                shoppingListItem.setSelectedForEdit(false);
-                textView.setVisibility(View.VISIBLE);
-                editText.setVisibility(View.GONE);
-                cancelButton.setVisibility(View.GONE);
-                okButton.setVisibility(View.GONE);
+                Toast.makeText(getContext(), "cancel button", Toast.LENGTH_SHORT).show();
+                setEditing(false, editText, textView, shoppingListItem, cancelButton, okButton);
             }
 
         });
+    }
+
+    private void setEditing(boolean isEditing, final EditText editText, final TextView textView, final ShoppingListItem shoppingListItem, ImageButton cancelButton, ImageButton okButton) {
+        int textViewVisibility = View.VISIBLE;
+        int editingVisibility = View.GONE;
+        if (isEditing) {
+            textViewVisibility = View.GONE;
+            editingVisibility = View.VISIBLE;
+        }
+
+        shoppingListItem.setSelectedForEdit(isEditing);
+        textView.setVisibility(textViewVisibility);
+        editText.setVisibility(editingVisibility);
+        cancelButton.setVisibility(editingVisibility);
+        okButton.setVisibility(editingVisibility);
     }
 }

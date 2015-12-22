@@ -79,7 +79,13 @@ public class MainActivity extends Activity {
     }
     private void setShoppingListItemEdit(final AdapterView<?> parent, View v, final int position, long id){
         shoppingList.setShoppingListItemIsEditing(position);
+
         shoppingListAdapter.notifyDataSetChanged();
+
+        final EditText editText = (EditText) v.findViewById(R.id.shoppingListItemEditText);
+        InputMethodManager imm = (InputMethodManager)
+                getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.showSoftInput(editText, InputMethodManager.SHOW_IMPLICIT);
     }
 
     private void setShoppingListOnItemClick(){
