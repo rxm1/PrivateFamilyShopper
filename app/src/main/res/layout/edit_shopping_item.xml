@@ -3,6 +3,9 @@
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
+    style="@style/DarkTheme"
+    android:background="@drawable/border"
+
     >
 
     <EditText
@@ -11,10 +14,12 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_weight="1"
+        android:textColor="@android:color/white"
         />
 
 
     <LinearLayout
+        style="@style/DarkTheme"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
@@ -30,6 +35,7 @@
             android:layout_gravity="top"/>
 
         <Button
+
             android:id="@+id/edit_shopping_item_cancel_btn"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"

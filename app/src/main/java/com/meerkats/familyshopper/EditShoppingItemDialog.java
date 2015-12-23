@@ -42,6 +42,7 @@ public class EditShoppingItemDialog extends Dialog implements
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.edit_shopping_item);
+
         editText = (EditText)findViewById(R.id.edit_shopping_item_edit_text);
         okBtn = (Button) findViewById(R.id.edit_shopping_item_ok_btn);
         cancelBtn = (Button) findViewById(R.id.edit_shopping_item_cancel_btn);
