@@ -38,4 +38,10 @@ public class ShoppingList extends ArrayList<String>{
         shoppingListItems.set(index, shoppingListItem);
         this.set(index, shoppingListItem.toString());
     }
+
+    @Override
+    public void clear(){
+        super.clear();
+        shoppingListItems.clear();
+    }
 }

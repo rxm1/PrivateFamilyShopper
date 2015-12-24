@@ -1,35 +1,23 @@
 package com.meerkats.familyshopper;
 
-import android.app.ActionBar;
-import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 
-import android.media.Image;
 import android.os.Bundle;
-import android.os.Handler;
-import android.text.InputType;
-import android.view.ContextMenu;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.Menu;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.Window;
-import android.view.WindowManager;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.EditText;
-import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.meerkats.familyshopper.model.ShoppingList;
 import com.meerkats.familyshopper.model.ShoppingListItem;
 
-public class MainActivity extends Activity {
+public class MainActivity extends AppCompatActivity {
 
     EditText enterItemEditTxt;
     ShoppingList shoppingList;
@@ -43,6 +31,10 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Toolbar myToolbar = (Toolbar) findViewById(R.id.family_shopper_toolbar);
+        setSupportActionBar(myToolbar);
+        myToolbar.setLogo(R.mipmap.ic_launcher);
+
         enterItemEditTxt = (EditText)findViewById(R.id.enterItemTxt);
 
         shoppingList.add("aa");
@@ -55,6 +47,35 @@ public class MainActivity extends Activity {
         setShoppingListOnItemLongClick();
 
         //requestWindowFeature(Window.FEATURE_NO_TITLE);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        super.onCreateOptionsMenu(menu);
+        MenuInflater mi = getMenuInflater();
+        mi.inflate(R.menu.shopping_list_action_items, menu);
+        return true;
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.sync:
+                // User chose the "Settings" item, show the app settings UI...
+                return true;
+
+            case R.id.clear_list:
+                shoppingList.clear();
+                shoppingListAdapter.notifyDataSetChanged();
+                // User chose the "Favorite" action, mark the current item
+                // as a favorite...
+                return true;
+
+            default:
+                // If we got here, the user's action was not recognized.
+                // Invoke the superclass to handle it.
+                return super.onOptionsItemSelected(item);
+
+        }
     }
 
     private void setShoppingListOnItemLongClick(){
@@ -122,7 +143,8 @@ public class MainActivity extends Activity {
 
 
     public void addBtnClick(View view){
-        shoppingList.add(enterItemEditTxt.getText().toString());
+        if (enterItemEditTxt.getText().toString().trim().length() > 0)
+        shoppingList.add(enterItemEditTxt.getText().toString().trim());
         shoppingListAdapter.notifyDataSetChanged();
         shoppingListView.setSelection(shoppingListAdapter.getCount() - 1);
         enterItemEditTxt.setText("");
