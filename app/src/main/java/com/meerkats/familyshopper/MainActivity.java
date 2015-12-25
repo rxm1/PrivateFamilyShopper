@@ -120,8 +120,9 @@ public class MainActivity extends AppCompatActivity {
                 String newData = ((EditShoppingItemDialog) dialog).getNewData();
                 shoppingListItem.setShoppingListItem(newData);
                 shoppingList.setShoppingListItem(position, shoppingListItem);
-                //getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_UNCHANGED);
+
                 shoppingListAdapter.notifyDataSetChanged();
+                shoppingListView.setSelection(position);
             }
         });
         cdd.show();
