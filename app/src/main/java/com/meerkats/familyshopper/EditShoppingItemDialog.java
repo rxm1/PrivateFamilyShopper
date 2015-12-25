@@ -70,7 +70,6 @@ public class EditShoppingItemDialog extends Dialog implements
                 break;
             case R.id.edit_shopping_item_cancel_btn:
             default:
-                isCanceled = true;
                 cancel();
                 break;
         }
