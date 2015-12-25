@@ -3,7 +3,9 @@ package com.meerkats.familyshopper;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
@@ -14,15 +16,15 @@ import android.widget.TextView;
 /**
  * Created by Rez on 21/12/2015.
  */
-public class EditShoppingItemDialog extends Dialog implements
+public class EditShoppingItemDialog extends AlertDialog implements
         android.view.View.OnClickListener {
 
     private Button okBtn, cancelBtn;
     private EditText editText;
     private String newData;
-    private String oldData;
+    public String oldData;
     private boolean isCanceled = false;
-    private Activity activity;
+    public Activity activity;
 
     public EditShoppingItemDialog(Activity activity, String oldData) {
         super(activity);
@@ -49,9 +51,11 @@ public class EditShoppingItemDialog extends Dialog implements
         okBtn.setOnClickListener(this);
         cancelBtn.setOnClickListener(this);
         setCancelable(true);
+
         setTitle("Edit: " + oldData);
         editText.setText(oldData);
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+
     }
 
     @Override

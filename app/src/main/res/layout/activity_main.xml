@@ -6,6 +6,7 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity"
     android:orientation="vertical"
+
     >
     <android.support.v7.widget.Toolbar
         android:id="@+id/family_shopper_toolbar"
@@ -24,6 +25,8 @@
         android:layout_height="0dp"
         android:layout_weight="1"
         android:fadeScrollbars="false"
+        android:scrollbarSize="2dp"
+        android:scrollbarThumbVertical="@android:color/white"
         android:background="@android:color/background_dark"
         android:divider="#4d4d4d"
         android:dividerHeight="1dp"

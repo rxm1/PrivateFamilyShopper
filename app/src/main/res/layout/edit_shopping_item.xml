@@ -3,7 +3,7 @@
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    style="@style/DarkTheme"
+    style="@android:style/Theme.Dialog"
     android:background="@drawable/border"
 
     >

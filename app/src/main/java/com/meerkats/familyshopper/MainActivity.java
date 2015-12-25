@@ -3,9 +3,12 @@ package com.meerkats.familyshopper;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+
 import android.support.v7.widget.Toolbar;
+import android.view.ContextThemeWrapper;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.Menu;
@@ -46,7 +49,6 @@ public class MainActivity extends AppCompatActivity {
         setShoppingListOnItemClick();
         setShoppingListOnItemLongClick();
 
-        //requestWindowFeature(Window.FEATURE_NO_TITLE);
     }
 
     @Override
@@ -60,19 +62,14 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.sync:
-                // User chose the "Settings" item, show the app settings UI...
                 return true;
 
             case R.id.clear_list:
                 shoppingList.clear();
                 shoppingListAdapter.notifyDataSetChanged();
-                // User chose the "Favorite" action, mark the current item
-                // as a favorite...
                 return true;
 
             default:
-                // If we got here, the user's action was not recognized.
-                // Invoke the superclass to handle it.
                 return super.onOptionsItemSelected(item);
 
         }
@@ -83,15 +80,17 @@ public class MainActivity extends AppCompatActivity {
         shoppingListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(final AdapterView<?> parent, final View v, final int position, final long id) {
-                new AlertDialog.Builder(MainActivity.this)
-                        .setTitle(shoppingList.get(position)).setCancelable(true).setItems(R.array.shoppingListContextMenuValues,
+                AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(MainActivity.this, R.style.ListContextMenu));
+                builder.setTitle(shoppingList.get(position)).setCancelable(true).setItems(R.array.shoppingListContextMenuValues,
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialoginterface, int index) {
                                 switch (index) {
                                     case 0:
                                         setShoppingListItemDelete(position);
+                                        break;
                                     case 1:
                                         setShoppingListItemEdit(parent, v, position, id);
+                                        break;
                                 }
                             }
                         }
@@ -110,7 +109,9 @@ public class MainActivity extends AppCompatActivity {
 
     private void setShoppingListItemEdit(final AdapterView<?> parent, final View v, final int position, long id){
         final ShoppingListItem shoppingListItem = shoppingList.getShoppingListItem(position);
+        //EditShoppingItemDialog.Builder builder = new EditShoppingItemDialog.Builder(new ContextThemeWrapper(MainActivity.this, R.style.ListContextMenu));
         EditShoppingItemDialog cdd=new EditShoppingItemDialog(MainActivity.this, shoppingListItem.getShoppingListItem());
+
         cdd.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialog) {
@@ -140,7 +141,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
     }
-
 
     public void addBtnClick(View view){
         if (enterItemEditTxt.getText().toString().trim().length() > 0)

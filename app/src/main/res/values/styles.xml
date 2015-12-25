@@ -7,4 +7,7 @@
     <style name="DarkTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="android:textSize">27dp</item>
     </style>
+    <style name="ListContextMenu" parent="@android:style/Theme.Dialog">
+        <item name="android:divider">@android:color/background_dark</item>
+    </style>
 </resources>
