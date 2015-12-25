@@ -16,20 +16,21 @@ import android.widget.TextView;
 /**
  * Created by Rez on 21/12/2015.
  */
-public class EditShoppingItemDialog extends AlertDialog implements
+public class EditShoppingItemDialog extends Dialog implements
         android.view.View.OnClickListener {
 
     private Button okBtn, cancelBtn;
     private EditText editText;
     private String newData;
     public String oldData;
-    private boolean isCanceled = false;
+    private boolean isCanceled = true;
     public Activity activity;
 
     public EditShoppingItemDialog(Activity activity, String oldData) {
-        super(activity);
+        super(activity, R.style.ListContextMenu);
         this.oldData = oldData;
         this.activity = activity;
+        setCancelable(true);
     }
 
     public String getNewData(){
@@ -54,7 +55,8 @@ public class EditShoppingItemDialog extends AlertDialog implements
 
         setTitle("Edit: " + oldData);
         editText.setText(oldData);
-        this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+        editText.requestFocus();
+        //this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
 
     }
 
@@ -63,6 +65,7 @@ public class EditShoppingItemDialog extends AlertDialog implements
         newData = editText.getText().toString();
         switch (v.getId()) {
             case R.id.edit_shopping_item_ok_btn:
+                isCanceled = false;
                 dismiss();
                 break;
             case R.id.edit_shopping_item_cancel_btn:

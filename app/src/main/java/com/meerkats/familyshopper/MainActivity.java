@@ -109,7 +109,6 @@ public class MainActivity extends AppCompatActivity {
 
     private void setShoppingListItemEdit(final AdapterView<?> parent, final View v, final int position, long id){
         final ShoppingListItem shoppingListItem = shoppingList.getShoppingListItem(position);
-        //EditShoppingItemDialog.Builder builder = new EditShoppingItemDialog.Builder(new ContextThemeWrapper(MainActivity.this, R.style.ListContextMenu));
         EditShoppingItemDialog cdd=new EditShoppingItemDialog(MainActivity.this, shoppingListItem.getShoppingListItem());
 
         cdd.setOnDismissListener(new DialogInterface.OnDismissListener() {

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="fill_parent"
     android:orientation="vertical"
     style="@android:style/Theme.Dialog"
     android:background="@drawable/border"
@@ -11,34 +11,34 @@
     <EditText
         android:id="@+id/edit_shopping_item_edit_text"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="fill_parent"
         android:layout_gravity="center"
         android:layout_weight="1"
-        android:textColor="@android:color/white"
         />
 
 
     <LinearLayout
         style="@style/DarkTheme"
-        android:layout_width="fill_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
+        android:layout_weight="0"
         android:orientation="horizontal" >
 
         <Button
             android:id="@+id/edit_shopping_item_ok_btn"
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="fill_parent"
             android:clickable="true"
             android:text="OK"
             android:layout_weight="1"
-            android:layout_gravity="top"/>
+            android:layout_gravity="bottom"/>
 
         <Button
 
             android:id="@+id/edit_shopping_item_cancel_btn"
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="fill_parent"
             android:clickable="true"
             android:text="Cancel"
             android:layout_weight="1"
