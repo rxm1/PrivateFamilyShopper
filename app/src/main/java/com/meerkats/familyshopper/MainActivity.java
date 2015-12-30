@@ -80,8 +80,11 @@ public class MainActivity extends AppCompatActivity {
         shoppingListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(final AdapterView<?> parent, final View v, final int position, final long id) {
+                int itemsID = ((int) R.array.shoppingListContextMenuValues);
+                if(shoppingList.getShoppingListItem(position).isCrossedOff())
+                    itemsID = ((int) R.array.shoppingListContextMenuValuesDeleteOnly);
                 AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(MainActivity.this, R.style.ListContextMenu));
-                builder.setTitle(shoppingList.get(position)).setCancelable(true).setItems(R.array.shoppingListContextMenuValues,
+                builder.setTitle(shoppingList.get(position)).setCancelable(true).setItems(itemsID,
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialoginterface, int index) {
                                 switch (index) {
@@ -94,8 +97,7 @@ public class MainActivity extends AppCompatActivity {
                                 }
                             }
                         }
-                )
-                        .show();
+                ).show();
                 return true;
             }
         });

@@ -30,6 +30,8 @@
         android:background="@android:color/background_dark"
         android:divider="#4d4d4d"
         android:dividerHeight="1dp"
+        android:listSelector="#282828"
+        android:cacheColorHint="#282828"
         >
 
     </ListView>
@@ -38,7 +40,9 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-android:background="@drawable/border"
+        android:background="@drawable/border"
+        android:listSelector="@android:color/white"
+        android:cacheColorHint="@android:color/white"
         >
         <EditText
             android:layout_width="0dp"
