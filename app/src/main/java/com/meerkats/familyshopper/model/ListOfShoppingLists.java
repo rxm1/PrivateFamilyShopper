@@ -1,5 +1,7 @@
 package com.meerkats.familyshopper.model;
 
+import android.content.Context;
+
 import java.util.ArrayList;
 
 /**
@@ -7,6 +9,7 @@ import java.util.ArrayList;
  */
 public class ListOfShoppingLists {
     private ArrayList<ShoppingList> shoppingList;
+    private Context context;
 
     public ListOfShoppingLists(){
         shoppingList = new ArrayList<ShoppingList>();

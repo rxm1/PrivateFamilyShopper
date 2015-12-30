@@ -28,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
     ListView shoppingListView;
 
     public MainActivity(){
-    shoppingList = new ShoppingList("firstList");
+    shoppingList = new ShoppingList("firstList", this);
 }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,8 +40,7 @@ public class MainActivity extends AppCompatActivity {
 
         enterItemEditTxt = (EditText)findViewById(R.id.enterItemTxt);
 
-        shoppingList.add("aa");
-        shoppingList.add("bb");
+        shoppingList.getSavedShoppingList();
         shoppingListAdapter = new ShoppingListAdapter(this, shoppingList);
         shoppingListView = (ListView)findViewById(R.id.shoppingListView);
         shoppingListView.setAdapter(shoppingListAdapter);
@@ -62,6 +61,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.sync:
+                shoppingList.getSavedShoppingList();
                 return true;
 
             case R.id.clear_list:
@@ -133,9 +133,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
 
-                ShoppingListItem shoppingListItem = shoppingList.getShoppingListItem(position);
-                shoppingListItem.setIsCrossedOff(!shoppingListItem.isCrossedOff());
-                shoppingList.setShoppingListItem(position, shoppingListItem);
+                shoppingList.setItemCrossedOff(position);
                 shoppingListAdapter.notifyDataSetChanged();
             }
         });

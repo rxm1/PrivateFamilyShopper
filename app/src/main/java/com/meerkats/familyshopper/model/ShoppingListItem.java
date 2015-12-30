@@ -18,12 +18,13 @@ public class ShoppingListItem {
 
     @Override
     public String toString(){
-        return shoppingListItem;
+        return
+                "ShoppingListItem [shopping_list_item=" + shoppingListItem + ", "
+        + "is_crossed_off=" + isCrossedOff + "]";
     }
 
     public String getShoppingListItem() { return shoppingListItem; }
     public void setShoppingListItem(String shoppingListItem) { this.shoppingListItem = shoppingListItem; }
-
     public boolean isCrossedOff() { return isCrossedOff; }
     public void setIsCrossedOff(boolean isCrossedOff) {
         this.isCrossedOff = isCrossedOff;
