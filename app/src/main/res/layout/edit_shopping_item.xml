@@ -11,7 +11,7 @@
     <EditText
         android:id="@+id/edit_shopping_item_edit_text"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
+        android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_weight="1"
         />
