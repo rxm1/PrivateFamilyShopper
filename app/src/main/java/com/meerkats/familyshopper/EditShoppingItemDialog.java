@@ -56,7 +56,7 @@ public class EditShoppingItemDialog extends Dialog implements
         setTitle("Edit: " + oldData);
         editText.setText(oldData);
         editText.requestFocus();
-        //this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+        this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
 
     }
 
