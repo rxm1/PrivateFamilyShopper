@@ -19,8 +19,6 @@ import java.util.ArrayList;
  * Created by Rez on 17/12/2015.
  */
 public class ShoppingList extends ArrayList<String>{
-    private Context context;
-    private String localMasterFileName = "localShoppingListMasterFile.json";
     Gson gson = new Gson();
     Type gsonType = new TypeToken<InnerShoppingList>() {}.getType();
     Firebase myFirebaseRef;
@@ -28,15 +26,7 @@ public class ShoppingList extends ArrayList<String>{
     private InnerShoppingList innerShoppingList;
 
     public ShoppingList(String name){
-        init(name, null, null);
-    }
-    public ShoppingList(String name, Context context, Firebase myFirebaseRef){
-        init(name, context, myFirebaseRef);
-    }
-    private void init(String name, Context context, Firebase myFirebaseRef){
         innerShoppingList = new InnerShoppingList(name);
-        this.context = context;
-        this.myFirebaseRef = myFirebaseRef;
     }
 
     public String getShoppingListName() {
@@ -47,50 +37,27 @@ public class ShoppingList extends ArrayList<String>{
     public boolean add(String item){
         super.add(item);
         innerShoppingList.add(new ShoppingListItem(item));
-        saveShoppingListToFile();
         return true;
     }
     @Override
     public String remove(int position){
         String item = super.remove(position);
         innerShoppingList.remove(position);
-        saveShoppingListToFile();
         return item;
     }
     @Override
     public void clear(){
         super.clear();
         innerShoppingList.clear();
-        saveShoppingListToFile();
     }
 
     public void setItemCrossedOff(int position){
         ShoppingListItem shoppingListItem = innerShoppingList.getShoppingListItems().get(position);
         shoppingListItem.setIsCrossedOff(!shoppingListItem.isCrossedOff());
         innerShoppingList.setShoppingListItem(position, shoppingListItem);
-        saveShoppingListToFile();
     }
 
 
-    public void loadShoppingListFromFile(){
-        File file = new File(context.getFilesDir(), localMasterFileName);
-        StringBuilder text = new StringBuilder();
-        try {
-            BufferedReader br = new BufferedReader(new FileReader(file));
-            String line;
-
-            while ((line = br.readLine()) != null) {
-                text.append(line);
-                text.append('\n');
-            }
-            br.close();
-            loadShoppingList(text.toString());
-
-        }
-        catch (IOException e) {
-            Log.e("Exception", "File read failed: " + e.toString());
-        }
-    }
     public void loadShoppingList(String newGson){
         super.clear();
         innerShoppingList = gson.fromJson(newGson, gsonType);
@@ -102,22 +69,6 @@ public class ShoppingList extends ArrayList<String>{
         return gson.toJson(innerShoppingList, gsonType);
     }
 
-    public void saveShoppingListToFile(){
-        saveShoppingListToFile(getJson());
-    }
-    public void saveShoppingListToFile(String jsonData){
-        try {
-            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(
-                    context.openFileOutput(localMasterFileName, Context.MODE_PRIVATE));
-            outputStreamWriter.write(jsonData);
-            outputStreamWriter.close();
-            myFirebaseRef.child("masterList").setValue(jsonData);
-        }
-        catch (IOException e) {
-            Log.e("Exception", "File write failed: " + e.toString());
-        }
-
-    }
 
     public ShoppingListItem getShoppingListItem(int index){
         return innerShoppingList.shoppingListItems.get(index);
@@ -129,7 +80,6 @@ public class ShoppingList extends ArrayList<String>{
     public void setShoppingListItemEdit(ShoppingListItem shoppingListItem, int position){
         innerShoppingList.shoppingListItems.set(position, shoppingListItem);
         this.set(position, shoppingListItem.toString());
-        saveShoppingListToFile();
     }
 
     private class InnerShoppingList

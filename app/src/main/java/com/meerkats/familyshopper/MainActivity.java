@@ -67,11 +67,10 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.sync:
-                shoppingList.loadShoppingListFromFile();
+
                 return true;
             case R.id.clear_list:
-                shoppingList.clear();
-                shoppingListAdapter.notifyDataSetChanged();
+                mainController.clearShoppingList();
                 return true;
             case R.id.connect:
                 return true;
