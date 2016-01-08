@@ -89,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
                 if (shoppingList.getShoppingListItem(position).isCrossedOff())
                     itemsID = ((int) R.array.shoppingListContextMenuValuesDeleteOnly);
                 AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(MainActivity.this, R.style.ListContextMenu));
-                builder.setTitle(shoppingList.get(position)).setCancelable(true).setItems(itemsID,
+                builder.setTitle(shoppingList.getShoppingListItem(position).getShoppingListItem()).setCancelable(true).setItems(itemsID,
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialoginterface, int index) {
                                 switch (index) {
