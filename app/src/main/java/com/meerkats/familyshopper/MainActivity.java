@@ -16,7 +16,12 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Toast;
 
+import com.firebase.client.DataSnapshot;
+import com.firebase.client.Firebase;
+import com.firebase.client.FirebaseError;
+import com.firebase.client.ValueEventListener;
 import com.meerkats.familyshopper.model.ShoppingList;
 import com.meerkats.familyshopper.model.ShoppingListItem;
 
@@ -26,13 +31,19 @@ public class MainActivity extends AppCompatActivity {
     ShoppingList shoppingList;
     ShoppingListAdapter shoppingListAdapter;
     ListView shoppingListView;
+    Firebase myFirebaseRef;
+    DataComparer dataComparer = new DataComparer(this);
 
-    public MainActivity(){
-    shoppingList = new ShoppingList("firstList", this);
-}
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Firebase.setAndroidContext(this);
+        myFirebaseRef = new Firebase("https://familyshopper.firebaseio.com/");
+
+
+
+        shoppingList = new ShoppingList("firstList", this, myFirebaseRef);
         setContentView(R.layout.activity_main);
         Toolbar myToolbar = (Toolbar) findViewById(R.id.family_shopper_toolbar);
         setSupportActionBar(myToolbar);
@@ -44,6 +55,18 @@ public class MainActivity extends AppCompatActivity {
         shoppingListAdapter = new ShoppingListAdapter(this, shoppingList);
         shoppingListView = (ListView)findViewById(R.id.shoppingListView);
         shoppingListView.setAdapter(shoppingListAdapter);
+
+        myFirebaseRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                dataComparer.dataChanged(snapshot, shoppingList, shoppingListAdapter);
+            }
+
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+                System.out.println("The read failed: " + firebaseError.getMessage());
+            }
+        });
 
         setShoppingListOnItemClick();
         setShoppingListOnItemLongClick();
@@ -63,12 +86,12 @@ public class MainActivity extends AppCompatActivity {
             case R.id.sync:
                 shoppingList.getSavedShoppingList();
                 return true;
-
             case R.id.clear_list:
                 shoppingList.clear();
                 shoppingListAdapter.notifyDataSetChanged();
                 return true;
-
+            case R.id.connect:
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
 

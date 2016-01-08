@@ -40,15 +40,16 @@ public class ShoppingListAdapter extends ArrayAdapter<String> {
         ShoppingListItem shoppingListItem = shoppingList.getShoppingListItem(position);
         textView.setText(shoppingListItem.getShoppingListItem());
 
-        if(shoppingListItem.isCrossedOff()) {
-            textView.setPaintFlags(textView.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG );
+        if (shoppingListItem.isCrossedOff()) {
+            textView.setPaintFlags(textView.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
             textView.setTextColor(textView.getTextColors().withAlpha(50));
-        }
-        else {
+        } else {
             //textView.setPaintFlags(textView.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
         }
+
         //Toast.makeText(getContext(), "in Adapter getView" + position, Toast.LENGTH_SHORT).show();
         return rowView;
+
 
     }
 
