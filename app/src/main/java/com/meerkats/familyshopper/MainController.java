@@ -51,7 +51,7 @@ public class MainController {
                 String newData = ((HashMap<String,String>)snapshot.getValue()).get("masterList");
                 if(dataComparer.hasDataChanged(newData, shoppingList)){
                     saveShoppingListToStorage(newData);
-                    loadShoppingListFromStorage();
+                    shoppingList.loadShoppingList(newData);
                     shoppingListAdapter.notifyDataSetChanged();
                 }
             }
