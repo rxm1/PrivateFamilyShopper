@@ -21,7 +21,6 @@ import java.util.ArrayList;
 public class ShoppingList extends ArrayList<String>{
     Gson gson = new Gson();
     Type gsonType = new TypeToken<InnerShoppingList>() {}.getType();
-    Firebase myFirebaseRef;
 
     private InnerShoppingList innerShoppingList;
 
@@ -72,9 +71,6 @@ public class ShoppingList extends ArrayList<String>{
 
     public ShoppingListItem getShoppingListItem(int index){
         return innerShoppingList.shoppingListItems.get(index);
-    }
-    private void setShoppingListItem(int index, ShoppingListItem shoppingListItem){
-
     }
 
     public void setShoppingListItemEdit(ShoppingListItem shoppingListItem, int position){
