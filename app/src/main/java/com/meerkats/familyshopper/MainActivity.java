@@ -3,7 +3,6 @@ package com.meerkats.familyshopper;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 
-import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
@@ -31,46 +30,30 @@ public class MainActivity extends AppCompatActivity {
     ShoppingList shoppingList;
     ShoppingListAdapter shoppingListAdapter;
     ListView shoppingListView;
-    Firebase myFirebaseRef;
-    DataComparer dataComparer = new DataComparer(this);
+    MainController mainController;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Firebase.setAndroidContext(this);
-        myFirebaseRef = new Firebase("https://familyshopper.firebaseio.com/");
-
-
-
-        shoppingList = new ShoppingList("firstList", this, myFirebaseRef);
         setContentView(R.layout.activity_main);
+
+        mainController = new MainController(this);
+        shoppingList = mainController.getShoppingList();
+        shoppingListAdapter = new ShoppingListAdapter(this, shoppingList);
+        mainController.setShoppingListAdapter(shoppingListAdapter);
+        mainController.init();
+
         Toolbar myToolbar = (Toolbar) findViewById(R.id.family_shopper_toolbar);
         setSupportActionBar(myToolbar);
         myToolbar.setLogo(R.mipmap.ic_launcher);
 
         enterItemEditTxt = (EditText)findViewById(R.id.enterItemTxt);
-
-        shoppingList.getSavedShoppingList();
-        shoppingListAdapter = new ShoppingListAdapter(this, shoppingList);
         shoppingListView = (ListView)findViewById(R.id.shoppingListView);
         shoppingListView.setAdapter(shoppingListAdapter);
 
-        myFirebaseRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot snapshot) {
-                dataComparer.dataChanged(snapshot, shoppingList, shoppingListAdapter);
-            }
-
-            @Override
-            public void onCancelled(FirebaseError firebaseError) {
-                System.out.println("The read failed: " + firebaseError.getMessage());
-            }
-        });
-
         setShoppingListOnItemClick();
         setShoppingListOnItemLongClick();
-
     }
 
     @Override
@@ -84,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.sync:
-                shoppingList.getSavedShoppingList();
+                shoppingList.loadShoppingListFromFile();
                 return true;
             case R.id.clear_list:
                 shoppingList.clear();
@@ -104,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean onItemLongClick(final AdapterView<?> parent, final View v, final int position, final long id) {
                 int itemsID = ((int) R.array.shoppingListContextMenuValues);
-                if(shoppingList.getShoppingListItem(position).isCrossedOff())
+                if (shoppingList.getShoppingListItem(position).isCrossedOff())
                     itemsID = ((int) R.array.shoppingListContextMenuValuesDeleteOnly);
                 AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(MainActivity.this, R.style.ListContextMenu));
                 builder.setTitle(shoppingList.get(position)).setCancelable(true).setItems(itemsID,
@@ -112,10 +95,12 @@ public class MainActivity extends AppCompatActivity {
                             public void onClick(DialogInterface dialoginterface, int index) {
                                 switch (index) {
                                     case 0:
-                                        setShoppingListItemDelete(position);
+                                        mainController.setShoppingListItemDelete(position);
+
                                         break;
                                     case 1:
-                                        setShoppingListItemEdit(parent, v, position, id);
+                                        mainController.setShoppingListItemEdit(parent, v, position, id, MainActivity.this);
+                                        shoppingListView.setSelection(position);
                                         break;
                                 }
                             }
@@ -127,53 +112,20 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void setShoppingListItemDelete(int position){
-        shoppingList.remove(position);
-        shoppingListAdapter.notifyDataSetChanged();
-    }
-
-    private void setShoppingListItemEdit(final AdapterView<?> parent, final View v, final int position, long id){
-        final ShoppingListItem shoppingListItem = shoppingList.getShoppingListItem(position);
-        EditShoppingItemDialog cdd=new EditShoppingItemDialog(MainActivity.this, shoppingListItem.getShoppingListItem());
-
-        cdd.setOnDismissListener(new DialogInterface.OnDismissListener() {
-            @Override
-            public void onDismiss(DialogInterface dialog) {
-                if (((EditShoppingItemDialog) dialog).isCanceled())
-                    return;
-
-                String newData = ((EditShoppingItemDialog) dialog).getNewData();
-                shoppingListItem.setShoppingListItem(newData);
-                shoppingList.setShoppingListItem(position, shoppingListItem);
-
-                shoppingListAdapter.notifyDataSetChanged();
-                shoppingListView.setSelection(position);
-            }
-        });
-        cdd.show();
-    }
-
     private void setShoppingListOnItemClick(){
         shoppingListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-
-                shoppingList.setItemCrossedOff(position);
-                shoppingListAdapter.notifyDataSetChanged();
+                mainController.setShoppingItemCrossedOff(position);
             }
         });
-
     }
 
     public void addBtnClick(View view){
         if (enterItemEditTxt.getText().toString().trim().length() > 0)
-        shoppingList.add(enterItemEditTxt.getText().toString().trim());
-        shoppingListAdapter.notifyDataSetChanged();
+            mainController.addItemToShoppingList(enterItemEditTxt.getText().toString().trim());
         shoppingListView.setSelection(shoppingListAdapter.getCount() - 1);
         enterItemEditTxt.setText("");
-    }
-    public void addItemTextEntered(View view){
-
     }
 
 

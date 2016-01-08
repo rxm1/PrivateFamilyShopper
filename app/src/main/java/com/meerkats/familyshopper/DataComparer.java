@@ -24,8 +24,9 @@ public class DataComparer {
         String oldData = shoppingList.getJson();
         if(oldData.compareTo(newData) != 0) {
             shoppingList.saveShoppingListToFile(newData);
-            shoppingList.getSavedShoppingList();
-            shoppingListAdapter.notifyDataSetChanged();
+            shoppingList.loadShoppingListFromFile();
+            if(shoppingListAdapter != null)
+                shoppingListAdapter.notifyDataSetChanged();
         }
     }
 }

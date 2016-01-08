@@ -72,7 +72,7 @@ public class ShoppingList extends ArrayList<String>{
     }
 
 
-    public void getSavedShoppingList(){
+    public void loadShoppingListFromFile(){
         File file = new File(context.getFilesDir(), localMasterFileName);
         StringBuilder text = new StringBuilder();
         try {
@@ -84,14 +84,14 @@ public class ShoppingList extends ArrayList<String>{
                 text.append('\n');
             }
             br.close();
-            setShoppingList(text.toString());
+            loadShoppingList(text.toString());
 
         }
         catch (IOException e) {
             Log.e("Exception", "File read failed: " + e.toString());
         }
     }
-    public void setShoppingList(String newGson){
+    public void loadShoppingList(String newGson){
         super.clear();
         innerShoppingList = gson.fromJson(newGson, gsonType);
         for (int i = 0; i < innerShoppingList.shoppingListItems.size(); i++){
@@ -122,9 +122,14 @@ public class ShoppingList extends ArrayList<String>{
     public ShoppingListItem getShoppingListItem(int index){
         return innerShoppingList.shoppingListItems.get(index);
     }
-    public void setShoppingListItem(int index, ShoppingListItem shoppingListItem){
-        innerShoppingList.shoppingListItems.set(index, shoppingListItem);
-        this.set(index, shoppingListItem.toString());
+    private void setShoppingListItem(int index, ShoppingListItem shoppingListItem){
+
+    }
+
+    public void setShoppingListItemEdit(ShoppingListItem shoppingListItem, int position){
+        innerShoppingList.shoppingListItems.set(position, shoppingListItem);
+        this.set(position, shoppingListItem.toString());
+        saveShoppingListToFile();
     }
 
     private class InnerShoppingList
