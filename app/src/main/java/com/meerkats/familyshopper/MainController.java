@@ -45,6 +45,11 @@ public class MainController {
 
     }
 
+    public void init(){
+        loadShoppingListFromStorage();
+        instanciateFirebase();
+    }
+
     private void instanciateFirebase() {
         try {
             SharedPreferences settings = activity.getPreferences(Context.MODE_PRIVATE);
@@ -70,11 +75,6 @@ public class MainController {
             Toast.makeText(activity.getApplicationContext(), "Firebase not connected.", Toast.LENGTH_SHORT).show();
         }
     }
-    public void init(){
-        loadShoppingListFromStorage();
-        instanciateFirebase();
-    }
-
     private void addFirebaseListeners(){
         if(myFirebaseRef != null) {
             firebaseListeners = myFirebaseRef.addValueEventListener(new ValueEventListener() {
@@ -95,9 +95,8 @@ public class MainController {
             });
         }
     }
-
     private void removeFirebaseListeners() {
-        if (myFirebaseRef != null) {
+        if (myFirebaseRef != null && firebaseListeners != null) {
             myFirebaseRef.removeEventListener(firebaseListeners);
         }
     }
@@ -107,7 +106,6 @@ public class MainController {
         saveShoppingListToStorage();
         shoppingListAdapter.notifyDataSetChanged();
     }
-
     public void editShoppingListItem(final AdapterView<?> parent, final View v, final int position, long id, Activity activity){
         final ShoppingListItem shoppingListItem = shoppingList.getShoppingListItem(position);
         EditShoppingItemDialog cdd=new EditShoppingItemDialog(activity, shoppingListItem.getShoppingListItem());
@@ -128,15 +126,18 @@ public class MainController {
         });
         cdd.show();
     }
-
     public void crossOffShoppingItem(int position){
         shoppingList.setItemCrossedOff(position);
         saveShoppingListToStorage();
         shoppingListAdapter.notifyDataSetChanged();
     }
-
     public void addItemToShoppingList(String item){
         shoppingList.add(item);
+        saveShoppingListToStorage();
+        shoppingListAdapter.notifyDataSetChanged();
+    }
+    public void clearShoppingList(){
+        shoppingList.clear();
         saveShoppingListToStorage();
         shoppingListAdapter.notifyDataSetChanged();
     }
@@ -180,12 +181,6 @@ public class MainController {
         catch (IOException e) {
             Log.e("Exception", "File read failed: " + e.toString());
         }
-    }
-
-    public void clearShoppingList(){
-        shoppingList.clear();
-        saveShoppingListToStorage();
-        shoppingListAdapter.notifyDataSetChanged();
     }
 
     public void sync(boolean fromConnect){
