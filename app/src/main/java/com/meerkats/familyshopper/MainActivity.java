@@ -15,14 +15,8 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.Toast;
 
-import com.firebase.client.DataSnapshot;
-import com.firebase.client.Firebase;
-import com.firebase.client.FirebaseError;
-import com.firebase.client.ValueEventListener;
 import com.meerkats.familyshopper.model.ShoppingList;
-import com.meerkats.familyshopper.model.ShoppingListItem;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -67,12 +61,13 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.sync:
-
+                mainController.sync(false);
                 return true;
             case R.id.clear_list:
                 mainController.clearShoppingList();
                 return true;
             case R.id.connect:
+                mainController.connect(this);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -94,11 +89,11 @@ public class MainActivity extends AppCompatActivity {
                             public void onClick(DialogInterface dialoginterface, int index) {
                                 switch (index) {
                                     case 0:
-                                        mainController.setShoppingListItemDelete(position);
+                                        mainController.deleteShoppingListItem(position);
 
                                         break;
                                     case 1:
-                                        mainController.setShoppingListItemEdit(parent, v, position, id, MainActivity.this);
+                                        mainController.editShoppingListItem(parent, v, position, id, MainActivity.this);
                                         shoppingListView.setSelection(position);
                                         break;
                                 }
@@ -115,7 +110,7 @@ public class MainActivity extends AppCompatActivity {
         shoppingListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                mainController.setShoppingItemCrossedOff(position);
+                mainController.crossOffShoppingItem(position);
             }
         });
     }

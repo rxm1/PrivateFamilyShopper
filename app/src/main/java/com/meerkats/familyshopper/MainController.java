@@ -3,6 +3,7 @@ package com.meerkats.familyshopper;
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -27,49 +28,76 @@ import java.util.HashMap;
  */
 public class MainController {
     Firebase myFirebaseRef;
-    Context context;
+    Activity activity;
     DataComparer dataComparer;
     ShoppingList shoppingList;
     ShoppingListAdapter shoppingListAdapter;
     private String localMasterFileName = "localShoppingListMasterFile.json";
+    public static final String PREFS_NAME = "MyPrefsFile";
+    public static final String Firebase_URL_Name = "FirebaseURLName";
 
-    public MainController(Context mainContext) {
-        this.context = mainContext;
-        Firebase.setAndroidContext(context);
+    public MainController(Activity mainActivity) {
+        this.activity = mainActivity;
+        Firebase.setAndroidContext(activity);
         dataComparer = new DataComparer();
-        myFirebaseRef = new Firebase("https://familyshopper.firebaseio.com/");
         shoppingList = new ShoppingList("mainList");
 
+        instanciateFirebase();
     }
 
+    private void instanciateFirebase() {
+        try {
+            SharedPreferences settings = activity.getPreferences(Context.MODE_PRIVATE);
+            if (settings.contains(Firebase_URL_Name)) {
+                String firebaseURL = "";
+                firebaseURL = settings.getString(Firebase_URL_Name, null);
+                if (firebaseURL != null && !firebaseURL.trim().isEmpty()) {
+                    myFirebaseRef = new Firebase(firebaseURL);
+                }
+                else {
+                    myFirebaseRef = null;
+                }
+                if (myFirebaseRef != null)
+                    Toast.makeText(activity.getApplicationContext(), "Firebase connected.", Toast.LENGTH_SHORT).show();
+                else
+                    Toast.makeText(activity.getApplicationContext(), "Firebase not connected.", Toast.LENGTH_SHORT).show();
+
+            }
+        }
+        catch (Exception ex){
+            Toast.makeText(activity.getApplicationContext(), "Firebase not connected.", Toast.LENGTH_SHORT).show();
+        }
+    }
     public void init(){
         loadShoppingListFromStorage();
 
-        myFirebaseRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot snapshot) {
-                String newData = ((HashMap<String,String>)snapshot.getValue()).get("masterList");
-                if(dataComparer.hasDataChanged(newData, shoppingList)){
-                    saveShoppingListToStorage(newData);
-                    shoppingList.loadShoppingList(newData);
-                    shoppingListAdapter.notifyDataSetChanged();
+        if(myFirebaseRef != null) {
+            myFirebaseRef.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot snapshot) {
+                    String newData = ((HashMap<String, String>) snapshot.getValue()).get("masterList");
+                    if (dataComparer.hasDataChanged(newData, shoppingList)) {
+                        saveShoppingListToStorage(newData);
+                        shoppingList.loadShoppingList(newData);
+                        shoppingListAdapter.notifyDataSetChanged();
+                    }
                 }
-            }
 
-            @Override
-            public void onCancelled(FirebaseError firebaseError) {
-                Toast.makeText(context, "The read failed: " + firebaseError.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
+                @Override
+                public void onCancelled(FirebaseError firebaseError) {
+                    Toast.makeText(activity, "The read failed: " + firebaseError.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
     }
 
-    public void setShoppingListItemDelete(int position){
+    public void deleteShoppingListItem(int position){
         shoppingList.remove(position);
         saveShoppingListToStorage();
         shoppingListAdapter.notifyDataSetChanged();
     }
 
-    public void setShoppingListItemEdit(final AdapterView<?> parent, final View v, final int position, long id, Activity activity){
+    public void editShoppingListItem(final AdapterView<?> parent, final View v, final int position, long id, Activity activity){
         final ShoppingListItem shoppingListItem = shoppingList.getShoppingListItem(position);
         EditShoppingItemDialog cdd=new EditShoppingItemDialog(activity, shoppingListItem.getShoppingListItem());
 
@@ -90,7 +118,7 @@ public class MainController {
         cdd.show();
     }
 
-    public void setShoppingItemCrossedOff(int position){
+    public void crossOffShoppingItem(int position){
         shoppingList.setItemCrossedOff(position);
         saveShoppingListToStorage();
         shoppingListAdapter.notifyDataSetChanged();
@@ -106,12 +134,16 @@ public class MainController {
         saveShoppingListToStorage(shoppingList.getJson());
     }
     public void saveShoppingListToStorage(String jsonData){
+        saveShoppingListToFile(jsonData);
+        if(myFirebaseRef != null)
+            myFirebaseRef.child("masterList").setValue(jsonData);
+    }
+    public void saveShoppingListToFile(String jsonData){
         try {
             OutputStreamWriter outputStreamWriter = new OutputStreamWriter(
-                    context.openFileOutput(localMasterFileName, Context.MODE_PRIVATE));
+                    activity.openFileOutput(localMasterFileName, Context.MODE_PRIVATE));
             outputStreamWriter.write(jsonData);
             outputStreamWriter.close();
-            myFirebaseRef.child("masterList").setValue(jsonData);
         }
         catch (IOException e) {
             Log.e("Exception", "File write failed: " + e.toString());
@@ -119,7 +151,7 @@ public class MainController {
     }
 
     public void loadShoppingListFromStorage(){
-        File file = new File(context.getFilesDir(), localMasterFileName);
+        File file = new File(activity.getFilesDir(), localMasterFileName);
         StringBuilder text = new StringBuilder();
         try {
             BufferedReader br = new BufferedReader(new FileReader(file));
@@ -130,7 +162,8 @@ public class MainController {
                 text.append('\n');
             }
             br.close();
-            shoppingList.loadShoppingList(text.toString());
+            if(!text.toString().trim().isEmpty())
+                shoppingList.loadShoppingList(text.toString());
 
         }
         catch (IOException e) {
@@ -142,6 +175,46 @@ public class MainController {
         shoppingList.clear();
         saveShoppingListToStorage();
         shoppingListAdapter.notifyDataSetChanged();
+    }
+
+    public void sync(boolean fromConnect){
+        if(myFirebaseRef != null) {
+            myFirebaseRef.addListenerForSingleValueEvent(
+                    new ValueEventListener() {
+                         @Override
+                         public void onDataChange(DataSnapshot snapshot) {
+                             String newData = ((HashMap<String, String>) snapshot.getValue()).get("masterList");
+                             saveShoppingListToFile(newData);
+                             shoppingList.loadShoppingList(newData);
+                             shoppingListAdapter.notifyDataSetChanged();
+                         }
+
+                         @Override
+                         public void onCancelled(FirebaseError firebaseError) {
+                             Toast.makeText(activity.getApplicationContext(), "The read failed: " + firebaseError.getMessage(), Toast.LENGTH_SHORT).show();
+                         }
+                     }
+            );
+        }
+        else {
+            if(!fromConnect)
+                Toast.makeText(activity, "Not Connected", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public void connect(Activity activity){
+        ConnectUsingFirebaseDialog cdd=new ConnectUsingFirebaseDialog(activity);
+
+        cdd.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                if (((ConnectUsingFirebaseDialog) dialog).isCanceled())
+                    return;
+                instanciateFirebase();
+                sync(true);
+            }
+        });
+        cdd.show();
     }
 
     public ShoppingList getShoppingList(){ return shoppingList; }
