@@ -35,6 +35,7 @@ public class MainController {
     private String localMasterFileName = "localShoppingListMasterFile.json";
     public static final String PREFS_NAME = "MyPrefsFile";
     public static final String Firebase_URL_Name = "FirebaseURLName";
+    ValueEventListener firebaseListeners;
 
     public MainController(Activity mainActivity) {
         this.activity = mainActivity;
@@ -42,7 +43,6 @@ public class MainController {
         dataComparer = new DataComparer();
         shoppingList = new ShoppingList("mainList");
 
-        instanciateFirebase();
     }
 
     private void instanciateFirebase() {
@@ -53,8 +53,10 @@ public class MainController {
                 firebaseURL = settings.getString(Firebase_URL_Name, null);
                 if (firebaseURL != null && !firebaseURL.trim().isEmpty()) {
                     myFirebaseRef = new Firebase(firebaseURL);
+                    addFirebaseListeners();
                 }
                 else {
+                    removeFirebaseListeners();
                     myFirebaseRef = null;
                 }
                 if (myFirebaseRef != null)
@@ -70,9 +72,12 @@ public class MainController {
     }
     public void init(){
         loadShoppingListFromStorage();
+        instanciateFirebase();
+    }
 
+    private void addFirebaseListeners(){
         if(myFirebaseRef != null) {
-            myFirebaseRef.addValueEventListener(new ValueEventListener() {
+            firebaseListeners = myFirebaseRef.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot snapshot) {
                     String newData = ((HashMap<String, String>) snapshot.getValue()).get("masterList");
@@ -88,6 +93,12 @@ public class MainController {
                     Toast.makeText(activity, "The read failed: " + firebaseError.getMessage(), Toast.LENGTH_SHORT).show();
                 }
             });
+        }
+    }
+
+    private void removeFirebaseListeners() {
+        if (myFirebaseRef != null) {
+            myFirebaseRef.removeEventListener(firebaseListeners);
         }
     }
 
