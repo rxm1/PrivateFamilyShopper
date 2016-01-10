@@ -8,9 +8,9 @@ import java.util.HashMap;
 /**
  * Created by Rez on 07/01/2016.
  */
-public class DataComparer {
+public class DataMerger {
 
-    public DataComparer(){
+    public DataMerger(){
 
     }
 
@@ -20,5 +20,15 @@ public class DataComparer {
             return true;
         }
         return false;
+    }
+    public boolean hasDataChanged(String newData, String oldData){
+        if(oldData.compareTo(newData) != 0) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean mergeData(String mergedData){
+        return true;
     }
 }

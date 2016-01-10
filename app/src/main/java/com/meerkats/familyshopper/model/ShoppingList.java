@@ -27,6 +27,9 @@ public class ShoppingList extends ArrayList<String>{
     public ShoppingList(String name){
         innerShoppingList = new InnerShoppingList(name);
     }
+    public ShoppingList(){
+        innerShoppingList = new InnerShoppingList("");
+    }
 
     public String getShoppingListName() {
         return innerShoppingList.shoppingListName;
