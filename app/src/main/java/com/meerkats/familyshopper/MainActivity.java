@@ -36,10 +36,11 @@ public class MainActivity extends AppCompatActivity {
         startService(intent);
 
         mainController = new MainController(this);
-        shoppingList = mainController.getShoppingList();
-        shoppingListAdapter = new ShoppingListAdapter(this, shoppingList);
-        mainController.setShoppingListAdapter(shoppingListAdapter);
         mainController.init();
+        shoppingList = mainController.getShoppingList();
+        shoppingListAdapter = mainController.getShoppingListAdapter();
+
+
 
         Toolbar myToolbar = (Toolbar) findViewById(R.id.family_shopper_toolbar);
         setSupportActionBar(myToolbar);

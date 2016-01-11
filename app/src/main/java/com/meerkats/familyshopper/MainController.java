@@ -46,9 +46,11 @@ public class MainController {
     }
 
     public void init(){
-        dataHelper.loadShoppingListFromLocalStorage(shoppingList);
+        shoppingList = dataHelper.loadShoppingListFromLocalStorage();
+        shoppingListAdapter = new ShoppingListAdapter(activity, shoppingList);
         dataHelper.instanciateFirebase(false);
         myFirebaseRef = dataHelper.getMyFirebaseRef();
+        shoppingListAdapter.notifyDataSetChanged();
     }
 
     public void deleteShoppingListItem(int position){
@@ -141,4 +143,5 @@ public class MainController {
     public void setShoppingListAdapter(ShoppingListAdapter shoppingListAdapter){
         this.shoppingListAdapter = shoppingListAdapter;
     }
+    public ShoppingListAdapter getShoppingListAdapter(){return shoppingListAdapter;}
 }

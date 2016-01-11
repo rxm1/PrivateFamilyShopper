@@ -81,8 +81,8 @@ public class DataHelper {
             firebaseListeners = myFirebaseRef.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot snapshot) {
-                    String localData = "";
-                    if (loadGsonFromLocalStorage(localData) && !localData.trim().isEmpty()){
+                    String localData = loadGsonFromLocalStorage();
+                    if (!localData.trim().isEmpty()){
                         String mergedData = sync(snapshot, localData);
                         if (!mergedData.trim().isEmpty())
                             saveShoppingListToStorage(mergedData);
@@ -119,18 +119,17 @@ public class DataHelper {
         dataMerger.setLastSynced(lastSynced);
         return mergedData;
     }
-    public boolean loadShoppingListFromLocalStorage(ShoppingList shoppingList){
-        String gson = "";
-        if(loadGsonFromLocalStorage(gson) && !gson.trim().isEmpty()) {
+    public ShoppingList loadShoppingListFromLocalStorage(){
+        ShoppingList shoppingList = null;
+        String gson = loadGsonFromLocalStorage();
+        if(!gson.trim().isEmpty()) {
             shoppingList = new ShoppingList();
             shoppingList.loadShoppingList(gson);
         }
-        else
-            return false;
 
-        return true;
+        return shoppingList;
     }
-    private boolean loadGsonFromLocalStorage(String oldData){
+    private String loadGsonFromLocalStorage(){
         StringBuilder text = new StringBuilder();
         File file = new File(context.getFilesDir(), localMasterFileName);
         try {
@@ -142,13 +141,12 @@ public class DataHelper {
                 text.append('\n');
             }
             br.close();
-            oldData = text.toString();
+            return text.toString();
         }
         catch (IOException e) {
             Log.e("Exception", "File read failed: " + e.toString());
-            return false;
+            return "";
         }
-        return true;
     }
     public void saveShoppingListToStorage(ShoppingList shoppingList){
         saveShoppingListToStorage(shoppingList.getJson());
