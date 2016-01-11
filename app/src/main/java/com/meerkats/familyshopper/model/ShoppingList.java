@@ -33,6 +33,11 @@ public class ShoppingList extends ArrayList<String>{
         innerShoppingList.add(new ShoppingListItem(item));
         return true;
     }
+    public void add(ShoppingListItem shoppingListItem){
+        super.add(shoppingListItem.getShoppingListItem());
+        innerShoppingList.add(shoppingListItem);
+    }
+
     @Override
     public String remove(int position){
         String item = super.remove(position);
@@ -70,6 +75,9 @@ public class ShoppingList extends ArrayList<String>{
 
     public ShoppingListItem getShoppingListItem(int index){
         return innerShoppingList.shoppingListItems.get(index);
+    }
+    public ArrayList<ShoppingListItem> getShoppingListItems(){
+        return innerShoppingList.getShoppingListItems();
     }
 
     public void setShoppingListItemEdit(ShoppingListItem shoppingListItem, int position){
