@@ -28,6 +28,9 @@ public class MainService extends Service {
     Firebase myFirebaseRef;
     DataHelper dataHelper;
     DataMerger dataMerger;
+    int mStartMode = START_STICKY;       // indicates how to behave if the service is killed
+    IBinder mBinder;      // interface for clients that bind
+    boolean mAllowRebind; // indicates whether onRebind should be used
 
     @Override
     public void onCreate() {
@@ -38,15 +41,25 @@ public class MainService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
-        dataHelper.instanciateFirebase();
-
+        dataHelper.instanciateFirebase(true);
         // If we get killed, after returning from here, restart
-        return START_STICKY;
+        return mStartMode;
     }
 
-    @Nullable
-    public IBinder onBind(Intent intent){
-        return null;
+    public IBinder onBind(Intent intent) {
+        // A client is binding to the service with bindService()
+        return mBinder;
     }
+    @Override
+    public boolean onUnbind(Intent intent) {
+        // All clients have unbound with unbindService()
+        return mAllowRebind;
+    }
+    @Override
+    public void onRebind(Intent intent) {
+        // A client is binding to the service with bindService(),
+        // after onUnbind() has already been called
+    }
+
 
 }

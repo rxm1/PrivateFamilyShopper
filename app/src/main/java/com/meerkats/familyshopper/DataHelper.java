@@ -16,6 +16,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 
 /**
@@ -25,17 +27,23 @@ public class DataHelper {
     ValueEventListener firebaseListeners;
     Context context;
     private String localMasterFileName = "localShoppingListMasterFile.json";
-    DataMerger dataMerger = new DataMerger();
+    DataMerger dataMerger;
     Firebase myFirebaseRef;
+    SharedPreferences settings;
+    public static final String Last_Synced_Name = "LastSyncedName";
 
-    public void DataHelper(Context context){
-            this.context = context;
+    public DataHelper(Context context) {
+        this.context = context;
+        settings = context.getSharedPreferences(MainController.PREFS_NAME, context.MODE_PRIVATE);
+        dataMerger = new DataMerger();
+        if (settings.contains(Last_Synced_Name)) {
+            settings.getLong(Last_Synced_Name, System.currentTimeMillis());
+            dataMerger.setLastSynced(settings.getLong(Last_Synced_Name, 0));
+        }
     }
-    
 
     public void instanciateFirebase(boolean fromService) {
         try {
-            SharedPreferences settings = context.getSharedPreferences(MainController.PREFS_NAME, context.MODE_PRIVATE);
             if (settings.contains(MainController.Firebase_URL_Name)) {
                 String firebaseURL = settings.getString(MainController.Firebase_URL_Name, null);
                 if (firebaseURL != null && !firebaseURL.trim().isEmpty()) {
@@ -57,20 +65,26 @@ public class DataHelper {
             }
         }
         catch (Exception ex){
-            //Toast.makeText(activity.getApplicationContext(), "Firebase not connected.", Toast.LENGTH_SHORT).show();
+            if(!fromService) {
+                Toast.makeText(context.getApplicationContext(), "Firebase not connected.", Toast.LENGTH_SHORT).show();
+            }
         }
     }
+
+    /*  Sync is between saved local file
+    and remote saved storage.
+    After merge, it updates local file
+    and remote storage
+    */
     private void addFirebaseListeners(){
         if(myFirebaseRef != null) {
             firebaseListeners = myFirebaseRef.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot snapshot) {
-                    String newData = ((HashMap<String, String>) snapshot.getValue()).get("masterList");
-                    String oldData = "";
-                    if(loadGsonFromLocalStorage(oldData) && !oldData.trim().isEmpty())
-                    if (dataMerger.hasDataChanged(newData, oldData)) {
-                        String mergedData = "";
-                        if(dataMerger.mergeData(mergedData))
+                    String localData = "";
+                    if (loadGsonFromLocalStorage(localData) && !localData.trim().isEmpty()){
+                        String mergedData = sync(snapshot, localData);
+                        if (!mergedData.trim().isEmpty())
                             saveShoppingListToStorage(mergedData);
                     }
                 }
@@ -89,6 +103,22 @@ public class DataHelper {
         }
     }
 
+    public String sync(DataSnapshot snapshot, String localData){
+        HashMap<String, String> map = (HashMap<String, String>) snapshot.getValue();
+        String mergedData = "";
+        if (map != null) {
+            String remoteData = map.get("masterList");
+            if (dataMerger.hasDataChanged(localData, remoteData)) {
+                mergedData = dataMerger.mergeData(localData, remoteData);
+            }
+        }
+        SharedPreferences.Editor editor = settings.edit();
+        long lastSynced = (new Date()).getTime();
+        editor.putLong(Last_Synced_Name, lastSynced);
+        editor.commit();
+        dataMerger.setLastSynced(lastSynced);
+        return mergedData;
+    }
     public boolean loadShoppingListFromLocalStorage(ShoppingList shoppingList){
         String gson = "";
         if(loadGsonFromLocalStorage(gson) && !gson.trim().isEmpty()) {
@@ -148,5 +178,6 @@ public class DataHelper {
         return true;
     }
 
+    public Firebase getMyFirebaseRef(){return myFirebaseRef;}
 
 }

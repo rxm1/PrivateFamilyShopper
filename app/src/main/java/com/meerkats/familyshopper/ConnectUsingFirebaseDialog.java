@@ -24,12 +24,12 @@ public class ConnectUsingFirebaseDialog extends Dialog implements
     public String oldData = "";
     private boolean isCanceled = true;
     public Activity activity;
-
+    SharedPreferences settings;
 
 
     public ConnectUsingFirebaseDialog(Activity activity) {
         super(activity, R.style.ListContextMenu);
-
+        settings = activity.getSharedPreferences(MainController.PREFS_NAME, Context.MODE_PRIVATE);
         this.activity = activity;
         setCancelable(true);
     }
@@ -48,7 +48,7 @@ public class ConnectUsingFirebaseDialog extends Dialog implements
         setCancelable(true);
 
         setTitle("Connect to Firebase");
-        SharedPreferences settings = activity.getPreferences(Context.MODE_PRIVATE);
+
         if(settings.contains(MainController.Firebase_URL_Name)){
             oldData = settings.getString(MainController.Firebase_URL_Name, null);
         }
@@ -60,10 +60,9 @@ public class ConnectUsingFirebaseDialog extends Dialog implements
 
     @Override
     public void onClick(View v) {
-        newData = editText.getText().toString().trim();
+        newData = formatURL(editText.getText().toString().trim());
         switch (v.getId()) {
             case R.id.edit_shopping_item_ok_btn:
-                SharedPreferences settings = activity.getPreferences(Context.MODE_PRIVATE);
                 SharedPreferences.Editor editor = settings.edit();
                 editor.putString(MainController.Firebase_URL_Name, newData);
                 editor.commit();
@@ -80,5 +79,17 @@ public class ConnectUsingFirebaseDialog extends Dialog implements
 
     public boolean isCanceled(){
         return isCanceled;
+    }
+
+    public String formatURL(String URL){
+        if(URL.trim().isEmpty())
+            return URL;
+
+        if(!URL.startsWith("https://"))
+            URL = "https://" + URL;
+        if(!URL.endsWith(".com"))
+            URL += ".com";
+
+        return URL;
     }
 }

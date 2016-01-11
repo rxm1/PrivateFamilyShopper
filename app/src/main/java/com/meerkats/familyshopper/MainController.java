@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.util.Date;
 import java.util.HashMap;
 
 /**
@@ -45,14 +46,14 @@ public class MainController {
     }
 
     public void init(){
-        loadShoppingListFromStorage();
-        instanciateFirebase();
+        dataHelper.loadShoppingListFromLocalStorage(shoppingList);
+        dataHelper.instanciateFirebase(false);
+        myFirebaseRef = dataHelper.getMyFirebaseRef();
     }
 
     public void deleteShoppingListItem(int position){
         shoppingList.remove(position);
         sync(false);
-        shoppingListAdapter.notifyDataSetChanged();
     }
     public void editShoppingListItem(final AdapterView<?> parent, final View v, final int position, long id, Activity activity){
         final ShoppingListItem shoppingListItem = shoppingList.getShoppingListItem(position);
@@ -86,33 +87,35 @@ public class MainController {
         sync(false);
     }
 
+/*  Sync is between local shopping list object
+    and remote saved storage.
+    After merge, it updates all local object and file
+    and remote storage
+ */
     public void sync(boolean fromConnect){
         if(myFirebaseRef != null) {
             myFirebaseRef.addListenerForSingleValueEvent(
                     new ValueEventListener() {
-                         @Override
-                         public void onDataChange(DataSnapshot snapshot) {
-                             String newData = ((HashMap<String, String>) snapshot.getValue()).get("masterList");
-                             if (dataMerger.hasDataChanged(newData, shoppingList.getJson())) {
-                                 String mergedData = "";
-                                 if(dataMerger.mergeData(mergedData)) {
-                                     dataHelper.saveShoppingListToStorage(mergedData);
-                                     shoppingList.loadShoppingList(newData);
-                                     shoppingListAdapter.notifyDataSetChanged();
-                                 }
-                             }
+                        @Override
+                        public void onDataChange(DataSnapshot snapshot) {
+                            String localData = shoppingList.getJson();
+                            String mergedData = dataHelper.sync(snapshot, localData);
+                            if (!mergedData.trim().isEmpty()) {
+                                dataHelper.saveShoppingListToStorage(mergedData);
+                                shoppingList.loadShoppingList(mergedData);
+                                shoppingListAdapter.notifyDataSetChanged();
+                            }
+                        }
 
-                         }
+                        @Override
+                        public void onCancelled(FirebaseError firebaseError) {
+                            Toast.makeText(activity.getApplicationContext(), "The read failed: " + firebaseError.getMessage(), Toast.LENGTH_SHORT).show();
+                        }
 
-                         @Override
-                         public void onCancelled(FirebaseError firebaseError) {
-                             Toast.makeText(activity.getApplicationContext(), "The read failed: " + firebaseError.getMessage(), Toast.LENGTH_SHORT).show();
-                         }
-                     }
-            );
+                    });
         }
-        else {
-            if(!fromConnect)
+        else{
+            if (!fromConnect)
                 Toast.makeText(activity, "Not Connected", Toast.LENGTH_SHORT).show();
         }
     }
@@ -125,7 +128,8 @@ public class MainController {
             public void onDismiss(DialogInterface dialog) {
                 if (((ConnectUsingFirebaseDialog) dialog).isCanceled())
                     return;
-                dataHelper.instanciateFirebase();
+                dataHelper.instanciateFirebase(false);
+                myFirebaseRef = dataHelper.getMyFirebaseRef();
                 sync(true);
             }
         });
