@@ -1,7 +1,9 @@
 package com.meerkats.familyshopper;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -31,6 +33,7 @@ public class DataHelper {
     Firebase myFirebaseRef;
     SharedPreferences settings;
     public static final String Last_Synced_Name = "LastSyncedName";
+    public static final String ACTION = "com.meerkats.familyshopper.MainService";
 
     public DataHelper(Context context) {
         this.context = context;
@@ -81,11 +84,25 @@ public class DataHelper {
             firebaseListeners = myFirebaseRef.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot snapshot) {
+
                     String localData = loadGsonFromLocalStorage();
+                    String mergedData = "";
                     if (!localData.trim().isEmpty()){
-                        String mergedData = sync(snapshot, localData);
-                        if (!mergedData.trim().isEmpty())
-                            saveShoppingListToStorage(mergedData);
+                        mergedData = sync(snapshot, localData);
+                    }
+                    else {
+                        HashMap<String, String> map = (HashMap<String, String>) snapshot.getValue();
+                        if (map != null) {
+                            mergedData = map.get("masterList");
+                        }
+                    }
+                    if (!mergedData.trim().isEmpty()) {
+                        saveShoppingListToStorage(mergedData);
+                        Intent intent = new Intent(ACTION);
+                        boolean recieversAvailable = LocalBroadcastManager.getInstance(context.getApplicationContext()).sendBroadcast(intent);
+                        if(!recieversAvailable){
+                            //send notification
+                        }
                     }
                 }
 
@@ -129,7 +146,7 @@ public class DataHelper {
 
         return shoppingList;
     }
-    private String loadGsonFromLocalStorage(){
+    public String loadGsonFromLocalStorage(){
         StringBuilder text = new StringBuilder();
         File file = new File(context.getFilesDir(), localMasterFileName);
         try {

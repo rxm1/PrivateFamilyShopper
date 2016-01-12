@@ -1,10 +1,15 @@
 package com.meerkats.familyshopper;
 
 import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
 
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
+import android.os.FileObserver;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 
 import android.support.v7.widget.Toolbar;
@@ -16,6 +21,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.meerkats.familyshopper.model.ShoppingList;
 
@@ -26,14 +32,12 @@ public class MainActivity extends AppCompatActivity {
     ShoppingListAdapter shoppingListAdapter;
     ListView shoppingListView;
     MainController mainController;
-
+    public static FileObserver observer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Intent intent = new Intent(this, MainService.class);
-        startService(intent);
 
         mainController = new MainController(this);
         mainController.init();
@@ -52,7 +56,12 @@ public class MainActivity extends AppCompatActivity {
 
         setShoppingListOnItemClick();
         setShoppingListOnItemLongClick();
+
+        Intent intent = new Intent(this, MainService.class);
+        startService(intent);
     }
+
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -126,5 +135,30 @@ public class MainActivity extends AppCompatActivity {
         enterItemEditTxt.setText("");
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Register for the particular broadcast based on ACTION string
+        IntentFilter filter = new IntentFilter(DataHelper.ACTION);
+        LocalBroadcastManager.getInstance(this.getApplicationContext()).registerReceiver(new DataChangedReceiver(), filter);
+        shoppingList.loadShoppingList(mainController.dataHelper.loadGsonFromLocalStorage());
+        shoppingListAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        // Unregister the listener when the application is paused
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(new DataChangedReceiver());
+    }
+
+    // Define the callback for what to do when message is received
+    public class DataChangedReceiver extends BroadcastReceiver {
+          @Override
+        public void onReceive(Context context, Intent intent) {
+              shoppingList.loadShoppingList(mainController.dataHelper.loadGsonFromLocalStorage());
+              shoppingListAdapter.notifyDataSetChanged();
+        }
+    }
 
 }
