@@ -1,9 +1,14 @@
 package com.meerkats.familyshopper;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -20,6 +25,8 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Random;
+import java.util.UUID;
 
 /**
  * Created by Rez on 10/01/2016.
@@ -34,6 +41,7 @@ public class DataHelper {
     public static final String Last_Synced_Name = "LastSyncedName";
     public static final String FILE_CHANGED_ACTION = "com.meerkats.familyshopper.MainService.FileChanged";
     public static final String FIREBASE_URL_CHANGED_ACTION = "com.meerkats.familyshopper.MainService.FileChanged";
+    public static final int file_changed_notification_id = 123456;
 
     public DataHelper(Context context) {
         this.context = context;
@@ -101,7 +109,7 @@ public class DataHelper {
                         Intent intent = new Intent(FILE_CHANGED_ACTION);
                         boolean recieversAvailable = LocalBroadcastManager.getInstance(context.getApplicationContext()).sendBroadcast(intent);
                         if(!recieversAvailable){
-                            //send notification
+                            sendFileChangedNotification();
                         }
                     }
                 }
@@ -118,6 +126,33 @@ public class DataHelper {
         if (myFirebaseRef != null && firebaseListeners != null) {
             myFirebaseRef.removeEventListener(firebaseListeners);
         }
+    }
+
+    private void sendFileChangedNotification(){
+        NotificationCompat.Builder mBuilder =
+                new NotificationCompat.Builder(context)
+                        .setSmallIcon(R.mipmap.ic_launcher)
+                        .setContentTitle("Family Shopper")
+                        .setContentText("Shopping List has changed.");
+
+        Intent resultIntent = new Intent(context, MainActivity.class);
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
+        // Adds the back stack for the Intent (but not the Intent itself)
+        stackBuilder.addParentStack(MainActivity.class);
+        // Adds the Intent that starts the Activity to the top of the stack
+        stackBuilder.addNextIntent(resultIntent);
+        PendingIntent resultPendingIntent =
+                stackBuilder.getPendingIntent(
+                        0,
+                        PendingIntent.FLAG_UPDATE_CURRENT
+                );
+        mBuilder.setContentIntent(resultPendingIntent)
+                .setAutoCancel(true)
+                .setDefaults(Notification.DEFAULT_ALL);
+        NotificationManager mNotificationManager =
+                (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        // mId allows you to update the notification later on.
+        mNotificationManager.notify(file_changed_notification_id, mBuilder.build());
     }
 
     public String sync(DataSnapshot snapshot, String localData){

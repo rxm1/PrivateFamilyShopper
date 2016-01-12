@@ -30,6 +30,7 @@ public class MainActivity extends AppCompatActivity {
     ShoppingListAdapter shoppingListAdapter;
     ListView shoppingListView;
     MainController mainController;
+    DataChangedReceiver dataChangedReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
         mainController.init();
         shoppingList = mainController.getShoppingList();
         shoppingListAdapter = mainController.getShoppingListAdapter();
-
+        dataChangedReceiver = new DataChangedReceiver();
 
 
         Toolbar myToolbar = (Toolbar) findViewById(R.id.family_shopper_toolbar);
@@ -137,7 +138,7 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         // Register for the particular broadcast based on ACTION string
         IntentFilter filter = new IntentFilter(DataHelper.FILE_CHANGED_ACTION);
-        LocalBroadcastManager.getInstance(this.getApplicationContext()).registerReceiver(new DataChangedReceiver(), filter);
+        LocalBroadcastManager.getInstance(this).registerReceiver(dataChangedReceiver, filter);
         shoppingList.loadShoppingList(mainController.dataHelper.loadGsonFromLocalStorage());
         shoppingListAdapter.notifyDataSetChanged();
     }
@@ -146,7 +147,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         // Unregister the listener when the application is paused
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(new DataChangedReceiver());
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(dataChangedReceiver);
     }
 
     // Define the callback for what to do when message is received
