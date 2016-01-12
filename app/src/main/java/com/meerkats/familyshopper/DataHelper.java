@@ -18,7 +18,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -33,7 +32,8 @@ public class DataHelper {
     Firebase myFirebaseRef;
     SharedPreferences settings;
     public static final String Last_Synced_Name = "LastSyncedName";
-    public static final String ACTION = "com.meerkats.familyshopper.MainService";
+    public static final String FILE_CHANGED_ACTION = "com.meerkats.familyshopper.MainService.FileChanged";
+    public static final String FIREBASE_URL_CHANGED_ACTION = "com.meerkats.familyshopper.MainService.FileChanged";
 
     public DataHelper(Context context) {
         this.context = context;
@@ -98,7 +98,7 @@ public class DataHelper {
                     }
                     if (!mergedData.trim().isEmpty()) {
                         saveShoppingListToStorage(mergedData);
-                        Intent intent = new Intent(ACTION);
+                        Intent intent = new Intent(FILE_CHANGED_ACTION);
                         boolean recieversAvailable = LocalBroadcastManager.getInstance(context.getApplicationContext()).sendBroadcast(intent);
                         if(!recieversAvailable){
                             //send notification

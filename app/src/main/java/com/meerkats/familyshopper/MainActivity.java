@@ -8,7 +8,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.os.FileObserver;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 
@@ -21,7 +20,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.meerkats.familyshopper.model.ShoppingList;
 
@@ -32,7 +30,6 @@ public class MainActivity extends AppCompatActivity {
     ShoppingListAdapter shoppingListAdapter;
     ListView shoppingListView;
     MainController mainController;
-    public static FileObserver observer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -139,7 +136,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         // Register for the particular broadcast based on ACTION string
-        IntentFilter filter = new IntentFilter(DataHelper.ACTION);
+        IntentFilter filter = new IntentFilter(DataHelper.FILE_CHANGED_ACTION);
         LocalBroadcastManager.getInstance(this.getApplicationContext()).registerReceiver(new DataChangedReceiver(), filter);
         shoppingList.loadShoppingList(mainController.dataHelper.loadGsonFromLocalStorage());
         shoppingListAdapter.notifyDataSetChanged();
