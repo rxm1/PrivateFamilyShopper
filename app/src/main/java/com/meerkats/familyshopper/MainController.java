@@ -2,6 +2,10 @@ package com.meerkats.familyshopper;
 
 import android.app.Activity;
 import android.content.DialogInterface;
+import android.os.Handler;
+import android.os.HandlerThread;
+import android.os.Looper;
+import android.os.Message;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Toast;
@@ -26,6 +30,32 @@ public class MainController {
     ShoppingListAdapter shoppingListAdapter;
     public static final String PREFS_NAME = "MyPrefsFile";
     public static final String Firebase_URL_Name = "FirebaseURLName";
+    HandlerThread handlerThread;
+    SyncHandler syncHandler;
+    Handler mainUIHandler;
+    Handler mainControllerHandler;
+
+    class SyncHandler extends Handler {
+        public SyncHandler(Looper myLooper) {
+            super(myLooper);
+        }
+        public void handleMessage(Message msg) {
+            DataSnapshot snapshot = (DataSnapshot)msg.obj;
+            String localData = shoppingList.getJson();
+            String mergedData = dataHelper.merge(snapshot, localData);
+            if (!mergedData.trim().isEmpty()) {
+                dataHelper.saveShoppingListToStorage(mergedData);
+                shoppingList.loadShoppingList(mergedData);
+                mainUIHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        MainController.this.shoppingListAdapter.notifyDataSetChanged();
+                    }
+                });
+            }
+        }
+    }
+
 
     public MainController(Activity mainActivity) {
         this.activity = mainActivity;
@@ -36,11 +66,26 @@ public class MainController {
     }
 
     public void init(){
+        handlerThread = new HandlerThread("MainController.SyncThread");
+        handlerThread.start();
+        syncHandler = new SyncHandler(handlerThread.getLooper());
+        mainUIHandler = new Handler(Looper.getMainLooper());
+        mainControllerHandler = new Handler(handlerThread.getLooper());
+
         shoppingList = dataHelper.loadShoppingListFromLocalStorage();
         shoppingListAdapter = new ShoppingListAdapter(activity, shoppingList);
-        dataHelper.instanciateFirebase(false);
-        myFirebaseRef = dataHelper.getMyFirebaseRef();
+
+        mainControllerHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                dataHelper.instanciateFirebase(false);
+                myFirebaseRef = dataHelper.getMyFirebaseRef();
+            }
+        });
+
+
         shoppingListAdapter.notifyDataSetChanged();
+
     }
 
     public void deleteShoppingListItem(int position){
@@ -61,7 +106,6 @@ public class MainController {
                 shoppingListItem.setShoppingListItem(newData);
                 shoppingList.setShoppingListItemEdit(shoppingListItem, position);
                 sync(false);
-
             }
         });
         cdd.show();
@@ -86,25 +130,24 @@ public class MainController {
  */
     public void sync(boolean fromConnect){
         if(myFirebaseRef != null) {
-            myFirebaseRef.addListenerForSingleValueEvent(
-                    new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot snapshot) {
-                            String localData = shoppingList.getJson();
-                            String mergedData = dataHelper.sync(snapshot, localData);
-                            if (!mergedData.trim().isEmpty()) {
-                                dataHelper.saveShoppingListToStorage(mergedData);
-                                shoppingList.loadShoppingList(mergedData);
-                                shoppingListAdapter.notifyDataSetChanged();
-                            }
-                        }
+                    myFirebaseRef.addListenerForSingleValueEvent(
+                            new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot snapshot) {
+                                    shoppingListAdapter.notifyDataSetChanged();
 
-                        @Override
-                        public void onCancelled(FirebaseError firebaseError) {
-                            Toast.makeText(activity.getApplicationContext(), "The read failed: " + firebaseError.getMessage(), Toast.LENGTH_SHORT).show();
-                        }
+                                    Message message = syncHandler.obtainMessage();
+                                    message.obj = snapshot;
+                                    syncHandler.sendMessage(message);
+                                }
 
-                    });
+                                @Override
+                                public void onCancelled(FirebaseError firebaseError) {
+                                    Toast.makeText(activity.getApplicationContext(), "The read failed: " + firebaseError.getMessage(), Toast.LENGTH_SHORT).show();
+                                }
+
+                            });
+
         }
         else{
             if (!fromConnect)
@@ -120,9 +163,15 @@ public class MainController {
             public void onDismiss(DialogInterface dialog) {
                 if (((ConnectUsingFirebaseDialog) dialog).isCanceled())
                     return;
-                dataHelper.instanciateFirebase(false);
-                myFirebaseRef = dataHelper.getMyFirebaseRef();
-                sync(true);
+                mainControllerHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        dataHelper.instanciateFirebase(false);
+                        myFirebaseRef = dataHelper.getMyFirebaseRef();
+                        sync(true);
+                    }
+                });
+
             }
         });
         cdd.show();
@@ -130,8 +179,9 @@ public class MainController {
 
     public ShoppingList getShoppingList(){ return shoppingList; }
 
-    public void setShoppingListAdapter(ShoppingListAdapter shoppingListAdapter){
-        this.shoppingListAdapter = shoppingListAdapter;
-    }
     public ShoppingListAdapter getShoppingListAdapter(){return shoppingListAdapter;}
+
+    public void cleanUp(){
+        handlerThread.quit();
+    }
 }

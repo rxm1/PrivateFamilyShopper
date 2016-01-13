@@ -6,6 +6,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Looper;
 import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.app.NotificationCompat;
@@ -25,8 +26,6 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Random;
-import java.util.UUID;
 
 /**
  * Created by Rez on 10/01/2016.
@@ -45,8 +44,9 @@ public class DataHelper {
 
     public DataHelper(Context context) {
         this.context = context;
-        settings = context.getSharedPreferences(MainController.PREFS_NAME, context.MODE_PRIVATE);
         dataMerger = new DataMerger();
+
+        settings = context.getSharedPreferences(MainController.PREFS_NAME, context.MODE_PRIVATE);
         if (settings.contains(Last_Synced_Name)) {
             settings.getLong(Last_Synced_Name, System.currentTimeMillis());
             dataMerger.setLastSynced(settings.getLong(Last_Synced_Name, 0));
@@ -96,7 +96,7 @@ public class DataHelper {
                     String localData = loadGsonFromLocalStorage();
                     String mergedData = "";
                     if (!localData.trim().isEmpty()){
-                        mergedData = sync(snapshot, localData);
+                        mergedData = merge(snapshot, localData);
                     }
                     else {
                         HashMap<String, String> map = (HashMap<String, String>) snapshot.getValue();
@@ -155,7 +155,7 @@ public class DataHelper {
         mNotificationManager.notify(file_changed_notification_id, mBuilder.build());
     }
 
-    public String sync(DataSnapshot snapshot, String localData){
+    public String merge(DataSnapshot snapshot, String localData){
         HashMap<String, String> map = (HashMap<String, String>) snapshot.getValue();
         String mergedData = "";
         if (map != null) {

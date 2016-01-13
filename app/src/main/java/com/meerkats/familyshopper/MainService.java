@@ -7,6 +7,8 @@ import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
+import android.widget.Toast;
+
 import com.firebase.client.Firebase;
 
 /**

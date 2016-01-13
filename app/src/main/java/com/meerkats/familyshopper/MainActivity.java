@@ -8,6 +8,9 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.HandlerThread;
+import android.os.Looper;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 
@@ -31,11 +34,20 @@ public class MainActivity extends AppCompatActivity {
     ListView shoppingListView;
     MainController mainController;
     DataChangedReceiver dataChangedReceiver;
+    Handler mainActivityHandler;
+    Handler mainUIHandler;
+    HandlerThread handlerThread;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        handlerThread = new HandlerThread("MainActivity.HandlerThread");
+        handlerThread.start();
+        mainActivityHandler = new Handler(handlerThread.getLooper());
+        mainUIHandler = new Handler(Looper.getMainLooper());
 
         mainController = new MainController(this);
         mainController.init();
@@ -58,8 +70,6 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this, MainService.class);
         startService(intent);
     }
-
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -91,17 +101,17 @@ public class MainActivity extends AppCompatActivity {
         shoppingListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(final AdapterView<?> parent, final View v, final int position, final long id) {
-                int itemsID = ((int) R.array.shoppingListContextMenuValues);
+                int contextMenuID = ((int) R.array.shoppingListContextMenuValues);
                 if (shoppingList.getShoppingListItem(position).isCrossedOff())
-                    itemsID = ((int) R.array.shoppingListContextMenuValuesDeleteOnly);
+                    contextMenuID = ((int) R.array.shoppingListContextMenuValuesDeleteOnly);
+
                 AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(MainActivity.this, R.style.ListContextMenu));
-                builder.setTitle(shoppingList.getShoppingListItem(position).getShoppingListItem()).setCancelable(true).setItems(itemsID,
+                builder.setTitle(shoppingList.getShoppingListItem(position).getShoppingListItem()).setCancelable(true).setItems(contextMenuID,
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialoginterface, int index) {
                                 switch (index) {
                                     case 0:
                                         mainController.deleteShoppingListItem(position);
-
                                         break;
                                     case 1:
                                         mainController.editShoppingListItem(parent, v, position, id, MainActivity.this);
@@ -136,27 +146,48 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        // Register for the particular broadcast based on ACTION string
+
         IntentFilter filter = new IntentFilter(DataHelper.FILE_CHANGED_ACTION);
         LocalBroadcastManager.getInstance(this).registerReceiver(dataChangedReceiver, filter);
-        shoppingList.loadShoppingList(mainController.dataHelper.loadGsonFromLocalStorage());
-        shoppingListAdapter.notifyDataSetChanged();
-    }
 
+        loadLocalShoppingList();
+    }
     @Override
     protected void onPause() {
         super.onPause();
-        // Unregister the listener when the application is paused
+
         LocalBroadcastManager.getInstance(this).unregisterReceiver(dataChangedReceiver);
+    }
+    @Override
+    protected void onDestroy(){
+        super.onDestroy();
+
+        mainController.cleanUp();
     }
 
     // Define the callback for what to do when message is received
     public class DataChangedReceiver extends BroadcastReceiver {
           @Override
         public void onReceive(Context context, Intent intent) {
-              shoppingList.loadShoppingList(mainController.dataHelper.loadGsonFromLocalStorage());
-              shoppingListAdapter.notifyDataSetChanged();
+              loadLocalShoppingList();
         }
     }
 
+    public void loadLocalShoppingList(){
+        mainActivityHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                shoppingList.loadShoppingList(mainController.dataHelper.loadGsonFromLocalStorage());
+
+                mainUIHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        MainActivity.this.shoppingListAdapter.notifyDataSetChanged();
+                    }
+                });
+            }
+        });
+    }
+
+    public ShoppingListAdapter getShoppingListAdapter(){return shoppingListAdapter;}
 }
