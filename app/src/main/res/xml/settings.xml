@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+    <PreferenceCategory android:title="Family Shopper Settings" >
+        <CheckBoxPreference android:title="Integrate with Firebase"
+            android:defaultValue="false"
+            android:summary="Turns on on syncing with Firebase."
+            android:key="IntegrateFirebase" />
+        <EditTextPreference android:title="Firebase URL"
+            android:key="FirebaseURLName"
+            android:summary="Please provide the firebase URL"></EditTextPreference>
+        <EditTextPreference android:inputType="number"
+            android:title="Notification Frequency (seconds)"
+            android:key="notificationFrequency"
+            android:summary="Value of 0 means real-time updates, greater then 0 means notification interval at least equal the value"></EditTextPreference>
+        <MultiSelectListPreference
+            android:title="Notification Events"
+            android:key="notificationEvents"
+            android:summary="Select the kind of events you would like to be notified about"
+            android:entries="@array/listArray"
+            android:entryValues="@array/listValues" />
+    </PreferenceCategory>
+</PreferenceScreen>

@@ -7,10 +7,12 @@ import android.content.DialogInterface;
 
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
+import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 
@@ -37,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
     Handler mainActivityHandler;
     Handler mainUIHandler;
     HandlerThread handlerThread;
-
+    private static final int SETTINGS_RESULT = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,15 +89,28 @@ public class MainActivity extends AppCompatActivity {
             case R.id.clear_list:
                 mainController.clearShoppingList();
                 return true;
-            case R.id.connect:
-                mainController.connect(this);
-                return true;
             case R.id.settings:
-
+                Intent i = new Intent(this, SettingsActivity.class);
+                startActivityForResult(i, SETTINGS_RESULT);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
 
+        }
+    }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        switch (requestCode) {
+            case SETTINGS_RESULT:
+                mainController.connect();
+
+                //notify service that settings have changed
+                Intent intent = new Intent(MainController.settings_updated_action);
+                LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+
+                break;
         }
     }
 

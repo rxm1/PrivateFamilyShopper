@@ -10,6 +10,7 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
+import android.preference.PreferenceManager;
 import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.app.NotificationCompat;
@@ -82,7 +83,7 @@ public class DataHelper {
         dataChangedHandler = new DataChangedHandler(handlerThread.getLooper());
 
 
-        settings = context.getSharedPreferences(MainController.PREFS_NAME, context.MODE_PRIVATE);
+        settings = PreferenceManager.getDefaultSharedPreferences(context);
         if (settings.contains(Last_Synced_Name)) {
             settings.getLong(Last_Synced_Name, System.currentTimeMillis());
             dataMerger.setLastSynced(settings.getLong(Last_Synced_Name, 0));
@@ -92,8 +93,9 @@ public class DataHelper {
     public void instanciateFirebase(boolean fromService) {
         try {
             if (settings.contains(MainController.Firebase_URL_Name)) {
-                String firebaseURL = settings.getString(MainController.Firebase_URL_Name, null);
-                if (firebaseURL != null && !firebaseURL.trim().isEmpty()) {
+                String firebaseURL = formatFirebaseURL(settings.getString(MainController.Firebase_URL_Name, null));
+                Boolean integrateFirebase = settings.getBoolean(MainController.Integrate_With_Firebase_Name, false);
+                if (integrateFirebase && firebaseURL != null && !firebaseURL.trim().isEmpty()) {
                     myFirebaseRef = new Firebase(firebaseURL);
                     checkFirebaseURL(fromService);
 
@@ -149,6 +151,15 @@ public class DataHelper {
             Toast.makeText(context.getApplicationContext(), "Firebase not connected.", Toast.LENGTH_SHORT).show();
         }
     }
+    public String formatFirebaseURL(String firebaseURL){
+        if(!firebaseURL.startsWith("https://"))
+            firebaseURL = "https://" + firebaseURL;
+        if(!firebaseURL.endsWith(".com"))
+            firebaseURL += ".com";
+
+        return firebaseURL;
+    }
+
     /*  Sync is between saved local file
     and remote saved storage.
     After merge, it updates local file
@@ -173,8 +184,15 @@ public class DataHelper {
         }
     }
     private void removeFirebaseListeners() {
-        if (myFirebaseRef != null && firebaseListeners != null) {
-            myFirebaseRef.removeEventListener(firebaseListeners);
+        if (myFirebaseRef == null){
+            if (firebaseListeners != null) {
+                firebaseListeners = null;
+            }
+        }
+        else {
+            if (firebaseListeners != null) {
+                myFirebaseRef.removeEventListener(firebaseListeners);
+            }
         }
     }
 

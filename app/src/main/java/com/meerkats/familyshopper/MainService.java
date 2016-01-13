@@ -11,6 +11,7 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
 import android.support.v4.content.LocalBroadcastManager;
+import android.widget.Toast;
 
 import com.firebase.client.Firebase;
 
@@ -25,28 +26,24 @@ public class MainService extends Service {
     boolean mAllowRebind;
     private volatile HandlerThread mHandlerThread;
     private ServiceHandler mServiceHandler;
-    FirebaseURLChangedReceiver firebaseUDChangedReceiver;
+    SettingsChangedReceiver settingsChangedReceiver;
 
-    // Define how the handler will process messages
     private final class ServiceHandler extends Handler {
         public ServiceHandler(Looper looper) {
             super(looper);
         }
 
-        // Define how to handle any incoming messages here
         @Override
         public void handleMessage(Message message) {
-            // ...
-            // When needed, stop the service with
-            // stopSelf();
         }
     }
-    public class FirebaseURLChangedReceiver extends BroadcastReceiver {
+    public class SettingsChangedReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(final Context context, Intent intent) {
             mServiceHandler.post(new Runnable() {
                 @Override
                 public void run() {
+                    Toast.makeText(getApplicationContext(), "Settings changed", Toast.LENGTH_SHORT).show();
                     dataHelper.instanciateFirebase(true);
                 }
             });
@@ -63,9 +60,9 @@ public class MainService extends Service {
 
         Firebase.setAndroidContext(this);
         dataHelper = new DataHelper(this);
-        firebaseUDChangedReceiver = new FirebaseURLChangedReceiver();
-        IntentFilter filter = new IntentFilter(MainController.firebase_url_updated_action);
-        LocalBroadcastManager.getInstance(this).registerReceiver(firebaseUDChangedReceiver, filter);
+        settingsChangedReceiver = new SettingsChangedReceiver();
+        IntentFilter filter = new IntentFilter(MainController.settings_updated_action);
+        LocalBroadcastManager.getInstance(this).registerReceiver(settingsChangedReceiver, filter);
 
     }
 
@@ -103,7 +100,7 @@ public class MainService extends Service {
         // Cleanup service before destruction
         mHandlerThread.quit();
         dataHelper.cleanUp();
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(firebaseUDChangedReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(settingsChangedReceiver);
     }
 
 }

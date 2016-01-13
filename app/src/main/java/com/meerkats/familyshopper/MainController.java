@@ -31,11 +31,12 @@ public class MainController {
     ShoppingListAdapter shoppingListAdapter;
     public static final String PREFS_NAME = "MyPrefsFile";
     public static final String Firebase_URL_Name = "FirebaseURLName";
+    public static final String Integrate_With_Firebase_Name = "IntegrateFirebase";
     HandlerThread handlerThread;
     SyncHandler syncHandler;
     Handler mainUIHandler;
     Handler mainControllerHandler;
-    public static final String firebase_url_updated_action = "com.meerkats.familyshopper.MainController.FirebaseUI";
+    public static final String settings_updated_action = "com.meerkats.familyshopper.MainController.SettingsUpdated";
 
     class SyncHandler extends Handler {
         public SyncHandler(Looper myLooper) {
@@ -166,28 +167,15 @@ public class MainController {
         }
     }
 
-    public void connect(final Activity activity){
-        ConnectUsingFirebaseDialog cdd=new ConnectUsingFirebaseDialog(activity);
-
-        cdd.setOnDismissListener(new DialogInterface.OnDismissListener() {
+    public void connect(){
+        mainControllerHandler.post(new Runnable() {
             @Override
-            public void onDismiss(DialogInterface dialog) {
-                if (((ConnectUsingFirebaseDialog) dialog).isCanceled())
-                    return;
-                mainControllerHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        dataHelper.instanciateFirebase(false);
-                        myFirebaseRef = dataHelper.getMyFirebaseRef();
-                        Intent intent = new Intent(firebase_url_updated_action);
-                        LocalBroadcastManager.getInstance(activity.getApplicationContext()).sendBroadcast(intent);
-                        sync(false, false);
-                    }
-                });
-
+            public void run() {
+                dataHelper.instanciateFirebase(false);
+                myFirebaseRef = dataHelper.getMyFirebaseRef();
+                sync(false, false);
             }
         });
-        cdd.show();
     }
 
     public ShoppingList getShoppingList(){ return shoppingList; }
