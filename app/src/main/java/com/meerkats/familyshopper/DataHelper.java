@@ -6,7 +6,10 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Handler;
+import android.os.HandlerThread;
 import android.os.Looper;
+import android.os.Message;
 import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.app.NotificationCompat;
@@ -41,10 +44,43 @@ public class DataHelper {
     public static final String FILE_CHANGED_ACTION = "com.meerkats.familyshopper.MainService.FileChanged";
     public static final String FIREBASE_URL_CHANGED_ACTION = "com.meerkats.familyshopper.MainService.FileChanged";
     public static final int file_changed_notification_id = 123456;
+    DataChangedHandler dataChangedHandler;
+    HandlerThread handlerThread;
 
+    class DataChangedHandler extends Handler {
+        public DataChangedHandler(Looper myLooper) {
+            super(myLooper);
+        }
+        public void handleMessage(Message msg) {
+            DataSnapshot snapshot = (DataSnapshot)msg.obj;
+            String localData = loadGsonFromLocalStorage();
+            String mergedData = "";
+            if (!localData.trim().isEmpty()){
+                mergedData = merge(snapshot, localData);
+            }
+            else {
+                HashMap<String, String> map = (HashMap<String, String>) snapshot.getValue();
+                if (map != null) {
+                    mergedData = map.get("masterList");
+                }
+            }
+            if (!mergedData.trim().isEmpty()) {
+                saveShoppingListToStorage(mergedData);
+                Intent intent = new Intent(FILE_CHANGED_ACTION);
+                boolean recieversAvailable = LocalBroadcastManager.getInstance(context.getApplicationContext()).sendBroadcast(intent);
+                if(!recieversAvailable){
+                    sendFileChangedNotification();
+                }
+            }
+        }
+    }
     public DataHelper(Context context) {
         this.context = context;
         dataMerger = new DataMerger();
+        handlerThread = new HandlerThread("MainActivity.HandlerThread");
+        handlerThread.start();
+        dataChangedHandler = new DataChangedHandler(handlerThread.getLooper());
+
 
         settings = context.getSharedPreferences(MainController.PREFS_NAME, context.MODE_PRIVATE);
         if (settings.contains(Last_Synced_Name)) {
@@ -92,26 +128,9 @@ public class DataHelper {
             firebaseListeners = myFirebaseRef.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot snapshot) {
-
-                    String localData = loadGsonFromLocalStorage();
-                    String mergedData = "";
-                    if (!localData.trim().isEmpty()){
-                        mergedData = merge(snapshot, localData);
-                    }
-                    else {
-                        HashMap<String, String> map = (HashMap<String, String>) snapshot.getValue();
-                        if (map != null) {
-                            mergedData = map.get("masterList");
-                        }
-                    }
-                    if (!mergedData.trim().isEmpty()) {
-                        saveShoppingListToStorage(mergedData);
-                        Intent intent = new Intent(FILE_CHANGED_ACTION);
-                        boolean recieversAvailable = LocalBroadcastManager.getInstance(context.getApplicationContext()).sendBroadcast(intent);
-                        if(!recieversAvailable){
-                            sendFileChangedNotification();
-                        }
-                    }
+                    Message message = dataChangedHandler.obtainMessage();
+                    message.obj = snapshot;
+                    dataChangedHandler.sendMessage(message);
                 }
 
                 @Override
@@ -229,5 +248,7 @@ public class DataHelper {
     }
 
     public Firebase getMyFirebaseRef(){return myFirebaseRef;}
-
+    public void cleanUp(){
+        handlerThread.quit();
+    }
 }

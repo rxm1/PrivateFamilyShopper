@@ -86,6 +86,7 @@ public class MainService extends Service {
     public void onDestroy() {
         // Cleanup service before destruction
         mHandlerThread.quit();
+        dataHelper.cleanUp();
     }
 
 }

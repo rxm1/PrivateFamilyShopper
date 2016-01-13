@@ -24,7 +24,6 @@ import com.meerkats.familyshopper.model.ShoppingListItem;
 public class MainController {
     Firebase myFirebaseRef;
     Activity activity;
-    DataMerger dataMerger;
     DataHelper dataHelper;
     ShoppingList shoppingList;
     ShoppingListAdapter shoppingListAdapter;
@@ -60,7 +59,6 @@ public class MainController {
     public MainController(Activity mainActivity) {
         this.activity = mainActivity;
         Firebase.setAndroidContext(activity);
-        dataMerger = new DataMerger();
         shoppingList = new ShoppingList("mainList");
         dataHelper = new DataHelper(mainActivity);
     }
@@ -183,5 +181,6 @@ public class MainController {
 
     public void cleanUp(){
         handlerThread.quit();
+        dataHelper.cleanUp();
     }
 }
