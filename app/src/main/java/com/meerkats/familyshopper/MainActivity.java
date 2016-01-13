@@ -90,6 +90,9 @@ public class MainActivity extends AppCompatActivity {
             case R.id.connect:
                 mainController.connect(this);
                 return true;
+            case R.id.settings:
+                
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
 
