@@ -82,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.sync:
-                mainController.sync(false);
+                mainController.sync(false, true);
                 return true;
             case R.id.clear_list:
                 mainController.clearShoppingList();
@@ -147,7 +147,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
-        IntentFilter filter = new IntentFilter(DataHelper.FILE_CHANGED_ACTION);
+        IntentFilter filter = new IntentFilter(DataHelper.service_updated_file_action);
         LocalBroadcastManager.getInstance(this).registerReceiver(dataChangedReceiver, filter);
 
         loadLocalShoppingList();

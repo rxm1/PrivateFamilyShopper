@@ -1,12 +1,16 @@
 package com.meerkats.familyshopper;
 
 import android.app.Service;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
+import android.support.v4.content.LocalBroadcastManager;
 import android.widget.Toast;
 
 import com.firebase.client.Firebase;
@@ -20,10 +24,9 @@ public class MainService extends Service {
     int mStartMode = START_STICKY;
     IBinder mBinder;
     boolean mAllowRebind;
-
-
     private volatile HandlerThread mHandlerThread;
     private ServiceHandler mServiceHandler;
+    FirebaseURLChangedReceiver firebaseUDChangedReceiver;
 
     // Define how the handler will process messages
     private final class ServiceHandler extends Handler {
@@ -39,7 +42,17 @@ public class MainService extends Service {
             // stopSelf();
         }
     }
-
+    public class FirebaseURLChangedReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(final Context context, Intent intent) {
+            mServiceHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    dataHelper.instanciateFirebase(true);
+                }
+            });
+        }
+    }
     @Override
     public void onCreate() {
         super.onCreate();
@@ -51,11 +64,15 @@ public class MainService extends Service {
 
         Firebase.setAndroidContext(this);
         dataHelper = new DataHelper(this);
+        firebaseUDChangedReceiver = new FirebaseURLChangedReceiver();
+        IntentFilter filter = new IntentFilter(MainController.firebase_ui_updated_action);
+        LocalBroadcastManager.getInstance(this).registerReceiver(firebaseUDChangedReceiver, filter);
 
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+
 
         mServiceHandler.post(new Runnable() {
             @Override
@@ -87,6 +104,7 @@ public class MainService extends Service {
         // Cleanup service before destruction
         mHandlerThread.quit();
         dataHelper.cleanUp();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(firebaseUDChangedReceiver);
     }
 
 }

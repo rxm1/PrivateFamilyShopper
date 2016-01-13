@@ -41,11 +41,12 @@ public class DataHelper {
     Firebase myFirebaseRef;
     SharedPreferences settings;
     public static final String Last_Synced_Name = "LastSyncedName";
-    public static final String FILE_CHANGED_ACTION = "com.meerkats.familyshopper.MainService.FileChanged";
+    public static final String service_updated_file_action = "com.meerkats.familyshopper.MainService.FileChanged";
     public static final String FIREBASE_URL_CHANGED_ACTION = "com.meerkats.familyshopper.MainService.FileChanged";
     public static final int file_changed_notification_id = 123456;
     DataChangedHandler dataChangedHandler;
     HandlerThread handlerThread;
+    private static boolean isValidFirebaseURL = false;
 
     class DataChangedHandler extends Handler {
         public DataChangedHandler(Looper myLooper) {
@@ -66,7 +67,7 @@ public class DataHelper {
             }
             if (!mergedData.trim().isEmpty()) {
                 saveShoppingListToStorage(mergedData);
-                Intent intent = new Intent(FILE_CHANGED_ACTION);
+                Intent intent = new Intent(service_updated_file_action);
                 boolean recieversAvailable = LocalBroadcastManager.getInstance(context.getApplicationContext()).sendBroadcast(intent);
                 if(!recieversAvailable){
                     sendFileChangedNotification();
@@ -95,6 +96,8 @@ public class DataHelper {
                 String firebaseURL = settings.getString(MainController.Firebase_URL_Name, null);
                 if (firebaseURL != null && !firebaseURL.trim().isEmpty()) {
                     myFirebaseRef = new Firebase(firebaseURL);
+                    checkFirebaseURL(fromService);
+
                     if(fromService)
                         addFirebaseListeners();
                 }
@@ -105,7 +108,7 @@ public class DataHelper {
                 }
                 if(!fromService) {
                     if (myFirebaseRef != null)
-                        Toast.makeText(context.getApplicationContext(), "Firebase connected.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context.getApplicationContext(), "Connecting to Firebase...", Toast.LENGTH_SHORT).show();
                     else
                         Toast.makeText(context.getApplicationContext(), "Firebase not connected.", Toast.LENGTH_SHORT).show();
                 }
@@ -117,7 +120,36 @@ public class DataHelper {
             }
         }
     }
+    private void checkFirebaseURL(final boolean fromService) {
+        isValidFirebaseURL = false;
+        if (myFirebaseRef != null) {
+            try {
+                myFirebaseRef.addListenerForSingleValueEvent(
+                        new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot snapshot) {
+                                isValidFirebaseURL = true;
+                                if (!fromService) {
+                                    Toast.makeText(context.getApplicationContext(), "Firebase connected.", Toast.LENGTH_SHORT).show();
+                                }
+                            }
 
+                            @Override
+                            public void onCancelled(FirebaseError firebaseError) {
+
+                            }
+
+                        });
+            } catch (Exception e) {
+                if (!fromService) {
+                    Toast.makeText(context.getApplicationContext(), "Firebase not connected.", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }
+        else{
+            Toast.makeText(context.getApplicationContext(), "Firebase not connected.", Toast.LENGTH_SHORT).show();
+        }
+    }
     /*  Sync is between saved local file
     and remote saved storage.
     After merge, it updates local file
@@ -246,6 +278,8 @@ public class DataHelper {
 
         return true;
     }
+    public static boolean getIsValidFirebaseURL(){return isValidFirebaseURL;}
+
 
     public Firebase getMyFirebaseRef(){return myFirebaseRef;}
     public void cleanUp(){

@@ -2,10 +2,12 @@ package com.meerkats.familyshopper;
 
 import android.app.Activity;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
+import android.support.v4.content.LocalBroadcastManager;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Toast;
@@ -33,6 +35,7 @@ public class MainController {
     SyncHandler syncHandler;
     Handler mainUIHandler;
     Handler mainControllerHandler;
+    public static final String firebase_ui_updated_action = "com.meerkats.familyshopper.MainController.FirebaseUI";
 
     class SyncHandler extends Handler {
         public SyncHandler(Looper myLooper) {
@@ -88,7 +91,7 @@ public class MainController {
 
     public void deleteShoppingListItem(int position){
         shoppingList.remove(position);
-        sync(false);
+        sync(true, false);
     }
     public void editShoppingListItem(final AdapterView<?> parent, final View v, final int position, long id, Activity activity){
         final ShoppingListItem shoppingListItem = shoppingList.getShoppingListItem(position);
@@ -103,22 +106,22 @@ public class MainController {
                 String newData = ((EditShoppingItemDialog) dialog).getNewData();
                 shoppingListItem.setShoppingListItem(newData);
                 shoppingList.setShoppingListItemEdit(shoppingListItem, position);
-                sync(false);
+                sync(true, false);
             }
         });
         cdd.show();
     }
     public void crossOffShoppingItem(int position){
         shoppingList.setItemCrossedOff(position);
-        sync(false);
+        sync(true, false);
     }
     public void addItemToShoppingList(String item){
         shoppingList.add(item);
-        sync(false);
+        sync(true, false);
     }
     public void clearShoppingList(){
         shoppingList.clear();
-        sync(false);
+        sync(true, false);
     }
 
 /*  Sync is between local shopping list object
@@ -126,34 +129,44 @@ public class MainController {
     After merge, it updates all local object and file
     and remote storage
  */
-    public void sync(boolean fromConnect){
-        if(myFirebaseRef != null) {
-                    myFirebaseRef.addListenerForSingleValueEvent(
-                            new ValueEventListener() {
-                                @Override
-                                public void onDataChange(DataSnapshot snapshot) {
-                                    shoppingListAdapter.notifyDataSetChanged();
+    public void sync(boolean refresh, boolean showConnectionStatus){
+        if(refresh){
+            mainUIHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    shoppingListAdapter.notifyDataSetChanged();
+                }
+            });
+        }
+        if(myFirebaseRef != null && DataHelper.getIsValidFirebaseURL()) {
+            try {
+                myFirebaseRef.addListenerForSingleValueEvent(
+                        new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot snapshot) {
+                                Message message = syncHandler.obtainMessage();
+                                message.obj = snapshot;
+                                syncHandler.sendMessage(message);
+                            }
 
-                                    Message message = syncHandler.obtainMessage();
-                                    message.obj = snapshot;
-                                    syncHandler.sendMessage(message);
-                                }
+                            @Override
+                            public void onCancelled(FirebaseError firebaseError) {
+                                Toast.makeText(activity.getApplicationContext(), "Firebase not connected", Toast.LENGTH_SHORT).show();
+                            }
 
-                                @Override
-                                public void onCancelled(FirebaseError firebaseError) {
-                                    Toast.makeText(activity.getApplicationContext(), "The read failed: " + firebaseError.getMessage(), Toast.LENGTH_SHORT).show();
-                                }
-
-                            });
-
+                        });
+            }
+            catch (Exception e){
+                Toast.makeText(activity.getApplicationContext(), "Firebase not connected", Toast.LENGTH_SHORT).show();
+            }
         }
         else{
-            if (!fromConnect)
-                Toast.makeText(activity, "Not Connected", Toast.LENGTH_SHORT).show();
+            if(showConnectionStatus)
+                Toast.makeText(activity.getApplicationContext(), "Firebase not connected", Toast.LENGTH_SHORT).show();
         }
     }
 
-    public void connect(Activity activity){
+    public void connect(final Activity activity){
         ConnectUsingFirebaseDialog cdd=new ConnectUsingFirebaseDialog(activity);
 
         cdd.setOnDismissListener(new DialogInterface.OnDismissListener() {
@@ -166,7 +179,9 @@ public class MainController {
                     public void run() {
                         dataHelper.instanciateFirebase(false);
                         myFirebaseRef = dataHelper.getMyFirebaseRef();
-                        sync(true);
+                        Intent intent = new Intent(firebase_ui_updated_action);
+                        LocalBroadcastManager.getInstance(activity.getApplicationContext()).sendBroadcast(intent);
+                        sync(false, false);
                     }
                 });
 
