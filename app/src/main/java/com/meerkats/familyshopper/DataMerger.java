@@ -22,13 +22,6 @@ public class DataMerger {
         lastSynced = 0;
     }
 
-    public boolean hasDataChanged(String newData, ShoppingList shoppingList){
-        String oldData = shoppingList.getJson();
-        if(oldData.compareTo(newData) != 0) {
-            return true;
-        }
-        return false;
-    }
     public boolean hasDataChanged(String newData, String oldData){
         if(oldData.compareTo(newData) != 0) {
             return true;
@@ -40,11 +33,6 @@ public class DataMerger {
         ShoppingList localList = new ShoppingList();
         ShoppingList remoteList = new ShoppingList();
         localList.loadShoppingList(localData);
-        remoteList.loadShoppingList(remoteData);
-        return mergeData(localList, remoteList);
-    }
-    public String mergeData(ShoppingList localList, String remoteData){
-        ShoppingList remoteList = new ShoppingList();
         remoteList.loadShoppingList(remoteData);
         return mergeData(localList, remoteList);
     }
@@ -103,6 +91,5 @@ public class DataMerger {
         return mergedList.getJson();
     }
 
-    public long getLastSynced(){return lastSynced;}
     public void setLastSynced(long lastSynced){this.lastSynced = lastSynced;}
 }

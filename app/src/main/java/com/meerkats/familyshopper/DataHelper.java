@@ -42,7 +42,6 @@ public class DataHelper {
     SharedPreferences settings;
     public static final String Last_Synced_Name = "LastSyncedName";
     public static final String service_updated_file_action = "com.meerkats.familyshopper.MainService.FileChanged";
-    public static final String FIREBASE_URL_CHANGED_ACTION = "com.meerkats.familyshopper.MainService.FileChanged";
     public static final int file_changed_notification_id = 123456;
     DataChangedHandler dataChangedHandler;
     HandlerThread handlerThread;
@@ -250,9 +249,6 @@ public class DataHelper {
             Log.e("Exception", "File read failed: " + e.toString());
             return "";
         }
-    }
-    public void saveShoppingListToStorage(ShoppingList shoppingList){
-        saveShoppingListToStorage(shoppingList.getJson());
     }
     public boolean saveShoppingListToStorage(String jsonData){
         if(saveShoppingListToLocalStorage(jsonData)){

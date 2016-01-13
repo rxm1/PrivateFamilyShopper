@@ -11,7 +11,6 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
 import android.support.v4.content.LocalBroadcastManager;
-import android.widget.Toast;
 
 import com.firebase.client.Firebase;
 
@@ -65,7 +64,7 @@ public class MainService extends Service {
         Firebase.setAndroidContext(this);
         dataHelper = new DataHelper(this);
         firebaseUDChangedReceiver = new FirebaseURLChangedReceiver();
-        IntentFilter filter = new IntentFilter(MainController.firebase_ui_updated_action);
+        IntentFilter filter = new IntentFilter(MainController.firebase_url_updated_action);
         LocalBroadcastManager.getInstance(this).registerReceiver(firebaseUDChangedReceiver, filter);
 
     }

@@ -35,7 +35,7 @@ public class MainController {
     SyncHandler syncHandler;
     Handler mainUIHandler;
     Handler mainControllerHandler;
-    public static final String firebase_ui_updated_action = "com.meerkats.familyshopper.MainController.FirebaseUI";
+    public static final String firebase_url_updated_action = "com.meerkats.familyshopper.MainController.FirebaseUI";
 
     class SyncHandler extends Handler {
         public SyncHandler(Looper myLooper) {
@@ -179,7 +179,7 @@ public class MainController {
                     public void run() {
                         dataHelper.instanciateFirebase(false);
                         myFirebaseRef = dataHelper.getMyFirebaseRef();
-                        Intent intent = new Intent(firebase_ui_updated_action);
+                        Intent intent = new Intent(firebase_url_updated_action);
                         LocalBroadcastManager.getInstance(activity.getApplicationContext()).sendBroadcast(intent);
                         sync(false, false);
                     }
@@ -191,7 +191,6 @@ public class MainController {
     }
 
     public ShoppingList getShoppingList(){ return shoppingList; }
-
     public ShoppingListAdapter getShoppingListAdapter(){return shoppingListAdapter;}
 
     public void cleanUp(){
