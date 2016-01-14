@@ -11,6 +11,7 @@
         <EditTextPreference android:inputType="number"
             android:title="Notification Frequency (seconds)"
             android:key="notificationFrequency"
+            android:defaultValue="0"
             android:summary="Value of 0 means real-time updates, greater then 0 means notification interval at least equal the value"></EditTextPreference>
         <MultiSelectListPreference
             android:title="Notification Events"

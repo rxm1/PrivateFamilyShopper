@@ -15,7 +15,7 @@ public class NotificationEvents{
     }
 
     public boolean isTrue(){
-        return additions || modifications || deletions;
+        return (additions || modifications || deletions);
     }
 }
 

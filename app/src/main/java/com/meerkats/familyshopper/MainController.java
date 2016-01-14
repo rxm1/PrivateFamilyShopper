@@ -32,7 +32,9 @@ public class MainController {
     public static final String PREFS_NAME = "MyPrefsFile";
     public static final String Firebase_URL_Name = "FirebaseURLName";
     public static final String Integrate_With_Firebase_Name = "IntegrateFirebase";
+    public static final String Notification_Frequency_Name = "notificationFrequency";
     public static final String Notification_Events_Name = "notificationEvents";
+
     HandlerThread handlerThread;
     SyncHandler syncHandler;
     Handler mainUIHandler;

@@ -32,6 +32,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * Created by Rez on 10/01/2016.
@@ -50,6 +52,7 @@ public class DataHelper {
     HandlerThread handlerThread;
     private static boolean isValidFirebaseURL = false;
     NotificationEvents notificationEvents = new NotificationEvents();
+    Timer timer = new Timer();
 
     class MainServiceDataChangedHandler extends Handler {
         public MainServiceDataChangedHandler(Looper myLooper) {
@@ -85,8 +88,12 @@ public class DataHelper {
         handlerThread.start();
         mainServiceDataChangedHandler = new MainServiceDataChangedHandler(handlerThread.getLooper());
 
-
         settings = PreferenceManager.getDefaultSharedPreferences(context);
+
+      /*  SharedPreferences.Editor editor = settings.edit();
+        editor.clear();
+        editor.commit();
+*/
         if (settings.contains(Last_Synced_Name)) {
             settings.getLong(Last_Synced_Name, System.currentTimeMillis());
             dataMerger.setLastSynced(settings.getLong(Last_Synced_Name, 0));
@@ -200,7 +207,10 @@ public class DataHelper {
     }
 
     private void sendFileChangedNotification(){
+
         Set<String> notificationEventsSettings = settings.getStringSet(MainController.Notification_Events_Name, new HashSet<String>());
+        String temp = settings.getString(MainController.Notification_Frequency_Name, "0");
+        int notificationFrequency = temp==""?0:Integer.valueOf(temp);
         NotificationEvents tempNotifications = new NotificationEvents();
         String notificationDescription = "Items have been ";
         for (String events : notificationEventsSettings) {
@@ -221,33 +231,51 @@ public class DataHelper {
         }
         notificationDescription = notificationDescription.substring(0, notificationDescription.length()-2);
         notificationDescription += ".";
+        final String finalNotificationDescription = notificationDescription;
         if(tempNotifications.isTrue()) {
-            NotificationCompat.Builder mBuilder =
-                    new NotificationCompat.Builder(context)
-                            .setSmallIcon(R.mipmap.ic_launcher)
-                            .setContentTitle("Family Shopper")
-                            .setContentText(notificationDescription);
-
-            Intent resultIntent = new Intent(context, MainActivity.class);
-            TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
-            // Adds the back stack for the Intent (but not the Intent itself)
-            stackBuilder.addParentStack(MainActivity.class);
-            // Adds the Intent that starts the Activity to the top of the stack
-            stackBuilder.addNextIntent(resultIntent);
-            PendingIntent resultPendingIntent =
-                    stackBuilder.getPendingIntent(
-                            0,
-                            PendingIntent.FLAG_UPDATE_CURRENT
-                    );
-            mBuilder.setContentIntent(resultPendingIntent)
-                    .setAutoCancel(true)
-                    .setDefaults(Notification.DEFAULT_ALL);
-            NotificationManager mNotificationManager =
-                    (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-            // mId allows you to update the notification later on.
-            mNotificationManager.notify(file_changed_notification_id, mBuilder.build());
+            if (notificationFrequency > 0) {
+                TimerTask timerTask = new TimerTask() {
+                    @Override
+                    public void run() {
+                        sendNotification(finalNotificationDescription);
+                    }
+                };
+                timer.cancel();
+                timer.purge();
+                timer = new Timer();
+                timer.schedule(timerTask, notificationFrequency * 1000);
+            }
+            else
+                sendNotification(finalNotificationDescription);
         }
         notificationEvents.setFalse();
+    }
+
+    private void sendNotification(String notificationDescription){
+        NotificationCompat.Builder mBuilder =
+                new NotificationCompat.Builder(context)
+                        .setSmallIcon(R.mipmap.ic_launcher)
+                        .setContentTitle("Family Shopper")
+                        .setContentText(notificationDescription);
+
+        Intent resultIntent = new Intent(context, MainActivity.class);
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
+        // Adds the back stack for the Intent (but not the Intent itself)
+        stackBuilder.addParentStack(MainActivity.class);
+        // Adds the Intent that starts the Activity to the top of the stack
+        stackBuilder.addNextIntent(resultIntent);
+        PendingIntent resultPendingIntent =
+                stackBuilder.getPendingIntent(
+                        0,
+                        PendingIntent.FLAG_UPDATE_CURRENT
+                );
+        mBuilder.setContentIntent(resultPendingIntent)
+                .setAutoCancel(true)
+                .setDefaults(Notification.DEFAULT_ALL);
+        NotificationManager mNotificationManager =
+                (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        // mId allows you to update the notification later on.
+        mNotificationManager.notify(file_changed_notification_id, mBuilder.build());
     }
 
     public String merge(DataSnapshot snapshot, String localData, boolean alwaysMerge){
