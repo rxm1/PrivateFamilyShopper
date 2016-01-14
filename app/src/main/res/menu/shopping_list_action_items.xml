@@ -8,8 +8,8 @@
         app:showAsAction="ifRoom"/>
     <item
         android:id="@+id/clear_list"
-        android:title="Clear List"
-        android:icon="@mipmap/ic_table_column_remove_all"
+        android:title="Delete All"
+        android:icon="@mipmap/ic_delete_black_24dp"
         app:showAsAction="ifRoom"/>
 
     <item android:id="@+id/sync"
