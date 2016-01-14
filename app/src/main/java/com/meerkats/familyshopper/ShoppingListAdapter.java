@@ -34,10 +34,11 @@ public class ShoppingListAdapter extends ArrayAdapter<String> {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent){
+        ShoppingListItem shoppingListItem = shoppingList.getShoppingListItem(position);
         LayoutInflater inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View rowView = inflater.inflate(R.layout.shopping_list, parent, false);
         TextView textView = (TextView)rowView.findViewById(R.id.shoppingListItemTextView);
-        ShoppingListItem shoppingListItem = shoppingList.getShoppingListItem(position);
+
         textView.setText(shoppingListItem.getShoppingListItem());
 
         if (shoppingListItem.isCrossedOff()) {

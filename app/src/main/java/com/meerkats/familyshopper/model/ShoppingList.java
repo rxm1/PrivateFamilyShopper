@@ -70,8 +70,12 @@ public class ShoppingList extends ArrayList<String>{
         else
             innerShoppingList = new InnerShoppingList("");
 
+        int index = 0;
         for (int i = 0; i < innerShoppingList.shoppingListItems.size(); i++){
-            this.add(i, innerShoppingList.shoppingListItems.get(i).getShoppingListItem());
+            if(!innerShoppingList.shoppingListItems.get(i).getIsDeleted()) {
+                this.add(index, innerShoppingList.shoppingListItems.get(i).getShoppingListItem());
+                index++;
+            }
         }
     }
     public String getJson(){
