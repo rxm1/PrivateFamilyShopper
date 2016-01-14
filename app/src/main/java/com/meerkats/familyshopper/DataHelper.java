@@ -101,7 +101,7 @@ public class DataHelper {
         }
     }
 
-    public void instanciateFirebase(boolean fromService) {
+    public synchronized void instanciateFirebase(boolean fromService) {
         try {
             if (settings.contains(MainController.Firebase_URL_Name)) {
                 String firebaseURL = formatFirebaseURL(settings.getString(MainController.Firebase_URL_Name, null));
@@ -132,7 +132,7 @@ public class DataHelper {
             }
         }
     }
-    private void checkFirebaseURL(final boolean fromService) {
+    private synchronized void checkFirebaseURL(final boolean fromService) {
         isValidFirebaseURL = false;
         if (myFirebaseRef != null) {
             try {
@@ -162,7 +162,7 @@ public class DataHelper {
             Toast.makeText(context.getApplicationContext(), "Firebase not connected.", Toast.LENGTH_SHORT).show();
         }
     }
-    public String formatFirebaseURL(String firebaseURL){
+    public synchronized String formatFirebaseURL(String firebaseURL){
         if(!firebaseURL.startsWith("https://"))
             firebaseURL = "https://" + firebaseURL;
         if(!firebaseURL.endsWith(".com"))
@@ -176,7 +176,7 @@ public class DataHelper {
     After merge, it updates local file
     and remote storage
     */
-    private void addFirebaseListeners(){
+    private synchronized void addFirebaseListeners(){
         if(myFirebaseRef != null) {
             firebaseListeners = myFirebaseRef.addValueEventListener(new ValueEventListener() {
                 @Override
@@ -197,7 +197,7 @@ public class DataHelper {
             });
         }
     }
-    private void removeFirebaseListeners() {
+    private synchronized void removeFirebaseListeners() {
         if (myFirebaseRef == null){
             if (firebaseListeners != null) {
                 firebaseListeners = null;
@@ -210,7 +210,7 @@ public class DataHelper {
         }
     }
 
-    private void sendFileChangedNotification(){
+    private synchronized void sendFileChangedNotification(){
         String temp = settings.getString(MainController.Notification_Frequency_Name, "0");
         int notificationFrequency = temp==""?0:Integer.valueOf(temp);
 
@@ -250,7 +250,7 @@ public class DataHelper {
         }
     }
 
-    private void sendNotification(String notificationDescription){
+    private synchronized void sendNotification(String notificationDescription){
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(context)
                         .setSmallIcon(R.mipmap.ic_launcher)
@@ -276,7 +276,7 @@ public class DataHelper {
         // mId allows you to update the notification later on.
         mNotificationManager.notify(file_changed_notification_id, mBuilder.build());
     }
-    private NotificationEvents userSelectedNotificationEvents(){
+    private synchronized NotificationEvents userSelectedNotificationEvents(){
         Set<String> notificationEventsSettings = settings.getStringSet(MainController.Notification_Events_Name, new HashSet<String>());
         NotificationEvents tempNotifications = new NotificationEvents();
         for (String events : notificationEventsSettings) {
@@ -295,7 +295,7 @@ public class DataHelper {
         return tempNotifications;
     }
 
-    public String merge(DataSnapshot snapshot, String localData, boolean alwaysMerge){
+    public synchronized String merge(DataSnapshot snapshot, String localData, boolean alwaysMerge){
         HashMap<String, String> map = (HashMap<String, String>) snapshot.getValue();
         String mergedData = "";
         if (map != null) {
@@ -311,7 +311,7 @@ public class DataHelper {
         dataMerger.setLastSynced(lastSynced);
         return mergedData;
     }
-    public ShoppingList loadShoppingListFromLocalStorage(){
+    public synchronized ShoppingList loadShoppingListFromLocalStorage(){
         ShoppingList shoppingList = null;
         String gson = loadGsonFromLocalStorage();
         if(!gson.trim().isEmpty()) {
@@ -321,7 +321,7 @@ public class DataHelper {
 
         return shoppingList;
     }
-    public String loadGsonFromLocalStorage(){
+    public synchronized String loadGsonFromLocalStorage(){
         StringBuilder text = new StringBuilder();
         File file = new File(context.getFilesDir(), localMasterFileName);
         try {
@@ -340,7 +340,7 @@ public class DataHelper {
             return "";
         }
     }
-    public boolean saveShoppingListToStorage(String jsonData){
+    public synchronized boolean saveShoppingListToStorage(String jsonData){
         if(saveShoppingListToLocalStorage(jsonData)){
             if(myFirebaseRef != null)
                 myFirebaseRef.child("masterList").setValue(jsonData);
@@ -350,7 +350,7 @@ public class DataHelper {
 
         return true;
     }
-    public boolean saveShoppingListToLocalStorage(String jsonData){
+    public synchronized boolean saveShoppingListToLocalStorage(String jsonData){
         try {
             OutputStreamWriter outputStreamWriter = new OutputStreamWriter(
                     context.openFileOutput(localMasterFileName, Context.MODE_PRIVATE));
@@ -364,11 +364,11 @@ public class DataHelper {
 
         return true;
     }
-    public static boolean getIsValidFirebaseURL(){return isValidFirebaseURL;}
+    public synchronized static boolean getIsValidFirebaseURL(){return isValidFirebaseURL;}
 
 
-    public Firebase getMyFirebaseRef(){return myFirebaseRef;}
-    public void cleanUp(){
+    public synchronized Firebase getMyFirebaseRef(){return myFirebaseRef;}
+    public synchronized void cleanUp(){
         handlerThread.quit();
     }
 }

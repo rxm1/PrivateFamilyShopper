@@ -22,21 +22,21 @@ public class DataMerger {
         lastSynced = 0;
     }
 
-    public boolean hasDataChanged(String newData, String oldData){
+    public synchronized boolean hasDataChanged(String newData, String oldData){
         if(oldData.compareTo(newData) != 0) {
             return true;
         }
         return false;
     }
 
-    public String mergeData(String localData, String remoteData, NotificationEvents notificationEvents, boolean alwaysMerge){
+    public synchronized String mergeData(String localData, String remoteData, NotificationEvents notificationEvents, boolean alwaysMerge){
         ShoppingList localList = new ShoppingList();
         ShoppingList remoteList = new ShoppingList();
         localList.loadShoppingList(localData);
         remoteList.loadShoppingList(remoteData);
         return mergeData(localList, remoteList, notificationEvents, alwaysMerge);
     }
-    public String mergeData(ShoppingList localList, ShoppingList remoteList, NotificationEvents notificationEvents, boolean alwaysMerge){
+    public synchronized String mergeData(ShoppingList localList, ShoppingList remoteList, NotificationEvents notificationEvents, boolean alwaysMerge){
         long localLastUpdated = localList.getLastUpdated();
         long remoteLastUpdated = remoteList.getLastUpdated();
 
@@ -66,7 +66,7 @@ public class DataMerger {
         return "";
     }
 
-    private String merge(ShoppingList localList, ShoppingList remoteList, NotificationEvents notificationEvents){
+    private synchronized String merge(ShoppingList localList, ShoppingList remoteList, NotificationEvents notificationEvents){
         ShoppingList mergedList = new ShoppingList();
         HashMap<UUID, ShoppingListItem> remoteListHash = new HashMap<>(remoteList.size());
         for (ShoppingListItem i : remoteList.getShoppingListItems()) remoteListHash.put(i.getGuid(),i);
@@ -107,5 +107,5 @@ public class DataMerger {
         return mergedList.getJson();
     }
 
-    public void setLastSynced(long lastSynced){this.lastSynced = lastSynced;}
+    public synchronized void setLastSynced(long lastSynced){this.lastSynced = lastSynced;}
 }

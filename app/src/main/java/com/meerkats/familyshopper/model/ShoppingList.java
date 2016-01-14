@@ -23,39 +23,39 @@ public class ShoppingList extends ArrayList<String>{
         innerShoppingList = new InnerShoppingList("");
     }
 
-    public String getShoppingListName() {
+    public synchronized String getShoppingListName() {
         return innerShoppingList.shoppingListName;
     }
 
     @Override
-    public boolean add(String item){
+    public synchronized boolean add(String item){
         super.add(item);
         innerShoppingList.add(new ShoppingListItem(item));
         return true;
     }
-    public void add(ShoppingListItem shoppingListItem){
+    public synchronized void add(ShoppingListItem shoppingListItem){
         super.add(shoppingListItem.getShoppingListItem());
         innerShoppingList.add(shoppingListItem);
     }
 
     @Override
-    public String remove(int position){
+    public synchronized String remove(int position){
         String item = super.remove(position);
         innerShoppingList.remove(position);
         return item;
     }
-    public void markAsDeleted(int position){
+    public synchronized void markAsDeleted(int position){
         super.remove(position);
         innerShoppingList.markAsDeleted(position);
     }
     @Override
-    public void clear(){
+    public synchronized void clear(){
         super.clear();
         for (int i=0; i<innerShoppingList.getShoppingListItems().size(); i++) {
             innerShoppingList.markAsDeleted(i);
         }
     }
-    public void clearCrossedOff(){
+    public synchronized void clearCrossedOff(){
         for (int i = 0; i < innerShoppingList.getShoppingListItems().size(); i++) {
             ShoppingListItem listItem = innerShoppingList.getShoppingListItems().get(i);
             if(listItem.isCrossedOff()) {
@@ -64,15 +64,14 @@ public class ShoppingList extends ArrayList<String>{
             }
         }
     }
-    public void setItemCrossedOff(int position){
+    public synchronized void setItemCrossedOff(int position){
         ShoppingListItem shoppingListItem = innerShoppingList.getShoppingListItems().get(position);
         shoppingListItem.setIsCrossedOff(!shoppingListItem.isCrossedOff());
         innerShoppingList.setShoppingListItem(position, shoppingListItem);
     }
 
 
-    public void loadShoppingList(String newGson){
-        synchronized (this) {
+    public synchronized void loadShoppingList(String newGson){
             super.clear();
             if (newGson != null && !newGson.isEmpty())
                 innerShoppingList = gson.fromJson(newGson, gsonType);
@@ -85,27 +84,26 @@ public class ShoppingList extends ArrayList<String>{
                     this.add(index, innerShoppingList.shoppingListItems.get(i).getShoppingListItem());
                     index++;
                 }
-            }
         }
     }
-    public String getJson(){
+    public synchronized String getJson(){
         return gson.toJson(innerShoppingList, gsonType);
     }
 
 
-    public ShoppingListItem getShoppingListItem(int index){
+    public synchronized ShoppingListItem getShoppingListItem(int index){
         return innerShoppingList.shoppingListItems.get(index);
     }
-    public ArrayList<ShoppingListItem> getShoppingListItems(){
+    public synchronized ArrayList<ShoppingListItem> getShoppingListItems(){
         return innerShoppingList.getShoppingListItems();
     }
 
-    public void setShoppingListItemEdit(ShoppingListItem shoppingListItem, int position){
+    public synchronized void setShoppingListItemEdit(ShoppingListItem shoppingListItem, int position){
         innerShoppingList.setShoppingListItem(position, shoppingListItem);
         this.set(position, shoppingListItem.toString());
     }
 
-    public long getLastUpdated(){return innerShoppingList.getLastModified();}
+    public synchronized long getLastUpdated(){return innerShoppingList.getLastModified();}
 
     private class InnerShoppingList
     {
@@ -146,21 +144,21 @@ public class ShoppingList extends ArrayList<String>{
             shoppingListItems.set(position, shoppingListItem);
             setLastModified();
         }
-        public String getShoppingListName(){return shoppingListName;}
-        public void setShoppingListName(String shoppingListName){
+        private String getShoppingListName(){return shoppingListName;}
+        private void setShoppingListName(String shoppingListName){
             this.shoppingListName=shoppingListName;
             setLastModified();
         }
-        public ArrayList<ShoppingListItem> getShoppingListItems(){return shoppingListItems;}
-        public void setShoppingListItems(ArrayList<ShoppingListItem> shoppingListItems){
+        private ArrayList<ShoppingListItem> getShoppingListItems(){return shoppingListItems;}
+        private void setShoppingListItems(ArrayList<ShoppingListItem> shoppingListItems){
             this.shoppingListItems=shoppingListItems;
             setLastModified();
         }
-        public long getLastModified(){return lastModified;}
-        public void setLastModified(){this.lastModified = new Date().getTime();}
+        private long getLastModified(){return lastModified;}
+        private void setLastModified(){this.lastModified = new Date().getTime();}
 
         @Override
-        public String toString(){
+        public synchronized String toString(){
             String items = "";
             for (int i=0; i < shoppingListItems.size(); i++) {
                 items += shoppingListItems.get(i).toString();

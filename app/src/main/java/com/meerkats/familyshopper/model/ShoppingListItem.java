@@ -24,7 +24,7 @@ public class ShoppingListItem {
         init();
     }
 
-    private void init(){
+    private synchronized void init(){
         isCrossedOff = false;
         isDeleted = false;
         guid = UUID.randomUUID();
@@ -32,7 +32,7 @@ public class ShoppingListItem {
     }
 
     @Override
-    public String toString(){
+    public synchronized String toString(){
         return "ShoppingListItem [shopping_list_item=" + shoppingListItem + ", "
                 + "uuid=" + guid + ", "
                 + "last_modified=" + lastModified + ", "
@@ -40,27 +40,27 @@ public class ShoppingListItem {
                 + "is_deleted=" + isDeleted + "]";
     }
 
-    public String getShoppingListItem() { return shoppingListItem; }
-    public void setShoppingListItem(String shoppingListItem) {
+    public synchronized String getShoppingListItem() { return shoppingListItem; }
+    public synchronized void setShoppingListItem(String shoppingListItem) {
         this.shoppingListItem = shoppingListItem;
         lastModified = new Date();
     }
-    public boolean isCrossedOff() { return isCrossedOff; }
-    public void setIsCrossedOff(boolean isCrossedOff) {
+    public synchronized boolean isCrossedOff() { return isCrossedOff; }
+    public synchronized void setIsCrossedOff(boolean isCrossedOff) {
         this.isCrossedOff = isCrossedOff;
         lastModified = new Date();
     }
-    public boolean getIsDeleted(){return isDeleted;}
-    public void setIsDeleted(boolean isDeleted){this.isDeleted=isDeleted;}
-    public int getPostitonEntered(){return postitonEntered;}
-    public void setPostitonEntered(int postitonEntered){this.postitonEntered = postitonEntered;}
-    public void setPositionOrdered(int positionOrdered){this.positionOrdered = positionOrdered;}
-    public int getPositionOrdered(){return positionOrdered;}
-    public Date getLastModified(){return lastModified;}
-    public void setLastModified(Date lastModified){this.lastModified = lastModified;}
-    public UUID getGuid(){return guid;}
+    public synchronized boolean getIsDeleted(){return isDeleted;}
+    public synchronized void setIsDeleted(boolean isDeleted){this.isDeleted=isDeleted;}
+    public synchronized int getPostitonEntered(){return postitonEntered;}
+    public synchronized void setPostitonEntered(int postitonEntered){this.postitonEntered = postitonEntered;}
+    public synchronized void setPositionOrdered(int positionOrdered){this.positionOrdered = positionOrdered;}
+    public synchronized int getPositionOrdered(){return positionOrdered;}
+    public synchronized Date getLastModified(){return lastModified;}
+    public synchronized void setLastModified(Date lastModified){this.lastModified = lastModified;}
+    public synchronized UUID getGuid(){return guid;}
 
-    public boolean equal(ShoppingListItem other){
+    public synchronized boolean equal(ShoppingListItem other){
         if(this.getGuid().equals(other.getGuid())
                 && this.isCrossedOff()==other.isCrossedOff()
                 && this.shoppingListItem.equals(other.shoppingListItem)
