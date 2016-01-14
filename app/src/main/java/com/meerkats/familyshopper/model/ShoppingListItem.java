@@ -13,6 +13,7 @@ public class ShoppingListItem {
     private int postitonEntered;
     private int positionOrdered;
     private UUID guid;
+    private boolean isDeleted;
 
     public ShoppingListItem(){
         shoppingListItem = "";
@@ -25,6 +26,7 @@ public class ShoppingListItem {
 
     private void init(){
         isCrossedOff = false;
+        isDeleted = false;
         guid = UUID.randomUUID();
         lastModified = new Date();
     }
@@ -34,7 +36,8 @@ public class ShoppingListItem {
         return "ShoppingListItem [shopping_list_item=" + shoppingListItem + ", "
                 + "uuid=" + guid + ", "
                 + "last_modified=" + lastModified + ", "
-                + "is_crossed_off=" + isCrossedOff + "]";
+                + "is_crossed_off=" + isCrossedOff + ", "
+                + "is_deleted=" + isDeleted + "]";
     }
 
     public String getShoppingListItem() { return shoppingListItem; }
@@ -47,6 +50,8 @@ public class ShoppingListItem {
         this.isCrossedOff = isCrossedOff;
         lastModified = new Date();
     }
+    public boolean getIsDeleted(){return isDeleted;}
+    public void setIsDeleted(boolean isDeleted){this.isDeleted=isDeleted;}
     public int getPostitonEntered(){return postitonEntered;}
     public void setPostitonEntered(int postitonEntered){this.postitonEntered = postitonEntered;}
     public void setPositionOrdered(int positionOrdered){this.positionOrdered = positionOrdered;}
@@ -58,7 +63,8 @@ public class ShoppingListItem {
     public boolean equal(ShoppingListItem other){
         if(this.getGuid().equals(other.getGuid())
                 && this.isCrossedOff()==other.isCrossedOff()
-                && this.shoppingListItem.equals(other.shoppingListItem)){
+                && this.shoppingListItem.equals(other.shoppingListItem)
+                && this.isDeleted==other.isDeleted){
             return true;
         }
 

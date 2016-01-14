@@ -181,9 +181,12 @@ public class DataHelper {
             firebaseListeners = myFirebaseRef.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot snapshot) {
-                    Message message = mainServiceDataChangedHandler.obtainMessage();
-                    message.obj = snapshot;
-                    mainServiceDataChangedHandler.sendMessage(message);
+                    Boolean integrateFirebase = settings.getBoolean(MainController.Integrate_With_Firebase_Name, false);
+                    if(integrateFirebase) {
+                        Message message = mainServiceDataChangedHandler.obtainMessage();
+                        message.obj = snapshot;
+                        mainServiceDataChangedHandler.sendMessage(message);
+                    }
                 }
 
                 @Override

@@ -72,17 +72,21 @@ public class DataMerger {
         for (ShoppingListItem i : remoteList.getShoppingListItems()) remoteListHash.put(i.getGuid(),i);
 
         for (ShoppingListItem localItem : localList.getShoppingListItems()){
-            if(remoteListHash.containsKey(localItem.getGuid())){
+            if(remoteListHash.containsKey(localItem.getGuid())) {
                 //item exists in both list
                 ShoppingListItem remoteItem = remoteListHash.get(localItem.getGuid());
-                if(remoteItem.getLastModified().getTime() > localItem.getLastModified().getTime()) {
-                    mergedList.add(remoteItem);
+                if (!remoteItem.getIsDeleted()){ //do not add back in if its been deleted
+                    if (remoteItem.getLastModified().getTime() > localItem.getLastModified().getTime()) {
+                        mergedList.add(remoteItem);
+                    } else
+                        mergedList.add(localItem);
+
+                    if(!remoteItem.equal(localItem))
+                        notificationEvents.modifications = true;
                 }
                 else
-                    mergedList.add(localItem);
+                    notificationEvents.deletions = true;
 
-                if(!remoteItem.equal(localItem))
-                    notificationEvents.modifications = true;
 
                 remoteListHash.remove(localItem.getGuid());
             }
@@ -94,8 +98,10 @@ public class DataMerger {
         //items that exist only in remote list
         for (HashMap.Entry<UUID, ShoppingListItem> remoteItem : remoteListHash.entrySet())
         {
-            notificationEvents.additions = true;
-            mergedList.add(remoteItem.getValue());
+            if (!remoteItem.getValue().getIsDeleted()) { //do not add back in if its been deleted
+                notificationEvents.additions = true;
+                mergedList.add(remoteItem.getValue());
+            }
         }
 
         return mergedList.getJson();

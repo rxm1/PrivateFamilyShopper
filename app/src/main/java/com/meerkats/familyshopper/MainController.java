@@ -48,7 +48,7 @@ public class MainController {
         public void handleMessage(Message msg) {
             DataSnapshot snapshot = (DataSnapshot)msg.obj;
             String localData = shoppingList.getJson();
-            String mergedData = dataHelper.merge(snapshot, localData, false);
+            String mergedData = dataHelper.merge(snapshot, localData, true);
             if (!mergedData.trim().isEmpty()) {
                 dataHelper.saveShoppingListToStorage(mergedData);
                 shoppingList.loadShoppingList(mergedData);
@@ -94,7 +94,7 @@ public class MainController {
     }
 
     public void deleteShoppingListItem(int position){
-        shoppingList.remove(position);
+        shoppingList.markAsDeleted(position);
         sync(true, false);
     }
     public void editShoppingListItem(final AdapterView<?> parent, final View v, final int position, long id, Activity activity){

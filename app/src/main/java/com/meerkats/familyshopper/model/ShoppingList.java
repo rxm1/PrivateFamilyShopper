@@ -44,10 +44,16 @@ public class ShoppingList extends ArrayList<String>{
         innerShoppingList.remove(position);
         return item;
     }
+    public void markAsDeleted(int position){
+        super.remove(position);
+        innerShoppingList.markAsDeleted(position);
+    }
     @Override
     public void clear(){
         super.clear();
-        innerShoppingList.clear();
+        for (ShoppingListItem listItem:innerShoppingList.getShoppingListItems()) {
+            listItem.setIsDeleted(true);
+        }
     }
 
     public void setItemCrossedOff(int position){
@@ -107,6 +113,13 @@ public class ShoppingList extends ArrayList<String>{
 
         private void remove(int postion){
             shoppingListItems.remove(postion);
+            setLastModified();
+        }
+
+        private void markAsDeleted(int postion){
+            ShoppingListItem shoppingListItem = shoppingListItems.get(postion);
+            shoppingListItem.setIsDeleted(true);
+            shoppingListItems.set(postion, shoppingListItem);
             setLastModified();
         }
 
