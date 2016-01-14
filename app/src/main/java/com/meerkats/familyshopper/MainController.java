@@ -48,7 +48,7 @@ public class MainController {
         public void handleMessage(Message msg) {
             DataSnapshot snapshot = (DataSnapshot)msg.obj;
             String localData = shoppingList.getJson();
-            String mergedData = dataHelper.merge(snapshot, localData, true);
+            String mergedData = dataHelper.merge(snapshot, localData, false);
             if (!mergedData.trim().isEmpty()) {
                 dataHelper.saveShoppingListToStorage(mergedData);
                 shoppingList.loadShoppingList(mergedData);
