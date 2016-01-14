@@ -17,5 +17,9 @@ public class NotificationEvents{
     public boolean isTrue(){
         return (additions || modifications || deletions);
     }
+
+    public boolean isAllTrue(){
+        return (additions && modifications && deletions);
+    }
 }
 

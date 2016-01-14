@@ -51,7 +51,7 @@ public class DataHelper {
     MainServiceDataChangedHandler mainServiceDataChangedHandler;
     HandlerThread handlerThread;
     private static boolean isValidFirebaseURL = false;
-    NotificationEvents notificationEvents = new NotificationEvents();
+    NotificationEvents occuredNotificationEvents = new NotificationEvents();
     Timer timer = new Timer();
 
     class MainServiceDataChangedHandler extends Handler {
@@ -62,9 +62,9 @@ public class DataHelper {
             DataSnapshot snapshot = (DataSnapshot)msg.obj;
             String localData = loadGsonFromLocalStorage();
             String mergedData = "";
-            notificationEvents.setFalse();
+            occuredNotificationEvents.setFalse();
             if (!localData.trim().isEmpty()){
-                mergedData = merge(snapshot, localData, true);
+                mergedData = merge(snapshot, localData, !userSelectedNotificationEvents().isAllTrue());
             }
             else {
                 HashMap<String, String> map = (HashMap<String, String>) snapshot.getValue();
@@ -72,7 +72,7 @@ public class DataHelper {
                     mergedData = map.get("masterList");
                 }
             }
-            if (!mergedData.trim().isEmpty() && notificationEvents.isTrue()) {
+            if (!mergedData.trim().isEmpty() && occuredNotificationEvents.isTrue()) {
                 saveShoppingListToStorage(mergedData);
                 Intent intent = new Intent(service_updated_file_action);
                 boolean recieversAvailable = LocalBroadcastManager.getInstance(context.getApplicationContext()).sendBroadcast(intent);
@@ -211,32 +211,28 @@ public class DataHelper {
     }
 
     private void sendFileChangedNotification(){
-
-        Set<String> notificationEventsSettings = settings.getStringSet(MainController.Notification_Events_Name, new HashSet<String>());
         String temp = settings.getString(MainController.Notification_Frequency_Name, "0");
         int notificationFrequency = temp==""?0:Integer.valueOf(temp);
-        NotificationEvents tempNotifications = new NotificationEvents();
+
+        NotificationEvents userSelectedNotifications = userSelectedNotificationEvents();
+        NotificationEvents mergedNotifications = new NotificationEvents();
         String notificationDescription = "Items have been ";
-        for (String events : notificationEventsSettings) {
-            switch (events){
-                case "additions":
-                    tempNotifications.additions = notificationEvents.additions;
-                    if(notificationEvents.additions) notificationDescription += "added, ";
-                    break;
-                case "modifications":
-                    tempNotifications.modifications = notificationEvents.modifications;
-                    if(notificationEvents.modifications) notificationDescription += "modified, ";
-                    break;
-                case "deletions":
-                    tempNotifications.deletions = notificationEvents.deletions;
-                    if(notificationEvents.deletions) notificationDescription += "deleted, ";
-                    break;
-            }
+        if(userSelectedNotifications.additions){
+            mergedNotifications.additions = occuredNotificationEvents.additions;
+            if(occuredNotificationEvents.additions) notificationDescription += "added, ";
+        }
+        if(userSelectedNotifications.modifications){
+            mergedNotifications.modifications = occuredNotificationEvents.modifications;
+            if(occuredNotificationEvents.modifications) notificationDescription += "modified, ";
+        }
+        if(userSelectedNotifications.deletions){
+            mergedNotifications.deletions = occuredNotificationEvents.deletions;
+            if(occuredNotificationEvents.deletions) notificationDescription += "deleted, ";
         }
         notificationDescription = notificationDescription.substring(0, notificationDescription.length()-2);
         notificationDescription += ".";
         final String finalNotificationDescription = notificationDescription;
-        if(tempNotifications.isTrue()) {
+        if(mergedNotifications.isTrue()) {
             if (notificationFrequency > 0) {
                 TimerTask timerTask = new TimerTask() {
                     @Override
@@ -280,6 +276,24 @@ public class DataHelper {
         // mId allows you to update the notification later on.
         mNotificationManager.notify(file_changed_notification_id, mBuilder.build());
     }
+    private NotificationEvents userSelectedNotificationEvents(){
+        Set<String> notificationEventsSettings = settings.getStringSet(MainController.Notification_Events_Name, new HashSet<String>());
+        NotificationEvents tempNotifications = new NotificationEvents();
+        for (String events : notificationEventsSettings) {
+            switch (events){
+                case "additions":
+                    tempNotifications.additions = true;
+                    break;
+                case "modifications":
+                    tempNotifications.modifications = true;
+                    break;
+                case "deletions":
+                    tempNotifications.deletions = true;
+                    break;
+            }
+        }
+        return tempNotifications;
+    }
 
     public String merge(DataSnapshot snapshot, String localData, boolean alwaysMerge){
         HashMap<String, String> map = (HashMap<String, String>) snapshot.getValue();
@@ -287,7 +301,7 @@ public class DataHelper {
         if (map != null) {
             String remoteData = map.get("masterList");
             if (dataMerger.hasDataChanged(localData, remoteData)) {
-                mergedData = dataMerger.mergeData(localData, remoteData, notificationEvents, alwaysMerge);
+                mergedData = dataMerger.mergeData(localData, remoteData, occuredNotificationEvents, alwaysMerge);
             }
         }
         SharedPreferences.Editor editor = settings.edit();
