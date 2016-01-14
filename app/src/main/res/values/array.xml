@@ -6,8 +6,8 @@
     </string-array>
 
     <string-array name="listValues">
-        <item>1</item>
-        <item>2</item>
-        <item>3</item>
+        <item>additions</item>
+        <item>modifications</item>
+        <item>deletions</item>
     </string-array>
 </resources>

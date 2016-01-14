@@ -30,6 +30,8 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created by Rez on 10/01/2016.
@@ -44,12 +46,13 @@ public class DataHelper {
     public static final String Last_Synced_Name = "LastSyncedName";
     public static final String service_updated_file_action = "com.meerkats.familyshopper.MainService.FileChanged";
     public static final int file_changed_notification_id = 123456;
-    DataChangedHandler dataChangedHandler;
+    MainServiceDataChangedHandler mainServiceDataChangedHandler;
     HandlerThread handlerThread;
     private static boolean isValidFirebaseURL = false;
+    NotificationEvents notificationEvents = new NotificationEvents();
 
-    class DataChangedHandler extends Handler {
-        public DataChangedHandler(Looper myLooper) {
+    class MainServiceDataChangedHandler extends Handler {
+        public MainServiceDataChangedHandler(Looper myLooper) {
             super(myLooper);
         }
         public void handleMessage(Message msg) {
@@ -57,7 +60,7 @@ public class DataHelper {
             String localData = loadGsonFromLocalStorage();
             String mergedData = "";
             if (!localData.trim().isEmpty()){
-                mergedData = merge(snapshot, localData);
+                mergedData = merge(snapshot, localData, true);
             }
             else {
                 HashMap<String, String> map = (HashMap<String, String>) snapshot.getValue();
@@ -65,8 +68,8 @@ public class DataHelper {
                     mergedData = map.get("masterList");
                 }
             }
-            if (!mergedData.trim().isEmpty()) {
-                saveShoppingListToStorage(mergedData);
+            if (!mergedData.trim().isEmpty() && notificationEvents.isTrue()) {
+                saveShoppingListToLocalStorage(mergedData);
                 Intent intent = new Intent(service_updated_file_action);
                 boolean recieversAvailable = LocalBroadcastManager.getInstance(context.getApplicationContext()).sendBroadcast(intent);
                 if(!recieversAvailable){
@@ -80,7 +83,7 @@ public class DataHelper {
         dataMerger = new DataMerger();
         handlerThread = new HandlerThread("MainActivity.HandlerThread");
         handlerThread.start();
-        dataChangedHandler = new DataChangedHandler(handlerThread.getLooper());
+        mainServiceDataChangedHandler = new MainServiceDataChangedHandler(handlerThread.getLooper());
 
 
         settings = PreferenceManager.getDefaultSharedPreferences(context);
@@ -170,9 +173,9 @@ public class DataHelper {
             firebaseListeners = myFirebaseRef.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot snapshot) {
-                    Message message = dataChangedHandler.obtainMessage();
+                    Message message = mainServiceDataChangedHandler.obtainMessage();
                     message.obj = snapshot;
-                    dataChangedHandler.sendMessage(message);
+                    mainServiceDataChangedHandler.sendMessage(message);
                 }
 
                 @Override
@@ -197,39 +200,57 @@ public class DataHelper {
     }
 
     private void sendFileChangedNotification(){
-        NotificationCompat.Builder mBuilder =
-                new NotificationCompat.Builder(context)
-                        .setSmallIcon(R.mipmap.ic_launcher)
-                        .setContentTitle("Family Shopper")
-                        .setContentText("Shopping List has changed.");
+        Set<String> notificationEventsSettings = settings.getStringSet(MainController.Notification_Events_Name, new HashSet<String>());
+        NotificationEvents tempNotifications = new NotificationEvents();
+        for (String events : notificationEventsSettings) {
+            switch (events){
+                case "additions":
+                    tempNotifications.additions = notificationEvents.additions;
+                    break;
+                case "modifications":
+                    tempNotifications.modifications = notificationEvents.modifications;
+                    break;
+                case "deletions":
+                    tempNotifications.deletions = notificationEvents.deletions;
+                    break;
+            }
+        }
+        if(tempNotifications.isTrue()) {
+            NotificationCompat.Builder mBuilder =
+                    new NotificationCompat.Builder(context)
+                            .setSmallIcon(R.mipmap.ic_launcher)
+                            .setContentTitle("Family Shopper")
+                            .setContentText("Shopping List has changed.");
 
-        Intent resultIntent = new Intent(context, MainActivity.class);
-        TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
-        // Adds the back stack for the Intent (but not the Intent itself)
-        stackBuilder.addParentStack(MainActivity.class);
-        // Adds the Intent that starts the Activity to the top of the stack
-        stackBuilder.addNextIntent(resultIntent);
-        PendingIntent resultPendingIntent =
-                stackBuilder.getPendingIntent(
-                        0,
-                        PendingIntent.FLAG_UPDATE_CURRENT
-                );
-        mBuilder.setContentIntent(resultPendingIntent)
-                .setAutoCancel(true)
-                .setDefaults(Notification.DEFAULT_ALL);
-        NotificationManager mNotificationManager =
-                (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        // mId allows you to update the notification later on.
-        mNotificationManager.notify(file_changed_notification_id, mBuilder.build());
+            Intent resultIntent = new Intent(context, MainActivity.class);
+            TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
+            // Adds the back stack for the Intent (but not the Intent itself)
+            stackBuilder.addParentStack(MainActivity.class);
+            // Adds the Intent that starts the Activity to the top of the stack
+            stackBuilder.addNextIntent(resultIntent);
+            PendingIntent resultPendingIntent =
+                    stackBuilder.getPendingIntent(
+                            0,
+                            PendingIntent.FLAG_UPDATE_CURRENT
+                    );
+            mBuilder.setContentIntent(resultPendingIntent)
+                    .setAutoCancel(true)
+                    .setDefaults(Notification.DEFAULT_ALL);
+            NotificationManager mNotificationManager =
+                    (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+            // mId allows you to update the notification later on.
+            mNotificationManager.notify(file_changed_notification_id, mBuilder.build());
+        }
+        notificationEvents.setFalse();
     }
 
-    public String merge(DataSnapshot snapshot, String localData){
+    public String merge(DataSnapshot snapshot, String localData, boolean alwaysMerge){
         HashMap<String, String> map = (HashMap<String, String>) snapshot.getValue();
         String mergedData = "";
         if (map != null) {
             String remoteData = map.get("masterList");
             if (dataMerger.hasDataChanged(localData, remoteData)) {
-                mergedData = dataMerger.mergeData(localData, remoteData);
+                mergedData = dataMerger.mergeData(localData, remoteData, notificationEvents, alwaysMerge);
             }
         }
         SharedPreferences.Editor editor = settings.edit();

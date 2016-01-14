@@ -29,18 +29,22 @@ public class DataMerger {
         return false;
     }
 
-    public String mergeData(String localData, String remoteData){
+    public String mergeData(String localData, String remoteData, NotificationEvents notificationEvents, boolean alwaysMerge){
         ShoppingList localList = new ShoppingList();
         ShoppingList remoteList = new ShoppingList();
         localList.loadShoppingList(localData);
         remoteList.loadShoppingList(remoteData);
-        return mergeData(localList, remoteList);
+        return mergeData(localList, remoteList, notificationEvents, alwaysMerge);
     }
-    public String mergeData(ShoppingList localList, ShoppingList remoteList){
+    public String mergeData(ShoppingList localList, ShoppingList remoteList, NotificationEvents notificationEvents, boolean alwaysMerge){
         long localLastUpdated = localList.getLastUpdated();
         long remoteLastUpdated = remoteList.getLastUpdated();
 
-        if(localLastUpdated > remoteLastUpdated &&
+        if(alwaysMerge) {
+            return merge(localList, remoteList, notificationEvents);
+        }
+
+        if (localLastUpdated > remoteLastUpdated &&
                 localLastUpdated > lastSynced &&
                 remoteLastUpdated <= lastSynced) {
             return localList.getJson();
@@ -48,20 +52,21 @@ public class DataMerger {
 
         if (remoteLastUpdated > localLastUpdated &&
                 remoteLastUpdated > lastSynced &&
-                localLastUpdated <= lastSynced){
+                localLastUpdated <= lastSynced) {
+            notificationEvents.modifications = true;
             return remoteList.getJson();
 
         }
 
         if (remoteLastUpdated > lastSynced &&
                 localLastUpdated > lastSynced){
-            return merge(localList, remoteList);
+            return merge(localList, remoteList, notificationEvents);
         }
 
         return "";
     }
 
-    private String merge(ShoppingList localList, ShoppingList remoteList){
+    private String merge(ShoppingList localList, ShoppingList remoteList, NotificationEvents notificationEvents){
         ShoppingList mergedList = new ShoppingList();
         HashMap<UUID, ShoppingListItem> remoteListHash = new HashMap<>(remoteList.size());
         for (ShoppingListItem i : remoteList.getShoppingListItems()) remoteListHash.put(i.getGuid(),i);
@@ -70,8 +75,10 @@ public class DataMerger {
             if(remoteListHash.containsKey(localItem.getGuid())){
                 //item exists in both list
                 ShoppingListItem remoteItem = remoteListHash.get(localItem.getGuid());
-                if(remoteItem.getLastModified().getTime() > localItem.getLastModified().getTime())
+                if(remoteItem.getLastModified().getTime() > localItem.getLastModified().getTime()) {
                     mergedList.add(remoteItem);
+                    notificationEvents.modifications = true;
+                }
                 else
                     mergedList.add(localItem);
 
@@ -85,6 +92,7 @@ public class DataMerger {
         //items that exist only in remote list
         for (HashMap.Entry<UUID, ShoppingListItem> remoteItem : remoteListHash.entrySet())
         {
+            notificationEvents.additions = true;
             mergedList.add(remoteItem.getValue());
         }
 

@@ -43,7 +43,6 @@ public class MainService extends Service {
             mServiceHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    Toast.makeText(getApplicationContext(), "Settings changed", Toast.LENGTH_SHORT).show();
                     dataHelper.instanciateFirebase(true);
                 }
             });

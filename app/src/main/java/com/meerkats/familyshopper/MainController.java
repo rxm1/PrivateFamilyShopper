@@ -32,6 +32,7 @@ public class MainController {
     public static final String PREFS_NAME = "MyPrefsFile";
     public static final String Firebase_URL_Name = "FirebaseURLName";
     public static final String Integrate_With_Firebase_Name = "IntegrateFirebase";
+    public static final String Notification_Events_Name = "notificationEvents";
     HandlerThread handlerThread;
     SyncHandler syncHandler;
     Handler mainUIHandler;
@@ -45,7 +46,7 @@ public class MainController {
         public void handleMessage(Message msg) {
             DataSnapshot snapshot = (DataSnapshot)msg.obj;
             String localData = shoppingList.getJson();
-            String mergedData = dataHelper.merge(snapshot, localData);
+            String mergedData = dataHelper.merge(snapshot, localData, false);
             if (!mergedData.trim().isEmpty()) {
                 dataHelper.saveShoppingListToStorage(mergedData);
                 shoppingList.loadShoppingList(mergedData);
