@@ -2,19 +2,24 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
+        android:id="@+id/clear_crossed_off"
+        android:title="Clear Crossed-Off"
+        android:icon="@mipmap/ic_table_column_remove"
+        app:showAsAction="ifRoom"/>
+    <item
         android:id="@+id/clear_list"
         android:title="Clear List"
-        android:icon="@mipmap/ic_delete_black_24dp"
+        android:icon="@mipmap/ic_table_column_remove_all"
         app:showAsAction="ifRoom"/>
 
     <item android:id="@+id/sync"
         android:title="Sync"
         android:icon="@mipmap/ic_sync_black_24dp"
-        app:showAsAction="never"/>
+        app:showAsAction="always"/>
 
     <item android:id="@+id/settings"
         android:title="Settings"
         android:icon="@mipmap/ic_settings"
-        app:showAsAction="never"/>
+        app:showAsAction="ifRoom"/>
 
 </menu>

@@ -55,7 +55,15 @@ public class ShoppingList extends ArrayList<String>{
             listItem.setIsDeleted(true);
         }
     }
-
+    public void clearCrossedOff(){
+        for (int i = 0; i < innerShoppingList.getShoppingListItems().size(); i++) {
+            ShoppingListItem listItem = innerShoppingList.getShoppingListItems().get(i);
+            if(listItem.isCrossedOff()) {
+                listItem.setIsDeleted(true);
+                super.remove(i);
+            }
+        }
+    }
     public void setItemCrossedOff(int position){
         ShoppingListItem shoppingListItem = innerShoppingList.getShoppingListItems().get(position);
         shoppingListItem.setIsCrossedOff(!shoppingListItem.isCrossedOff());

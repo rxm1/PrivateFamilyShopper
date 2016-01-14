@@ -127,6 +127,10 @@ public class MainController {
         shoppingList.clear();
         sync(true, false);
     }
+    public void clearCrossedOffShoppingList(){
+        shoppingList.clearCrossedOff();
+        sync(true, false);
+    }
 
 /*  Sync is between local shopping list object
     and remote saved storage.

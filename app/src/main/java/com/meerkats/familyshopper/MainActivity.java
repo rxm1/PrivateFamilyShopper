@@ -89,6 +89,9 @@ public class MainActivity extends AppCompatActivity {
             case R.id.clear_list:
                 mainController.clearShoppingList();
                 return true;
+            case R.id.clear_crossed_off:
+                mainController.clearCrossedOffShoppingList();
+                return true;
             case R.id.settings:
                 Intent i = new Intent(this, SettingsActivity.class);
                 startActivityForResult(i, SETTINGS_RESULT);
