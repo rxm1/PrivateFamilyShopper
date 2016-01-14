@@ -202,25 +202,31 @@ public class DataHelper {
     private void sendFileChangedNotification(){
         Set<String> notificationEventsSettings = settings.getStringSet(MainController.Notification_Events_Name, new HashSet<String>());
         NotificationEvents tempNotifications = new NotificationEvents();
+        String notificationDescription = "Items have been ";
         for (String events : notificationEventsSettings) {
             switch (events){
                 case "additions":
                     tempNotifications.additions = notificationEvents.additions;
+                    if(notificationEvents.additions) notificationDescription += "added, ";
                     break;
                 case "modifications":
                     tempNotifications.modifications = notificationEvents.modifications;
+                    if(notificationEvents.modifications) notificationDescription += "modified, ";
                     break;
                 case "deletions":
                     tempNotifications.deletions = notificationEvents.deletions;
+                    if(notificationEvents.deletions) notificationDescription += "deleted, ";
                     break;
             }
         }
+        notificationDescription = notificationDescription.substring(0, notificationDescription.length()-2);
+        notificationDescription += ".";
         if(tempNotifications.isTrue()) {
             NotificationCompat.Builder mBuilder =
                     new NotificationCompat.Builder(context)
                             .setSmallIcon(R.mipmap.ic_launcher)
                             .setContentTitle("Family Shopper")
-                            .setContentText("Shopping List has changed.");
+                            .setContentText(notificationDescription);
 
             Intent resultIntent = new Intent(context, MainActivity.class);
             TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
