@@ -51,15 +51,15 @@ public class ShoppingList extends ArrayList<String>{
     @Override
     public void clear(){
         super.clear();
-        for (ShoppingListItem listItem:innerShoppingList.getShoppingListItems()) {
-            listItem.setIsDeleted(true);
+        for (int i=0; i<innerShoppingList.getShoppingListItems().size(); i++) {
+            innerShoppingList.markAsDeleted(i);
         }
     }
     public void clearCrossedOff(){
         for (int i = 0; i < innerShoppingList.getShoppingListItems().size(); i++) {
             ShoppingListItem listItem = innerShoppingList.getShoppingListItems().get(i);
             if(listItem.isCrossedOff()) {
-                listItem.setIsDeleted(true);
+                innerShoppingList.markAsDeleted(i);
                 super.remove(i);
             }
         }
