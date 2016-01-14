@@ -62,6 +62,7 @@ public class DataHelper {
             DataSnapshot snapshot = (DataSnapshot)msg.obj;
             String localData = loadGsonFromLocalStorage();
             String mergedData = "";
+            notificationEvents.setFalse();
             if (!localData.trim().isEmpty()){
                 mergedData = merge(snapshot, localData, true);
             }
@@ -72,7 +73,7 @@ public class DataHelper {
                 }
             }
             if (!mergedData.trim().isEmpty() && notificationEvents.isTrue()) {
-                saveShoppingListToLocalStorage(mergedData);
+                saveShoppingListToStorage(mergedData);
                 Intent intent = new Intent(service_updated_file_action);
                 boolean recieversAvailable = LocalBroadcastManager.getInstance(context.getApplicationContext()).sendBroadcast(intent);
                 if(!recieversAvailable){
@@ -248,7 +249,6 @@ public class DataHelper {
             else
                 sendNotification(finalNotificationDescription);
         }
-        notificationEvents.setFalse();
     }
 
     private void sendNotification(String notificationDescription){

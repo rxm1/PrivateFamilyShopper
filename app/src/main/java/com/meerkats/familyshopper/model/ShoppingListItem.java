@@ -55,4 +55,13 @@ public class ShoppingListItem {
     public void setLastModified(Date lastModified){this.lastModified = lastModified;}
     public UUID getGuid(){return guid;}
 
+    public boolean equal(ShoppingListItem other){
+        if(this.getGuid().equals(other.getGuid())
+                && this.isCrossedOff()==other.isCrossedOff()
+                && this.shoppingListItem.equals(other.shoppingListItem)){
+            return true;
+        }
+
+        return false;
+    }
 }

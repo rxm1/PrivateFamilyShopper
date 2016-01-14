@@ -77,10 +77,12 @@ public class DataMerger {
                 ShoppingListItem remoteItem = remoteListHash.get(localItem.getGuid());
                 if(remoteItem.getLastModified().getTime() > localItem.getLastModified().getTime()) {
                     mergedList.add(remoteItem);
-                    notificationEvents.modifications = true;
                 }
                 else
                     mergedList.add(localItem);
+
+                if(!remoteItem.equal(localItem))
+                    notificationEvents.modifications = true;
 
                 remoteListHash.remove(localItem.getGuid());
             }
