@@ -77,20 +77,24 @@ public class MainController {
         mainUIHandler = new Handler(Looper.getMainLooper());
         mainControllerHandler = new Handler(handlerThread.getLooper());
 
-        shoppingList = dataHelper.loadShoppingListFromLocalStorage();
+        shoppingList = new ShoppingList("master_list");
         shoppingListAdapter = new ShoppingListAdapter(activity, shoppingList);
-
+        shoppingListAdapter.notifyDataSetChanged();
         mainControllerHandler.post(new Runnable() {
             @Override
             public void run() {
+                shoppingList.loadShoppingList(dataHelper.loadGsonFromLocalStorage());
                 dataHelper.instanciateFirebase(false);
                 myFirebaseRef = dataHelper.getMyFirebaseRef();
+
+                mainUIHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        shoppingListAdapter.notifyDataSetChanged();
+                    }
+                });
             }
         });
-
-
-        shoppingListAdapter.notifyDataSetChanged();
-
     }
 
     public void deleteShoppingListItem(int position){

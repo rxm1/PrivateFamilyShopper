@@ -72,17 +72,19 @@ public class ShoppingList extends ArrayList<String>{
 
 
     public void loadShoppingList(String newGson){
-        super.clear();
-        if(newGson != null && !newGson.isEmpty())
-            innerShoppingList = gson.fromJson(newGson, gsonType);
-        else
-            innerShoppingList = new InnerShoppingList("");
+        synchronized (this) {
+            super.clear();
+            if (newGson != null && !newGson.isEmpty())
+                innerShoppingList = gson.fromJson(newGson, gsonType);
+            else
+                innerShoppingList = new InnerShoppingList("");
 
-        int index = 0;
-        for (int i = 0; i < innerShoppingList.shoppingListItems.size(); i++){
-            if(!innerShoppingList.shoppingListItems.get(i).getIsDeleted()) {
-                this.add(index, innerShoppingList.shoppingListItems.get(i).getShoppingListItem());
-                index++;
+            int index = 0;
+            for (int i = 0; i < innerShoppingList.shoppingListItems.size(); i++) {
+                if (!innerShoppingList.shoppingListItems.get(i).getIsDeleted()) {
+                    this.add(index, innerShoppingList.shoppingListItems.get(i).getShoppingListItem());
+                    index++;
+                }
             }
         }
     }
