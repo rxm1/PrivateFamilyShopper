@@ -19,6 +19,7 @@ import com.firebase.client.ValueEventListener;
 import com.meerkats.familyshopper.model.ShoppingList;
 import com.meerkats.familyshopper.model.ShoppingListItem;
 
+import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -53,9 +54,11 @@ public class MainController {
         }
         public void handleMessage(Message msg) {
             DataSnapshot snapshot = (DataSnapshot)msg.obj;
-            String localData = shoppingList.getJson();
-            String mergedData = dataHelper.merge(snapshot, localData, true);
-            if (!mergedData.trim().isEmpty()) {
+            NotificationEvents occuredNoticifications = new NotificationEvents();
+
+            ShoppingList mergedList = dataHelper.merge(snapshot, shoppingList, occuredNoticifications);
+            if(occuredNoticifications.isTrue()) {
+                String mergedData = mergedList.getJson();
                 dataHelper.saveShoppingListToStorage(mergedData);
                 shoppingList.loadShoppingList(mergedData);
                 mainUIHandler.post(new Runnable() {
@@ -65,8 +68,10 @@ public class MainController {
                     }
                 });
             }
+
         }
     }
+
 
 
     public MainController(Activity mainActivity) {

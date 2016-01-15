@@ -6,6 +6,8 @@ import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.UUID;
 
 /**
  * Created by Rez on 17/12/2015.
@@ -27,6 +29,7 @@ public class ShoppingList extends ArrayList<String>{
         return innerShoppingList.getShoppingListName();
     }
 
+
     @Override
     public synchronized boolean add(String item){
         super.add(item);
@@ -35,6 +38,7 @@ public class ShoppingList extends ArrayList<String>{
     }
     public synchronized void add(ShoppingListItem shoppingListItem){
         super.add(shoppingListItem.getShoppingListItem());
+        shoppingListItem.setLastModified(new Date());
         innerShoppingList.add(shoppingListItem);
     }
 
@@ -45,7 +49,6 @@ public class ShoppingList extends ArrayList<String>{
         return item;
     }
     public synchronized void markAsDeleted(int position){
-        super.remove(position);
         innerShoppingList.markAsDeleted(position);
     }
 
@@ -65,6 +68,7 @@ public class ShoppingList extends ArrayList<String>{
     public synchronized void setItemCrossedOff(int position){
         ShoppingListItem shoppingListItem = innerShoppingList.getShoppingListItems().get(position);
         shoppingListItem.setIsCrossedOff(!shoppingListItem.isCrossedOff());
+        shoppingListItem.setLastModified(new Date());
         innerShoppingList.setShoppingListItem(position, shoppingListItem);
     }
 
@@ -93,12 +97,14 @@ public class ShoppingList extends ArrayList<String>{
     }
 
     public synchronized void setShoppingListItemEdit(ShoppingListItem shoppingListItem, int position){
+        shoppingListItem.setLastModified(new Date());
         innerShoppingList.setShoppingListItem(position, shoppingListItem);
         this.set(position, shoppingListItem.toString());
     }
 
     public synchronized long getLastUpdated(){return innerShoppingList.getLastModified();}
 
+    public boolean equals(ShoppingList other){return innerShoppingList.equals(other.innerShoppingList);}
     class InnerShoppingList
     {
         private String shoppingListName;
@@ -114,42 +120,44 @@ public class ShoppingList extends ArrayList<String>{
 
         public void add(ShoppingListItem shoppingListItem){
             shoppingListItems.add(shoppingListItem);
-            setLastModified();
+            setLastModified(shoppingListItem.getLastModified().getTime());
         }
 
         public void remove(int postion){
             shoppingListItems.remove(postion);
-            setLastModified();
+            setLastModified(new Date().getTime());
         }
 
         public void markAsDeleted(int postion){
             ShoppingListItem shoppingListItem = shoppingListItems.get(postion);
             shoppingListItem.setIsDeleted(true);
+            Date now = new Date();
+            shoppingListItem.setLastModified(now);
+            setLastModified(now.getTime());
             shoppingListItems.set(postion, shoppingListItem);
-            setLastModified();
         }
 
         private void clear(){
             shoppingListItems.clear();
-            setLastModified();
+            setLastModified(new Date().getTime());
         }
 
         public void setShoppingListItem(int position, ShoppingListItem shoppingListItem){
             shoppingListItems.set(position, shoppingListItem);
-            setLastModified();
+            setLastModified(shoppingListItem.getLastModified().getTime());
         }
         public String getShoppingListName(){return shoppingListName;}
         public void setShoppingListName(String shoppingListName){
             this.shoppingListName=shoppingListName;
-            setLastModified();
+            setLastModified(new Date().getTime());
         }
         public ArrayList<ShoppingListItem> getShoppingListItems(){return shoppingListItems;}
         public void setShoppingListItems(ArrayList<ShoppingListItem> shoppingListItems){
             this.shoppingListItems=shoppingListItems;
-            setLastModified();
+            setLastModified(new Date().getTime());
         }
         public long getLastModified(){return lastModified;}
-        public void setLastModified(){this.lastModified = new Date().getTime();}
+        public void setLastModified(long lastModified){this.lastModified = lastModified;}
 
         @Override
         public synchronized String toString(){
@@ -160,6 +168,32 @@ public class ShoppingList extends ArrayList<String>{
             return "ShoppingList [shopping_list_name=" + shoppingListName + ", "
                     + "last_modified=" + lastModified + ", "
                     + items + "]";
+        }
+
+        public synchronized boolean equals(InnerShoppingList other){
+            //if(this.lastModified!=other.lastModified) return false;
+            if(this.shoppingListName!=other.shoppingListName) return false;
+
+            HashMap<UUID, ShoppingListItem> otherListHash = new HashMap<>(other.shoppingListItems.size());
+            for (ShoppingListItem i : other.getShoppingListItems()) otherListHash.put(i.getGuid(),i);
+
+            for (ShoppingListItem thisItem : this.getShoppingListItems()) {
+                if (otherListHash.containsKey(thisItem.getGuid())) {
+                    ShoppingListItem otherItem = otherListHash.get(thisItem.getGuid());
+                    if(!thisItem.equals(otherItem))
+                        return false;
+
+                    otherListHash.remove(thisItem.getGuid());
+                }
+                else
+                    return false;
+
+                if(otherListHash.size()>0)
+                    return false;
+
+            }
+
+            return true;
         }
     }
 }

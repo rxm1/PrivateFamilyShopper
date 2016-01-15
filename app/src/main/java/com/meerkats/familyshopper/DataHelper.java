@@ -60,20 +60,12 @@ public class DataHelper {
         }
         public void handleMessage(Message msg) {
             DataSnapshot snapshot = (DataSnapshot)msg.obj;
-            String localData = loadGsonFromLocalStorage();
-            String mergedData = "";
+            ShoppingList localList = loadShoppingListFromLocalStorage();
             occuredNotificationEvents.setFalse();
-            if (!localData.trim().isEmpty()){
-                mergedData = merge(snapshot, localData, true);
-            }
-            else {
-                HashMap<String, String> map = (HashMap<String, String>) snapshot.getValue();
-                if (map != null) {
-                    mergedData = map.get("masterList");
-                }
-            }
-            if (!mergedData.trim().isEmpty() && occuredNotificationEvents.isTrue()) {
-                saveShoppingListToStorage(mergedData);
+
+            ShoppingList mergedList = merge(snapshot, localList, occuredNotificationEvents);
+            if (occuredNotificationEvents.isTrue()) {
+                saveShoppingListToStorage(mergedList.getJson());
                 Intent intent = new Intent(service_updated_file_action);
                 boolean recieversAvailable = LocalBroadcastManager.getInstance(context.getApplicationContext()).sendBroadcast(intent);
                 if(!recieversAvailable){
@@ -296,13 +288,14 @@ public class DataHelper {
         return tempNotifications;
     }
 
-    public synchronized String merge(DataSnapshot snapshot, String localData, boolean alwaysMerge){
+    public synchronized ShoppingList merge(DataSnapshot snapshot, ShoppingList localList, NotificationEvents occuredNotificationEvents){
         HashMap<String, String> map = (HashMap<String, String>) snapshot.getValue();
-        String mergedData = "";
+        ShoppingList mergedList = new ShoppingList();
+        ShoppingList remoteList = new ShoppingList();
         if (map != null) {
-            String remoteData = map.get("masterList");
-            if (dataMerger.hasDataChanged(localData, remoteData)) {
-                mergedData = dataMerger.mergeData(localData, remoteData, occuredNotificationEvents, alwaysMerge);
+            remoteList.loadShoppingList(map.get("masterList"));
+            if (!localList.equals(remoteList)) {
+                mergedList = dataMerger.merge(localList, remoteList, occuredNotificationEvents);
             }
         }
         SharedPreferences.Editor editor = settings.edit();
@@ -310,7 +303,7 @@ public class DataHelper {
         editor.putLong(Last_Synced_Name, lastSynced);
         editor.commit();
         dataMerger.setLastSynced(lastSynced);
-        return mergedData;
+        return mergedList;
     }
     public synchronized ShoppingList loadShoppingListFromLocalStorage(){
         ShoppingList shoppingList = null;

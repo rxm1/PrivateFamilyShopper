@@ -22,21 +22,7 @@ public class DataMerger {
         lastSynced = 0;
     }
 
-    public synchronized boolean hasDataChanged(String newData, String oldData){
-        if(oldData.compareTo(newData) != 0) {
-            return true;
-        }
-        return false;
-    }
-
-    public synchronized String mergeData(String localData, String remoteData, NotificationEvents notificationEvents, boolean alwaysMerge){
-        ShoppingList localList = new ShoppingList();
-        ShoppingList remoteList = new ShoppingList();
-        localList.loadShoppingList(localData);
-        remoteList.loadShoppingList(remoteData);
-        return mergeData(localList, remoteList, notificationEvents, alwaysMerge);
-    }
-    public synchronized String mergeData(ShoppingList localList, ShoppingList remoteList, NotificationEvents notificationEvents, boolean alwaysMerge){
+    /*public synchronized ShoppingList mergeData(ShoppingList localList, ShoppingList remoteList, NotificationEvents notificationEvents){
         long localLastUpdated = localList.getLastUpdated();
         long remoteLastUpdated = remoteList.getLastUpdated();
 
@@ -47,14 +33,14 @@ public class DataMerger {
         if (localLastUpdated > remoteLastUpdated &&
                 localLastUpdated > lastSynced &&
                 remoteLastUpdated <= lastSynced) {
-            return localList.getJson();
+            return localList;
         }
 
         if (remoteLastUpdated > localLastUpdated &&
                 remoteLastUpdated > lastSynced &&
                 localLastUpdated <= lastSynced) {
             notificationEvents.modifications = true;
-            return remoteList.getJson();
+            return remoteList;
 
         }
 
@@ -63,10 +49,10 @@ public class DataMerger {
             return merge(localList, remoteList, notificationEvents);
         }
 
-        return "";
-    }
+        return new ShoppingList();
+    }*/
 
-    private synchronized String merge(ShoppingList localList, ShoppingList remoteList, NotificationEvents notificationEvents){
+    public synchronized ShoppingList merge(ShoppingList localList, ShoppingList remoteList, NotificationEvents notificationEvents){
         ShoppingList mergedList = new ShoppingList();
         HashMap<UUID, ShoppingListItem> remoteListHash = new HashMap<>(remoteList.size());
         for (ShoppingListItem i : remoteList.getShoppingListItems()) remoteListHash.put(i.getGuid(),i);
@@ -93,6 +79,7 @@ public class DataMerger {
             else {
                 //item exists only in local list
                 mergedList.add(localItem);
+                notificationEvents.additions = true;
             }
         }
         //items that exist only in remote list
@@ -104,7 +91,7 @@ public class DataMerger {
             }
         }
 
-        return mergedList.getJson();
+        return mergedList;
     }
 
     public synchronized void setLastSynced(long lastSynced){this.lastSynced = lastSynced;}
