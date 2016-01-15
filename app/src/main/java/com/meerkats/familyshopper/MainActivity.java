@@ -54,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
         mainActivityHandler = new Handler(handlerThread.getLooper());
         mainUIHandler = new Handler(Looper.getMainLooper());
 
-        mainController = new MainController(this);
+        mainController = new MainController(this, handlerThread);
         mainController.init();
         shoppingList = mainController.getShoppingList();
         shoppingListAdapter = mainController.getShoppingListAdapter();

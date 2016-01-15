@@ -1,12 +1,8 @@
 package com.meerkats.familyshopper;
 
-import android.content.SharedPreferences;
-
-import com.firebase.client.DataSnapshot;
 import com.meerkats.familyshopper.model.ShoppingList;
 import com.meerkats.familyshopper.model.ShoppingListItem;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.UUID;
 

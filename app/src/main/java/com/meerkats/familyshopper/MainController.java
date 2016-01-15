@@ -74,16 +74,15 @@ public class MainController {
 
 
 
-    public MainController(Activity mainActivity) {
+    public MainController(Activity mainActivity, HandlerThread handlerThread) {
         this.activity = mainActivity;
         Firebase.setAndroidContext(activity);
         shoppingList = new ShoppingList("mainList");
-        dataHelper = new DataHelper(mainActivity);
+        dataHelper = new DataHelper(mainActivity, handlerThread);
+        this.handlerThread = handlerThread;
     }
 
     public void init(){
-        handlerThread = new HandlerThread("MainController.SyncThread");
-        handlerThread.start();
         syncHandler = new SyncHandler(handlerThread.getLooper());
         mainUIHandler = new Handler(Looper.getMainLooper());
         mainControllerHandler = new Handler(handlerThread.getLooper());
@@ -152,8 +151,9 @@ public class MainController {
         }
         if(myFirebaseRef != null && DataHelper.getIsValidFirebaseURL()) {
             if (withTimer) {
-                String temp = settings.getString(Push_Batch_Time_Name, "0");
-                int pushBatchTime = temp==""?0:Integer.valueOf(temp);
+                String temp = settings.getString(Push_Batch_Time_Name, "0").trim();
+                int pushBatchTime = temp==""?3:Integer.valueOf(temp);
+                pushBatchTime=pushBatchTime<3?3:pushBatchTime;
                 TimerTask timerTask = new TimerTask() {
                     @Override
                     public void run() {

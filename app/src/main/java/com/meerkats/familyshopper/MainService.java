@@ -58,7 +58,7 @@ public class MainService extends Service {
         mServiceHandler = new ServiceHandler(mHandlerThread.getLooper());
 
         Firebase.setAndroidContext(this);
-        dataHelper = new DataHelper(this);
+        dataHelper = new DataHelper(this, mHandlerThread);
         settingsChangedReceiver = new SettingsChangedReceiver();
         IntentFilter filter = new IntentFilter(MainController.settings_updated_action);
         LocalBroadcastManager.getInstance(this).registerReceiver(settingsChangedReceiver, filter);

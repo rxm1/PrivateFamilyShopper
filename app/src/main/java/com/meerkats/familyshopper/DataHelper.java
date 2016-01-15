@@ -75,11 +75,10 @@ public class DataHelper {
         }
     }
 
-    public DataHelper(Context context) {
+    public DataHelper(Context context, HandlerThread handlerThread) {
         this.context = context;
         dataMerger = new DataMerger();
-        handlerThread = new HandlerThread("MainActivity.HandlerThread");
-        handlerThread.start();
+        this.handlerThread = handlerThread;
         mainServiceDataChangedHandler = new MainServiceDataChangedHandler(handlerThread.getLooper());
 
         settings = PreferenceManager.getDefaultSharedPreferences(context);
