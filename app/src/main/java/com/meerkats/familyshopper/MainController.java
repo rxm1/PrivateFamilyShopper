@@ -2,12 +2,10 @@ package com.meerkats.familyshopper;
 
 import android.app.Activity;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
-import android.support.v4.content.LocalBroadcastManager;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Toast;
@@ -48,7 +46,7 @@ public class MainController {
         public void handleMessage(Message msg) {
             DataSnapshot snapshot = (DataSnapshot)msg.obj;
             String localData = shoppingList.getJson();
-            String mergedData = dataHelper.merge(snapshot, localData, false);
+            String mergedData = dataHelper.merge(snapshot, localData, true);
             if (!mergedData.trim().isEmpty()) {
                 dataHelper.saveShoppingListToStorage(mergedData);
                 shoppingList.loadShoppingList(mergedData);
@@ -83,16 +81,16 @@ public class MainController {
         mainControllerHandler.post(new Runnable() {
             @Override
             public void run() {
-                shoppingList.loadShoppingList(dataHelper.loadGsonFromLocalStorage());
                 dataHelper.instanciateFirebase(false);
                 myFirebaseRef = dataHelper.getMyFirebaseRef();
+                sync(false, false);
 
-                mainUIHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        shoppingListAdapter.notifyDataSetChanged();
-                    }
-                });
+                //mainUIHandler.post(new Runnable() {
+                    //@Override
+                  //  public void run() {
+                  //      shoppingListAdapter.notifyDataSetChanged();
+                    //}
+                //});
             }
         });
     }
@@ -128,7 +126,7 @@ public class MainController {
         sync(true, false);
     }
     public void clearShoppingList(){
-        shoppingList.clear();
+        shoppingList.deleteAll();
         sync(true, false);
     }
     public void clearCrossedOffShoppingList(){
@@ -141,14 +139,14 @@ public class MainController {
     After merge, it updates all local object and file
     and remote storage
  */
-    public void sync(boolean refresh, boolean showConnectionStatus){
+    public synchronized void sync(boolean refresh, boolean showConnectionStatus){
         if(refresh){
-            mainUIHandler.post(new Runnable() {
-                @Override
-                public void run() {
+            //mainUIHandler.post(new Runnable() {
+                //@Override
+              //  public void run() {
                     shoppingListAdapter.notifyDataSetChanged();
-                }
-            });
+                //}
+            //});
         }
         if(myFirebaseRef != null && DataHelper.getIsValidFirebaseURL()) {
             try {

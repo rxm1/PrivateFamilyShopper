@@ -38,7 +38,6 @@ public class ShoppingListAdapter extends ArrayAdapter<String> {
         LayoutInflater inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View rowView = inflater.inflate(R.layout.shopping_list, parent, false);
         TextView textView = (TextView)rowView.findViewById(R.id.shoppingListItemTextView);
-
         textView.setText(shoppingListItem.getShoppingListItem());
 
         if (shoppingListItem.isCrossedOff()) {
@@ -46,6 +45,11 @@ public class ShoppingListAdapter extends ArrayAdapter<String> {
             textView.setTextColor(textView.getTextColors().withAlpha(50));
         } else {
             //textView.setPaintFlags(textView.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
+        }
+
+        if(shoppingListItem.getIsDeleted()){
+            LayoutInflater myInflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            return inflater.inflate(R.layout.deleted_shopping_list, parent, false);
         }
 
         //Toast.makeText(getContext(), "in Adapter getView" + position, Toast.LENGTH_SHORT).show();

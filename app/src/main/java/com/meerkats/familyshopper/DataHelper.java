@@ -64,7 +64,7 @@ public class DataHelper {
             String mergedData = "";
             occuredNotificationEvents.setFalse();
             if (!localData.trim().isEmpty()){
-                mergedData = merge(snapshot, localData, !userSelectedNotificationEvents().isAllTrue());
+                mergedData = merge(snapshot, localData, true);
             }
             else {
                 HashMap<String, String> map = (HashMap<String, String>) snapshot.getValue();
@@ -82,6 +82,7 @@ public class DataHelper {
             }
         }
     }
+
     public DataHelper(Context context) {
         this.context = context;
         dataMerger = new DataMerger();
@@ -92,7 +93,7 @@ public class DataHelper {
         settings = PreferenceManager.getDefaultSharedPreferences(context);
 
       /*  SharedPreferences.Editor editor = settings.edit();
-        editor.clear();
+        editor.clearao();
         editor.commit();
 */
         if (settings.contains(Last_Synced_Name)) {

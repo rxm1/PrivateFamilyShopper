@@ -70,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
         setShoppingListOnItemLongClick();
 
         Intent intent = new Intent(this, MainService.class);
-        //startService(intent);
+        startService(intent);
     }
 
     @Override
