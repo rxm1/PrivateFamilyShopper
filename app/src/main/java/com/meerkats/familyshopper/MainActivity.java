@@ -28,6 +28,8 @@ import android.widget.ListView;
 
 import com.meerkats.familyshopper.model.ShoppingList;
 
+import java.util.Timer;
+
 public class MainActivity extends AppCompatActivity {
 
     EditText enterItemEditTxt;
@@ -40,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
     Handler mainUIHandler;
     HandlerThread handlerThread;
     private static final int SETTINGS_RESULT = 1;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.sync:
-                mainController.sync(false, true);
+                mainController.sync(false, true, false);
                 return true;
             case R.id.clear_list:
                 mainController.clearShoppingList();

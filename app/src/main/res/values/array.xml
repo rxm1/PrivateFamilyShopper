@@ -1,7 +1,7 @@
 <resources>
     <string-array name="listArray">
         <item>Additions</item>
-        <item>Modifications and Details</item>
+        <item>Modifications</item>
         <item>Deletions</item>
     </string-array>
 

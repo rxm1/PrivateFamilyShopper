@@ -13,7 +13,7 @@
             android:title="Notification Frequency (seconds)"
             android:key="notificationFrequency"
             android:defaultValue="0"
-            android:summary="Value of 0 means real-time updates, greater then 0 means notification interval at least equal the value"/>
+            android:summary="Notifies of data changes after the duration. Value of 0 means real-time notifications."/>
         <MultiSelectListPreference
             android:title="Notification Events"
             android:key="notificationEvents"
@@ -21,5 +21,11 @@
             android:entries="@array/listArray"
             android:entryValues="@array/listValues"
             android:defaultValue="@array/listValues"/>
+        <EditTextPreference android:inputType="number"
+            android:title="Push Interval (seconds)"
+            android:key="pushBatchTime"
+            android:defaultValue="3"
+            android:summary="Batches together all data changes within the interval. Value of 0 means real-time data pushes."/>
+
     </PreferenceCategory>
 </PreferenceScreen>
