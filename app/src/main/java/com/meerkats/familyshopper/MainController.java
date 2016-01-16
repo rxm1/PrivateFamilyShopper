@@ -65,8 +65,13 @@ public class MainController {
                     @Override
                     public void run() {
                         MainController.this.shoppingListAdapter.notifyDataSetChanged();
+                        ((MainActivity)activity).setIsEditing(false);
                     }
                 });
+            }
+            else {
+                ((MainActivity)activity).setIsEditing(false);
+                ((MainActivity)activity).loadLocalShoppingList();
             }
 
         }
@@ -105,22 +110,32 @@ public class MainController {
         shoppingList.markAsDeleted(position);
         sync(true, false, true);
     }
-    public void editShoppingListItem(final AdapterView<?> parent, final View v, final int position, long id, Activity activity){
+    public void editShoppingListItem(final AdapterView<?> parent, final View v, final int position, long id, final Activity activity){
         final ShoppingListItem shoppingListItem = shoppingList.getShoppingListItem(position);
         EditShoppingItemDialog cdd=new EditShoppingItemDialog(activity, shoppingListItem.getShoppingListItem());
 
         cdd.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialog) {
-                if (((EditShoppingItemDialog) dialog).isCanceled())
-                    return;
-
-                String newData = ((EditShoppingItemDialog) dialog).getNewData();
-                shoppingListItem.setShoppingListItem(newData);
-                shoppingList.setShoppingListItemEdit(shoppingListItem, position);
-                sync(true, false, true);
+                if (((EditShoppingItemDialog) dialog).isCanceled()) {
+                    mainUIHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            ((MainActivity) activity).setIsEditing(false);
+                            ((MainActivity) activity).loadLocalShoppingList();
+                        }
+                    });
+                return;
             }
-        });
+
+
+            String newData = ((EditShoppingItemDialog) dialog).getNewData();
+            shoppingListItem.setShoppingListItem(newData);
+            shoppingList.setShoppingListItemEdit(shoppingListItem,position);
+
+            sync(true,false,true);
+        }
+    });
         cdd.show();
     }
     public void crossOffShoppingItem(int position){
@@ -177,7 +192,6 @@ public class MainController {
         }
 
     }
-
     public void addListenerForSingleValueEvent(){
         try {
             myFirebaseRef.addListenerForSingleValueEvent(

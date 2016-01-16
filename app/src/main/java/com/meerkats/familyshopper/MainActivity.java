@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
     Handler mainUIHandler;
     HandlerThread handlerThread;
     private static final int SETTINGS_RESULT = 1;
-
+    private boolean isEditing = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -125,6 +125,7 @@ public class MainActivity extends AppCompatActivity {
         shoppingListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(final AdapterView<?> parent, final View v, final int position, final long id) {
+                setIsEditing(true);
                 int contextMenuID = ((int) R.array.shoppingListContextMenuValues);
                 if (shoppingList.getShoppingListItem(position).isCrossedOff())
                     contextMenuID = ((int) R.array.shoppingListContextMenuValuesDeleteOnly);
@@ -144,7 +145,13 @@ public class MainActivity extends AppCompatActivity {
                                 }
                             }
                         }
-                ).show();
+                ).setOnCancelListener(new DialogInterface.OnCancelListener() {
+                    @Override
+                    public void onCancel(DialogInterface dialog) {
+                        loadLocalShoppingList();
+                        setIsEditing(false);
+                    }
+                }).show();
                 return true;
             }
         });
@@ -201,8 +208,10 @@ public class MainActivity extends AppCompatActivity {
         mainActivityHandler.post(new Runnable() {
             @Override
             public void run() {
-                shoppingList.loadShoppingList(mainController.dataHelper.loadGsonFromLocalStorage());
+                if(isEditing())
+                    return;
 
+                shoppingList.loadShoppingList(mainController.dataHelper.loadGsonFromLocalStorage());
                 mainUIHandler.post(new Runnable() {
                     @Override
                     public void run() {
@@ -213,5 +222,6 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public ShoppingListAdapter getShoppingListAdapter(){return shoppingListAdapter;}
+    public void setIsEditing(boolean isEditing){ this.isEditing=isEditing; }
+    public boolean isEditing(){return isEditing;}
 }
