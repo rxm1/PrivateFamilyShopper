@@ -10,10 +10,10 @@
             android:summary="Please provide the firebase URL"
             android:defaultValue=""/>
         <EditTextPreference android:inputType="number"
-            android:title="Notification Frequency (seconds)"
+            android:title="Notification Delay (seconds)"
             android:key="notificationFrequency"
-            android:defaultValue="0"
-            android:summary="Notifies of data changes after the duration. Value of 0 means real-time notifications."/>
+            android:defaultValue="60"
+            android:summary="Increase value to reduce notification frequency."/>
         <MultiSelectListPreference
             android:title="Notification Events"
             android:key="notificationEvents"
@@ -22,10 +22,10 @@
             android:entryValues="@array/listValues"
             android:defaultValue="@array/listValues"/>
         <EditTextPreference android:inputType="number"
-            android:title="Push Interval (seconds)"
+            android:title="Push Delay (seconds)"
             android:key="pushBatchTime"
             android:defaultValue="3"
-            android:summary="Batches together all data changes within the interval. Value of 0 means real-time data pushes."/>
+            android:summary="Batches up changes to push. Increase delay to reduce data usage."/>
 
     </PreferenceCategory>
 </PreferenceScreen>

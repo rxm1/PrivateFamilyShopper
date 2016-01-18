@@ -64,12 +64,14 @@ public class DataHelper {
             occuredNotificationEvents.setFalse();
 
             ShoppingList mergedList = merge(snapshot, localList, occuredNotificationEvents);
-            if (occuredNotificationEvents.isTrue()) {
+            if (occuredNotificationEvents.isTrue() && mergedList != null) {
                 saveShoppingListToStorage(mergedList.getJson());
                 Intent intent = new Intent(service_updated_file_action);
-                boolean recieversAvailable = LocalBroadcastManager.getInstance(context.getApplicationContext()).sendBroadcast(intent);
-                if(!recieversAvailable){
-                    sendFileChangedNotification();
+                if (occuredNotificationEvents.forService().isTrue()) {
+                    boolean recieversAvailable = LocalBroadcastManager.getInstance(context.getApplicationContext()).sendBroadcast(intent);
+                    if (!recieversAvailable) {
+                        sendFileChangedNotification();
+                    }
                 }
             }
         }
@@ -209,9 +211,9 @@ public class DataHelper {
         NotificationEvents userSelectedNotifications = userSelectedNotificationEvents();
         NotificationEvents mergedNotifications = new NotificationEvents();
         String notificationDescription = "Items have been ";
-        if(userSelectedNotifications.additions){
-            mergedNotifications.additions = occuredNotificationEvents.additions;
-            if(occuredNotificationEvents.additions) notificationDescription += "added, ";
+        if(userSelectedNotifications.remoteAdditions){
+            mergedNotifications.remoteAdditions = occuredNotificationEvents.remoteAdditions;
+            if(occuredNotificationEvents.remoteAdditions) notificationDescription += "added, ";
         }
         if(userSelectedNotifications.modifications){
             mergedNotifications.modifications = occuredNotificationEvents.modifications;
@@ -274,7 +276,7 @@ public class DataHelper {
         for (String events : notificationEventsSettings) {
             switch (events){
                 case "additions":
-                    tempNotifications.additions = true;
+                    tempNotifications.remoteAdditions = true;
                     break;
                 case "modifications":
                     tempNotifications.modifications = true;
@@ -293,10 +295,16 @@ public class DataHelper {
         ShoppingList remoteList = new ShoppingList();
         if (map != null) {
             remoteList.loadShoppingList(map.get("masterList"));
-            if (!localList.equals(remoteList)) {
+            if (localList != null && !localList.equals(remoteList)) {
                 mergedList = dataMerger.merge(localList, remoteList, occuredNotificationEvents);
             }
         }
+        else{
+            if(localList != null)
+                mergedList = localList;
+            occuredNotificationEvents.localAdditions=true;
+        }
+
         SharedPreferences.Editor editor = settings.edit();
         long lastSynced = (new Date()).getTime();
         editor.putLong(Last_Synced_Name, lastSynced);

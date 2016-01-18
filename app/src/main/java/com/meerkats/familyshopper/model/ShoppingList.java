@@ -173,6 +173,7 @@ public class ShoppingList extends ArrayList<String>{
         public synchronized boolean equals(InnerShoppingList other){
             //if(this.lastModified!=other.lastModified) return false;
             if(this.shoppingListName!=other.shoppingListName) return false;
+            if(this.shoppingListItems.size()!=other.shoppingListItems.size()) return false;
 
             HashMap<UUID, ShoppingListItem> otherListHash = new HashMap<>(other.shoppingListItems.size());
             for (ShoppingListItem i : other.getShoppingListItems()) otherListHash.put(i.getGuid(),i);
@@ -180,18 +181,15 @@ public class ShoppingList extends ArrayList<String>{
             for (ShoppingListItem thisItem : this.getShoppingListItems()) {
                 if (otherListHash.containsKey(thisItem.getGuid())) {
                     ShoppingListItem otherItem = otherListHash.get(thisItem.getGuid());
-                    if(!thisItem.equals(otherItem))
+                    if (!thisItem.equals(otherItem))
                         return false;
 
                     otherListHash.remove(thisItem.getGuid());
-                }
-                else
+                } else
                     return false;
-
-                if(otherListHash.size()>0)
-                    return false;
-
             }
+            if(otherListHash.size()>0)
+                return false;
 
             return true;
         }

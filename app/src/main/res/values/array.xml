@@ -7,7 +7,5 @@
 
     <string-array name="listValues">
         <item>additions</item>
-        <item>modifications</item>
-        <item>deletions</item>
     </string-array>
 </resources>
