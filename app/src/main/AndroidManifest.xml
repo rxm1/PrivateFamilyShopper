@@ -8,13 +8,13 @@
         android:label="@string/app_name"
         android:supportsRtl="true">
         <service
-            android:name=".MainService"
+            android:name="com.meerkats.familyshopper.MainService"
             android:icon="@mipmap/ic_launcher"
             android:label="FamilyShopperService"
             >
         </service>
 
-        <activity android:name=".MainActivity" android:configChanges="orientation|screenSize"
+        <activity android:name="com.meerkats.familyshopper.MainActivity" android:configChanges="orientation|screenSize"
             android:theme="@style/DarkTheme">
 
             <intent-filter>
@@ -24,11 +24,11 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".SettingsActivity"
+            android:name="com.meerkats.familyshopper.SettingsActivity"
             android:label="@string/app_name"
             android:theme="@android:style/Theme.Holo.Light.Dialog.NoActionBar">
         </activity>
-        <receiver android:name=".MainActivity$DataChangedReceiver" >
+        <receiver android:name="com.meerkats.familyshopper.MainActivity$DataChangedReceiver" >
         </receiver>
     </application>
 

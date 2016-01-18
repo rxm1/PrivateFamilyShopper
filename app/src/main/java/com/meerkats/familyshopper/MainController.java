@@ -45,7 +45,7 @@ public class MainController {
     SyncHandler syncHandler;
     Handler mainUIHandler;
     Handler mainControllerHandler;
-    public static final String settings_updated_action = "com.meerkats.privatefamilyshopper.MainController.SettingsUpdated";
+    public static final String settings_updated_action = "com.meerkats.familyshopper.MainController.SettingsUpdated";
     Timer timer = new Timer();
     SharedPreferences settings;
 
@@ -222,9 +222,9 @@ public class MainController {
             public void run() {
                 dataHelper.instanciateFirebase(false);
                 myFirebaseRef = dataHelper.getMyFirebaseRef();
-
                 try {
                     Thread.sleep(2*1000);
+
                     sync(false, false, false);
                 }
                 catch (Exception e){

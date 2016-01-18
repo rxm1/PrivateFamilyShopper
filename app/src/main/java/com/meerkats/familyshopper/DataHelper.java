@@ -46,7 +46,7 @@ public class DataHelper {
     Firebase myFirebaseRef;
     SharedPreferences settings;
     public static final String Last_Synced_Name = "LastSyncedName";
-    public static final String service_updated_file_action = "com.meerkats.privatefamilyshopper.MainService.FileChanged";
+    public static final String service_updated_file_action = "com.meerkats.familyshopper.MainService.FileChanged";
     public static final int file_changed_notification_id = 123456;
     MainServiceDataChangedHandler mainServiceDataChangedHandler;
     HandlerThread handlerThread;
@@ -102,6 +102,8 @@ public class DataHelper {
                 Boolean integrateFirebase = settings.getBoolean(MainController.Integrate_With_Firebase_Name, false);
                 if (integrateFirebase && firebaseURL != null && !firebaseURL.trim().isEmpty()) {
                     myFirebaseRef = new Firebase(firebaseURL);
+                    if (myFirebaseRef != null)
+                        Toast.makeText(context.getApplicationContext(), "Connecting to Firebase...", Toast.LENGTH_SHORT).show();
                     checkFirebaseURL(fromService);
 
                     if(fromService)
@@ -113,10 +115,8 @@ public class DataHelper {
                     myFirebaseRef = null;
                 }
                 if(!fromService) {
-                    if (myFirebaseRef != null)
-                        Toast.makeText(context.getApplicationContext(), "Connecting to Firebase...", Toast.LENGTH_SHORT).show();
-                    else
-                        Toast.makeText(context.getApplicationContext(), "Firebase not connected.", Toast.LENGTH_SHORT).show();
+                    if (myFirebaseRef == null || !integrateFirebase)
+                        Toast.makeText(context.getApplicationContext(), "Firebase not connected.", Toast.LENGTH_LONG).show();
                 }
             }
         }
