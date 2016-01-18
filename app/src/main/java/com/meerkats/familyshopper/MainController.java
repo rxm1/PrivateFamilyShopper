@@ -8,6 +8,7 @@ import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Toast;
@@ -19,7 +20,6 @@ import com.firebase.client.ValueEventListener;
 import com.meerkats.familyshopper.model.ShoppingList;
 import com.meerkats.familyshopper.model.ShoppingListItem;
 
-import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -39,12 +39,13 @@ public class MainController {
     public static final String Notification_Frequency_Name = "notificationFrequency";
     public static final String Notification_Events_Name = "notificationEvents";
     public static final String Push_Batch_Time_Name = "pushBatchTime";
+    public static final String master_shopping_list_name = "Master_List";
 
     HandlerThread handlerThread;
     SyncHandler syncHandler;
     Handler mainUIHandler;
     Handler mainControllerHandler;
-    public static final String settings_updated_action = "com.meerkats.familyshopper.MainController.SettingsUpdated";
+    public static final String settings_updated_action = "com.meerkats.privatefamilyshopper.MainController.SettingsUpdated";
     Timer timer = new Timer();
     SharedPreferences settings;
 
@@ -93,7 +94,7 @@ public class MainController {
         mainControllerHandler = new Handler(handlerThread.getLooper());
         settings = PreferenceManager.getDefaultSharedPreferences(activity);
 
-        shoppingList = new ShoppingList("master_list");
+        shoppingList = new ShoppingList(master_shopping_list_name);
         shoppingListAdapter = new ShoppingListAdapter(activity, shoppingList);
         shoppingListAdapter.notifyDataSetChanged();
         mainControllerHandler.post(new Runnable() {
@@ -125,17 +126,17 @@ public class MainController {
                             ((MainActivity) activity).loadLocalShoppingList();
                         }
                     });
-                return;
+                    return;
+                }
+
+
+                String newData = ((EditShoppingItemDialog) dialog).getNewData();
+                shoppingListItem.setShoppingListItem(newData);
+                shoppingList.setShoppingListItemEdit(shoppingListItem, position);
+
+                sync(true, false, true);
             }
-
-
-            String newData = ((EditShoppingItemDialog) dialog).getNewData();
-            shoppingListItem.setShoppingListItem(newData);
-            shoppingList.setShoppingListItemEdit(shoppingListItem,position);
-
-            sync(true,false,true);
-        }
-    });
+        });
         cdd.show();
     }
     public void crossOffShoppingItem(int position){
@@ -221,7 +222,15 @@ public class MainController {
             public void run() {
                 dataHelper.instanciateFirebase(false);
                 myFirebaseRef = dataHelper.getMyFirebaseRef();
-                sync(false, false, false);
+
+                try {
+                    Thread.sleep(2*1000);
+                    sync(false, false, false);
+                }
+                catch (Exception e){
+                    Log.e("Exception", "Sync failed: " + e.toString());
+                }
+
             }
         });
     }

@@ -7,12 +7,10 @@ import android.content.DialogInterface;
 
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
-import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 
@@ -27,8 +25,6 @@ import android.widget.EditText;
 import android.widget.ListView;
 
 import com.meerkats.familyshopper.model.ShoppingList;
-
-import java.util.Timer;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -47,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(com.meerkats.familyshopper.R.layout.activity_main);
 
         handlerThread = new HandlerThread("MainActivity.HandlerThread");
         handlerThread.start();
@@ -61,12 +57,12 @@ public class MainActivity extends AppCompatActivity {
         dataChangedReceiver = new DataChangedReceiver();
 
 
-        Toolbar myToolbar = (Toolbar) findViewById(R.id.family_shopper_toolbar);
+        Toolbar myToolbar = (Toolbar) findViewById(com.meerkats.familyshopper.R.id.family_shopper_toolbar);
         setSupportActionBar(myToolbar);
-        myToolbar.setLogo(R.mipmap.ic_launcher);
+        myToolbar.setLogo(com.meerkats.familyshopper.R.mipmap.ic_launcher);
 
-        enterItemEditTxt = (EditText)findViewById(R.id.enterItemTxt);
-        shoppingListView = (ListView)findViewById(R.id.shoppingListView);
+        enterItemEditTxt = (EditText)findViewById(com.meerkats.familyshopper.R.id.enterItemTxt);
+        shoppingListView = (ListView)findViewById(com.meerkats.familyshopper.R.id.shoppingListView);
         shoppingListView.setAdapter(shoppingListAdapter);
 
         setShoppingListOnItemClick();
@@ -80,22 +76,22 @@ public class MainActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
         MenuInflater mi = getMenuInflater();
-        mi.inflate(R.menu.shopping_list_action_items, menu);
+        mi.inflate(com.meerkats.familyshopper.R.menu.shopping_list_action_items, menu);
         return true;
     }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.sync:
+            case com.meerkats.familyshopper.R.id.sync:
                 mainController.sync(false, true, false);
                 return true;
-            case R.id.clear_list:
+            case com.meerkats.familyshopper.R.id.clear_list:
                 mainController.clearShoppingList();
                 return true;
-            case R.id.clear_crossed_off:
+            case com.meerkats.familyshopper.R.id.clear_crossed_off:
                 mainController.clearCrossedOffShoppingList();
                 return true;
-            case R.id.settings:
+            case com.meerkats.familyshopper.R.id.settings:
                 Intent i = new Intent(this, SettingsActivity.class);
                 startActivityForResult(i, SETTINGS_RESULT);
                 return true;
@@ -126,11 +122,11 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean onItemLongClick(final AdapterView<?> parent, final View v, final int position, final long id) {
                 setIsEditing(true);
-                int contextMenuID = ((int) R.array.shoppingListContextMenuValues);
+                int contextMenuID = ((int) com.meerkats.familyshopper.R.array.shoppingListContextMenuValues);
                 if (shoppingList.getShoppingListItem(position).isCrossedOff())
-                    contextMenuID = ((int) R.array.shoppingListContextMenuValuesDeleteOnly);
+                    contextMenuID = ((int) com.meerkats.familyshopper.R.array.shoppingListContextMenuValuesDeleteOnly);
 
-                AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(MainActivity.this, R.style.ListContextMenu));
+                AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(MainActivity.this, com.meerkats.familyshopper.R.style.ListContextMenu));
                 builder.setTitle(shoppingList.getShoppingListItem(position).getShoppingListItem()).setCancelable(true).setItems(contextMenuID,
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialoginterface, int index) {
@@ -211,7 +207,9 @@ public class MainActivity extends AppCompatActivity {
                 if(isEditing())
                     return;
 
-                shoppingList.loadShoppingList(mainController.dataHelper.loadGsonFromLocalStorage());
+                String localFile = mainController.dataHelper.loadGsonFromLocalStorage().trim();
+                if(!localFile.isEmpty())
+                    shoppingList.loadShoppingList(localFile);
                 mainUIHandler.post(new Runnable() {
                     @Override
                     public void run() {

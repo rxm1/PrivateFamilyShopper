@@ -46,7 +46,7 @@ public class DataHelper {
     Firebase myFirebaseRef;
     SharedPreferences settings;
     public static final String Last_Synced_Name = "LastSyncedName";
-    public static final String service_updated_file_action = "com.meerkats.familyshopper.MainService.FileChanged";
+    public static final String service_updated_file_action = "com.meerkats.privatefamilyshopper.MainService.FileChanged";
     public static final int file_changed_notification_id = 123456;
     MainServiceDataChangedHandler mainServiceDataChangedHandler;
     HandlerThread handlerThread;
@@ -247,7 +247,7 @@ public class DataHelper {
     private synchronized void sendNotification(String notificationDescription){
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(context)
-                        .setSmallIcon(R.mipmap.ic_launcher)
+                        .setSmallIcon(com.meerkats.familyshopper.R.mipmap.ic_launcher)
                         .setContentTitle("Family Shopper")
                         .setContentText(notificationDescription);
 
@@ -325,6 +325,8 @@ public class DataHelper {
     public synchronized String loadGsonFromLocalStorage(){
         StringBuilder text = new StringBuilder();
         File file = new File(context.getFilesDir(), localMasterFileName);
+        if(!file.exists())
+            return "";
         try {
             BufferedReader br = new BufferedReader(new FileReader(file));
             String line;

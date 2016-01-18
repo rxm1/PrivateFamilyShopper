@@ -1,19 +1,12 @@
 package com.meerkats.familyshopper;
 
 import android.content.Context;
-import android.content.res.ColorStateList;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
-import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.meerkats.familyshopper.model.ShoppingList;
 import com.meerkats.familyshopper.model.ShoppingListItem;
@@ -27,7 +20,7 @@ public class ShoppingListAdapter extends ArrayAdapter<String> {
 
 
     public ShoppingListAdapter(Context context, ShoppingList shoppingList){
-        super(context, R.layout.shopping_list, shoppingList);
+        super(context, com.meerkats.familyshopper.R.layout.shopping_list, shoppingList);
         this.context = context;
         this.shoppingList = shoppingList;
     }
@@ -36,8 +29,8 @@ public class ShoppingListAdapter extends ArrayAdapter<String> {
     public View getView(int position, View convertView, ViewGroup parent){
         ShoppingListItem shoppingListItem = shoppingList.getShoppingListItem(position);
         LayoutInflater inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View rowView = inflater.inflate(R.layout.shopping_list, parent, false);
-        TextView textView = (TextView)rowView.findViewById(R.id.shoppingListItemTextView);
+        View rowView = inflater.inflate(com.meerkats.familyshopper.R.layout.shopping_list, parent, false);
+        TextView textView = (TextView)rowView.findViewById(com.meerkats.familyshopper.R.id.shoppingListItemTextView);
         textView.setText(shoppingListItem.getShoppingListItem());
 
         if (shoppingListItem.isCrossedOff()) {
@@ -49,7 +42,7 @@ public class ShoppingListAdapter extends ArrayAdapter<String> {
 
         if(shoppingListItem.getIsDeleted()){
             LayoutInflater myInflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            return inflater.inflate(R.layout.deleted_shopping_list, parent, false);
+            return inflater.inflate(com.meerkats.familyshopper.R.layout.deleted_shopping_list, parent, false);
         }
 
         //Toast.makeText(getContext(), "in Adapter getView" + position, Toast.LENGTH_SHORT).show();

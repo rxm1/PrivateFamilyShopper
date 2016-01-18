@@ -11,7 +11,7 @@ public class SettingsActivity extends PreferenceActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getFragmentManager().beginTransaction().replace(android.R.id.content, new MyPreferenceFragment()).commit();
-        PreferenceManager.setDefaultValues(this, R.xml.settings, false);
+        PreferenceManager.setDefaultValues(this, com.meerkats.familyshopper.R.xml.settings, false);
     }
 
     public static class MyPreferenceFragment extends PreferenceFragment
@@ -20,7 +20,7 @@ public class SettingsActivity extends PreferenceActivity {
         public void onCreate(final Bundle savedInstanceState)
         {
             super.onCreate(savedInstanceState);
-            addPreferencesFromResource(R.xml.settings);
+            addPreferencesFromResource(com.meerkats.familyshopper.R.xml.settings);
         }
         @Override
         public void onPause(){
