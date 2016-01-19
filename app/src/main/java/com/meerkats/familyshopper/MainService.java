@@ -39,6 +39,8 @@ public class MainService extends Service {
     public class SettingsChangedReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(final Context context, Intent intent) {
+            dataHelper.removeFirebaseListeners();
+            dataHelper.setMyFirebaseRefNull();
             mServiceHandler.post(new Runnable() {
                 @Override
                 public void run() {

@@ -192,7 +192,7 @@ public class DataHelper {
             });
         }
     }
-    private synchronized void removeFirebaseListeners() {
+    public synchronized void removeFirebaseListeners() {
         if (myFirebaseRef == null){
             if (firebaseListeners != null) {
                 firebaseListeners = null;
@@ -382,6 +382,7 @@ public class DataHelper {
     }
 
     public synchronized Firebase getMyFirebaseRef(){return myFirebaseRef;}
+    public synchronized void setMyFirebaseRefNull(){myFirebaseRef=null;}
     public synchronized void cleanUp(){
         handlerThread.quit();
     }

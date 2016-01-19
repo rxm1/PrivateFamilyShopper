@@ -217,6 +217,7 @@ public class MainController {
     }
 
     public void connect(){
+        dataHelper.setMyFirebaseRefNull();
         mainControllerHandler.post(new Runnable() {
             @Override
             public void run() {
