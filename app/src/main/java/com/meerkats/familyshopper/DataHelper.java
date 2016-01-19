@@ -55,8 +55,8 @@ public class DataHelper {
     Timer timer = new Timer();
 
     class MainServiceDataChangedHandler extends Handler {
-        public MainServiceDataChangedHandler(Looper myLooper) {
-            super(myLooper);
+        public MainServiceDataChangedHandler(Looper looper) {
+            super(looper);
         }
         public void handleMessage(Message msg) {
             DataSnapshot snapshot = (DataSnapshot)msg.obj;
@@ -68,7 +68,8 @@ public class DataHelper {
                 saveShoppingListToStorage(mergedList.getJson());
                 Intent intent = new Intent(service_updated_file_action);
                 if (occuredNotificationEvents.forService().isTrue()) {
-                    boolean recieversAvailable = LocalBroadcastManager.getInstance(context.getApplicationContext()).sendBroadcast(intent);
+                    boolean recieversAvailable =
+                            LocalBroadcastManager.getInstance(context.getApplicationContext()).sendBroadcast(intent);
                     if (!recieversAvailable) {
                         sendFileChangedNotification();
                     }

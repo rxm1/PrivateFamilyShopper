@@ -50,8 +50,8 @@ public class MainController {
     SharedPreferences settings;
 
     class SyncHandler extends Handler {
-        public SyncHandler(Looper myLooper) {
-            super(myLooper);
+        public SyncHandler(Looper looper) {
+            super(looper);
         }
         public void handleMessage(Message msg) {
             DataSnapshot snapshot = (DataSnapshot)msg.obj;
@@ -168,8 +168,8 @@ public class MainController {
         if(myFirebaseRef != null && DataHelper.getIsValidFirebaseURL()) {
             if (withTimer) {
                 String temp = settings.getString(Push_Batch_Time_Name, "0").trim();
-                int pushBatchTime = temp==""?3:Integer.valueOf(temp);
-                pushBatchTime=pushBatchTime<3?3:pushBatchTime;
+                int pushBatchTime = temp==""?1:Integer.valueOf(temp);
+                pushBatchTime=pushBatchTime<1?1:pushBatchTime;
                 TimerTask timerTask = new TimerTask() {
                     @Override
                     public void run() {
