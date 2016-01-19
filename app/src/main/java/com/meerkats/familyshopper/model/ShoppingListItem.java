@@ -9,7 +9,7 @@ import java.util.UUID;
 public class ShoppingListItem {
     private String shoppingListItem;
     private boolean isCrossedOff;
-    private Date lastModified;
+    private long lastModified;
     private int postitonEntered;
     private int positionOrdered;
     private UUID guid;
@@ -28,7 +28,7 @@ public class ShoppingListItem {
         isCrossedOff = false;
         isDeleted = false;
         guid = UUID.randomUUID();
-        lastModified = new Date();
+        lastModified = new Date().getTime();
     }
 
     @Override
@@ -43,12 +43,12 @@ public class ShoppingListItem {
     public synchronized String getShoppingListItem() { return shoppingListItem; }
     public synchronized void setShoppingListItem(String shoppingListItem) {
         this.shoppingListItem = shoppingListItem;
-        lastModified = new Date();
+        lastModified = new Date().getTime();
     }
     public synchronized boolean isCrossedOff() { return isCrossedOff; }
     public synchronized void setIsCrossedOff(boolean isCrossedOff) {
         this.isCrossedOff = isCrossedOff;
-        lastModified = new Date();
+        lastModified = new Date().getTime();
     }
     public synchronized boolean getIsDeleted(){return isDeleted;}
     public synchronized void setIsDeleted(boolean isDeleted){this.isDeleted=isDeleted;}
@@ -56,8 +56,8 @@ public class ShoppingListItem {
     public synchronized void setPostitonEntered(int postitonEntered){this.postitonEntered = postitonEntered;}
     public synchronized void setPositionOrdered(int positionOrdered){this.positionOrdered = positionOrdered;}
     public synchronized int getPositionOrdered(){return positionOrdered;}
-    public synchronized Date getLastModified(){return lastModified;}
-    public synchronized void setLastModified(Date lastModified){this.lastModified = lastModified;}
+    public synchronized long getLastModified(){return lastModified;}
+    public synchronized void setLastModified(long lastModified){this.lastModified = lastModified;}
     public synchronized UUID getGuid(){return guid;}
 
     public synchronized boolean equal(ShoppingListItem other){

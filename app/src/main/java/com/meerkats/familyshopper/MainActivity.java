@@ -106,6 +106,7 @@ public class MainActivity extends AppCompatActivity {
 
         switch (requestCode) {
             case SETTINGS_RESULT:
+                mainController.clearShoppingListFromLocalStorage();
                 mainController.connect();
 
                 //notify service that settings have changed

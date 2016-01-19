@@ -57,7 +57,7 @@ public class DataMerger {
             if(remoteListHash.containsKey(localItem.getGuid())) {
                 ShoppingListItem remoteItem = remoteListHash.get(localItem.getGuid()); //item exists in both list
                 if (!remoteItem.getIsDeleted()){ //do not add back in if its been deleted
-                    if (remoteItem.getLastModified().getTime() > localItem.getLastModified().getTime()) {
+                    if (remoteItem.getLastModified() > localItem.getLastModified()) {
                         mergedList.add(remoteItem);
                     } else
                         mergedList.add(localItem);

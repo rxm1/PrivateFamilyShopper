@@ -1,5 +1,7 @@
 package com.meerkats.familyshopper.model;
 
+import android.util.Log;
+
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -38,7 +40,7 @@ public class ShoppingList extends ArrayList<String>{
     }
     public synchronized void add(ShoppingListItem shoppingListItem){
         super.add(shoppingListItem.getShoppingListItem());
-        shoppingListItem.setLastModified(new Date());
+        shoppingListItem.setLastModified(new Date().getTime());
         innerShoppingList.add(shoppingListItem);
     }
 
@@ -68,15 +70,22 @@ public class ShoppingList extends ArrayList<String>{
     public synchronized void setItemCrossedOff(int position){
         ShoppingListItem shoppingListItem = innerShoppingList.getShoppingListItems().get(position);
         shoppingListItem.setIsCrossedOff(!shoppingListItem.isCrossedOff());
-        shoppingListItem.setLastModified(new Date());
+        shoppingListItem.setLastModified(new Date().getTime());
         innerShoppingList.setShoppingListItem(position, shoppingListItem);
     }
 
 
     public synchronized void loadShoppingList(String newGson){
             super.clear();
-            if (newGson != null && !newGson.isEmpty())
-                innerShoppingList = gson.fromJson(newGson, gsonType);
+            if (newGson != null && !newGson.isEmpty()) {
+                try {
+                    innerShoppingList = gson.fromJson(newGson, gsonType);
+                }
+                catch (Exception e){
+                    innerShoppingList = new InnerShoppingList("");
+                    Log.e("Exception", "loadShoppingList from ShoppingList failed: " + e.toString());
+                }
+            }
             else
                 innerShoppingList = new InnerShoppingList("");
 
@@ -97,7 +106,7 @@ public class ShoppingList extends ArrayList<String>{
     }
 
     public synchronized void setShoppingListItemEdit(ShoppingListItem shoppingListItem, int position){
-        shoppingListItem.setLastModified(new Date());
+        shoppingListItem.setLastModified(new Date().getTime());
         innerShoppingList.setShoppingListItem(position, shoppingListItem);
         this.set(position, shoppingListItem.toString());
     }
@@ -120,7 +129,7 @@ public class ShoppingList extends ArrayList<String>{
 
         public void add(ShoppingListItem shoppingListItem){
             shoppingListItems.add(shoppingListItem);
-            setLastModified(shoppingListItem.getLastModified().getTime());
+            setLastModified(shoppingListItem.getLastModified());
         }
 
         public void remove(int postion){
@@ -131,9 +140,9 @@ public class ShoppingList extends ArrayList<String>{
         public void markAsDeleted(int postion){
             ShoppingListItem shoppingListItem = shoppingListItems.get(postion);
             shoppingListItem.setIsDeleted(true);
-            Date now = new Date();
+            long now = new Date().getTime();
             shoppingListItem.setLastModified(now);
-            setLastModified(now.getTime());
+            setLastModified(now);
             shoppingListItems.set(postion, shoppingListItem);
         }
 
@@ -144,7 +153,7 @@ public class ShoppingList extends ArrayList<String>{
 
         public void setShoppingListItem(int position, ShoppingListItem shoppingListItem){
             shoppingListItems.set(position, shoppingListItem);
-            setLastModified(shoppingListItem.getLastModified().getTime());
+            setLastModified(shoppingListItem.getLastModified());
         }
         public String getShoppingListName(){return shoppingListName;}
         public void setShoppingListName(String shoppingListName){

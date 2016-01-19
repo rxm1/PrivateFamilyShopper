@@ -315,12 +315,18 @@ public class DataHelper {
     }
     public synchronized ShoppingList loadShoppingListFromLocalStorage(){
         ShoppingList shoppingList = null;
-        String gson = loadGsonFromLocalStorage();
-        if(!gson.trim().isEmpty()) {
-            shoppingList = new ShoppingList();
-            shoppingList.loadShoppingList(gson);
-        }
+        String gson = "";
+        try {
+            gson = loadGsonFromLocalStorage();
 
+            if(!gson.trim().isEmpty()) {
+                shoppingList = new ShoppingList();
+                shoppingList.loadShoppingList(gson);
+            }
+        }
+        catch (Exception e){
+            Log.e("Exception", "loadShoppingListFromLocalStorage failed: " + e.toString());
+        }
         return shoppingList;
     }
     public synchronized String loadGsonFromLocalStorage(){
@@ -369,7 +375,11 @@ public class DataHelper {
         return true;
     }
     public synchronized static boolean getIsValidFirebaseURL(){return isValidFirebaseURL;}
-
+    public synchronized void clearShoppingListFromLocalStorage(){
+        File file = new File(context.getFilesDir(), localMasterFileName);
+        if(file.exists())
+            saveShoppingListToLocalStorage(new ShoppingList(MainController.master_shopping_list_name).getJson());
+    }
 
     public synchronized Firebase getMyFirebaseRef(){return myFirebaseRef;}
     public synchronized void cleanUp(){

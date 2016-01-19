@@ -237,7 +237,9 @@ public class MainController {
 
     public ShoppingList getShoppingList(){ return shoppingList; }
     public ShoppingListAdapter getShoppingListAdapter(){return shoppingListAdapter;}
-
+    public void clearShoppingListFromLocalStorage(){
+        dataHelper.clearShoppingListFromLocalStorage();
+    }
     public void cleanUp(){
         handlerThread.quit();
         dataHelper.cleanUp();
