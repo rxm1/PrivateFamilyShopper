@@ -95,6 +95,8 @@ public class MainActivity extends AppCompatActivity {
                 Intent i = new Intent(this, SettingsActivity.class);
                 startActivityForResult(i, SETTINGS_RESULT);
                 return true;
+            case com.meerkats.familyshopper.R.id.about:
+                mainController.about();
             default:
                 return super.onOptionsItemSelected(item);
 

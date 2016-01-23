@@ -1,16 +1,20 @@
 package com.meerkats.familyshopper;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.view.ContextThemeWrapper;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.firebase.client.DataSnapshot;
@@ -244,5 +248,32 @@ public class MainController {
     public void cleanUp(){
         handlerThread.quit();
         dataHelper.cleanUp();
+    }
+
+    public void about(){
+        // Inflate the about message contents
+        View messageView = activity.getLayoutInflater().inflate(R.layout.about, null, false);
+
+        // When linking text, force to always use default color. This works
+        // around a pressed color state bug.
+        //TextView textView = (TextView) messageView.findViewById(R.id.about_credits);
+        //int defaultColor = textView.getTextColors().getDefaultColor();
+        //textView.setTextColor(defaultColor);
+        TextView versionCodeTextView = (TextView) messageView.findViewById(R.id.version_code);
+        TextView versionNameTextView = (TextView) messageView.findViewById(R.id.version_name);
+        try {
+            PackageInfo pInfo = activity.getPackageManager().getPackageInfo(activity.getPackageName(), 0);
+            versionCodeTextView.setText("Version Code: " + pInfo.versionCode);
+            versionNameTextView.setText("Version Name: " + pInfo.versionName);
+        }
+        catch (Exception e){
+
+        }
+        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+        builder.setIcon(R.mipmap.ic_launcher);
+        builder.setTitle(R.string.app_name);
+        builder.setView(messageView);
+        builder.create();
+        builder.show();
     }
 }

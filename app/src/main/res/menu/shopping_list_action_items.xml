@@ -22,4 +22,9 @@
         android:icon="@mipmap/ic_settings"
         app:showAsAction="ifRoom"/>
 
+    <item android:id="@+id/about"
+        android:title="About"
+        android:icon="@mipmap/ic_settings"
+        app:showAsAction="never"/>
+
 </menu>
