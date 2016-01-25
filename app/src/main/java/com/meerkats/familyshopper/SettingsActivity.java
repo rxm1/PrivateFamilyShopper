@@ -5,6 +5,8 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 
+import com.meerkats.familyshopper.util.Settings;
+
 public class SettingsActivity extends PreferenceActivity {
 
     @Override

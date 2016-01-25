@@ -13,6 +13,7 @@ import android.os.Message;
 import android.support.v4.content.LocalBroadcastManager;
 
 import com.firebase.client.Firebase;
+import com.meerkats.familyshopper.util.Settings;
 
 /**
  * Created by Rez on 10/01/2016.
@@ -41,6 +42,7 @@ public class MainService extends Service {
         public void onReceive(final Context context, Intent intent) {
             dataHelper.removeFirebaseListeners();
             dataHelper.setMyFirebaseRefNull();
+            Settings.loadSettings(context);
             mServiceHandler.post(new Runnable() {
                 @Override
                 public void run() {

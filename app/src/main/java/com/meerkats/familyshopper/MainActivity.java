@@ -24,6 +24,7 @@ import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
 
+import com.meerkats.familyshopper.util.Settings;
 import com.meerkats.familyshopper.model.ShoppingList;
 
 public class MainActivity extends AppCompatActivity {
@@ -108,6 +109,7 @@ public class MainActivity extends AppCompatActivity {
 
         switch (requestCode) {
             case SETTINGS_RESULT:
+                Settings.loadSettings(this);
                 mainController.clearShoppingListFromLocalStorage();
                 mainController.connect();
 
