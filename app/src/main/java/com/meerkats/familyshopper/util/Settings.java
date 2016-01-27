@@ -17,7 +17,17 @@ import java.util.Set;
  */
 public class Settings {
     private static final String logging_name = "logging";
+    public static final String Firebase_URL_Name = "FirebaseURLName";
+    public static final String Integrate_With_Firebase_Name = "IntegrateFirebase";
+    public static final String Notification_Frequency_Name = "notificationFrequency";
+    public static final String Notification_Events_Name = "notificationEvents";
+    public static final String Push_Batch_Time_Name = "pushBatchTime";
 
+    private static NotificationEvents userSelectedNotificationEvents = new NotificationEvents();
+    private static String firebaseURL = "";
+    private static boolean integrateFirebase = false;
+    private static int notificationDelay = 0;
+    private static int pushBatchDelay = 0;
     private static boolean debugVerbose=false;
     private static boolean debugDebug=false;
     private static boolean debugInfo=false;
@@ -27,8 +37,32 @@ public class Settings {
     public static void loadSettings(Context context){
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
 
-        Set<String> notificationEventsSettings = settings.getStringSet(logging_name, new HashSet<String>());
+        String temp = settings.getString(Push_Batch_Time_Name, "0").trim();
+        int pushBatchTime = temp==""?1:Integer.valueOf(temp);
+        pushBatchDelay=1000*(pushBatchTime<1?1:pushBatchTime);
+        temp = settings.getString(Notification_Frequency_Name, "0");
+        notificationDelay = 1000*(temp==""?0:Integer.valueOf(temp));
+
+        firebaseURL = formatFirebaseURL(settings.getString(Firebase_URL_Name, null));
+        integrateFirebase = settings.getBoolean(Integrate_With_Firebase_Name, false);
+
+        Set<String> notificationEventsSettings = settings.getStringSet(Notification_Events_Name, new HashSet<String>());
         for (String events : notificationEventsSettings) {
+            switch (events){
+                case "additions":
+                    userSelectedNotificationEvents.remoteAdditions = true;
+                    break;
+                case "modifications":
+                    userSelectedNotificationEvents.modifications = true;
+                    break;
+                case "deletions":
+                    userSelectedNotificationEvents.deletions = true;
+                    break;
+            }
+        }
+
+        Set<String> logEventsSettings = settings.getStringSet(logging_name, new HashSet<String>());
+        for (String events : logEventsSettings) {
             switch (events){
                 case "verbose":
                     debugVerbose = true;
@@ -54,7 +88,20 @@ public class Settings {
         editor.clear();
         editor.commit();
     }
+    private static String formatFirebaseURL(String firebaseURL){
+        if(!firebaseURL.startsWith("https://"))
+            firebaseURL = "https://" + firebaseURL;
+        if(!firebaseURL.endsWith(".com"))
+            firebaseURL += ".com";
 
+        return firebaseURL;
+    }
+
+    public static NotificationEvents getUserSelectedNotificationEvents(){return userSelectedNotificationEvents;}
+    public static int getNotificationDelay(){return notificationDelay;}
+    public static boolean isIntegrateFirebase(){return integrateFirebase;}
+    public static String getFirebaseURL(){return firebaseURL;}
+    public static int getPushBatchDelay(){return pushBatchDelay;}
     public static boolean isDebugVerbose(){return debugVerbose;}
     public static boolean isDebugDebug(){return debugDebug;}
     public static boolean isDebugInfo(){return debugInfo;}

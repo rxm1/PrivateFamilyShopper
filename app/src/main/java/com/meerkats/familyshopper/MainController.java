@@ -10,8 +10,6 @@ import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
 import android.preference.PreferenceManager;
-import android.util.Log;
-import android.view.ContextThemeWrapper;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.TextView;
@@ -24,6 +22,7 @@ import com.firebase.client.ValueEventListener;
 import com.meerkats.familyshopper.model.ShoppingList;
 import com.meerkats.familyshopper.model.ShoppingListItem;
 import com.meerkats.familyshopper.util.FSLog;
+import com.meerkats.familyshopper.util.Settings;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -39,11 +38,6 @@ public class MainController {
     ShoppingList shoppingList;
     ShoppingListAdapter shoppingListAdapter;
     public static final String PREFS_NAME = "MyPrefsFile";
-    public static final String Firebase_URL_Name = "FirebaseURLName";
-    public static final String Integrate_With_Firebase_Name = "IntegrateFirebase";
-    public static final String Notification_Frequency_Name = "notificationFrequency";
-    public static final String Notification_Events_Name = "notificationEvents";
-    public static final String Push_Batch_Time_Name = "pushBatchTime";
     public static final String master_shopping_list_name = "Master_List";
     public static final String activity_tag = "meerkats_MainActivity";
 
@@ -191,9 +185,6 @@ public class MainController {
         }
         if(myFirebaseRef != null && DataHelper.getIsValidFirebaseURL()) {
             if (withTimer) {
-                String temp = settings.getString(Push_Batch_Time_Name, "0").trim();
-                int pushBatchTime = temp==""?1:Integer.valueOf(temp);
-                pushBatchTime=pushBatchTime<1?1:pushBatchTime;
                 TimerTask timerTask = new TimerTask() {
                     @Override
                     public void run() {
@@ -203,7 +194,7 @@ public class MainController {
                 timer.cancel();
                 timer.purge();
                 timer = new Timer();
-                timer.schedule(timerTask, pushBatchTime * 1000);
+                timer.schedule(timerTask, Settings.getPushBatchDelay());
             }
             else {
                 timer.cancel();

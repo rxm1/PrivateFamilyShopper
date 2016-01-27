@@ -23,6 +23,7 @@ import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
 import com.meerkats.familyshopper.model.ShoppingList;
 import com.meerkats.familyshopper.util.FSLog;
+import com.meerkats.familyshopper.util.Settings;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -100,27 +101,25 @@ public class DataHelper {
         FSLog.verbose(logTag, "DataHelper instanciateFirebase");
 
         try {
-            if (settings.contains(MainController.Firebase_URL_Name)) {
-                String firebaseURL = formatFirebaseURL(settings.getString(MainController.Firebase_URL_Name, null));
-                Boolean integrateFirebase = settings.getBoolean(MainController.Integrate_With_Firebase_Name, false);
-                if (integrateFirebase && firebaseURL != null && !firebaseURL.trim().isEmpty()) {
-                    myFirebaseRef = new Firebase(firebaseURL);
-                    if (myFirebaseRef != null)
-                        Toast.makeText(context.getApplicationContext(), "Connecting to Firebase...", Toast.LENGTH_SHORT).show();
-                    checkFirebaseURL(fromService);
+            String firebaseURL = Settings.getFirebaseURL();
+            Boolean integrateFirebase = Settings.isIntegrateFirebase();
+            if (integrateFirebase && firebaseURL != null && !firebaseURL.trim().isEmpty()) {
+                myFirebaseRef = new Firebase(firebaseURL);
+                if (myFirebaseRef != null)
+                    Toast.makeText(context.getApplicationContext(), "Connecting to Firebase...", Toast.LENGTH_SHORT).show();
+                checkFirebaseURL(fromService);
 
-                    if(fromService)
-                        addFirebaseListeners();
-                }
-                else {
-                    if(fromService)
-                        removeFirebaseListeners();
-                    myFirebaseRef = null;
-                }
-                if(!fromService) {
-                    if (myFirebaseRef == null || !integrateFirebase)
-                        Toast.makeText(context.getApplicationContext(), "Firebase not connected.", Toast.LENGTH_LONG).show();
-                }
+                if(fromService)
+                    addFirebaseListeners();
+            }
+            else {
+                if(fromService)
+                    removeFirebaseListeners();
+                myFirebaseRef = null;
+            }
+            if(!fromService) {
+                if (myFirebaseRef == null || !integrateFirebase)
+                    Toast.makeText(context.getApplicationContext(), "Firebase not connected.", Toast.LENGTH_LONG).show();
             }
         }
         catch (Exception ex){
@@ -163,15 +162,6 @@ public class DataHelper {
             Toast.makeText(context.getApplicationContext(), "Firebase not connected.", Toast.LENGTH_SHORT).show();
         }
     }
-    public synchronized String formatFirebaseURL(String firebaseURL){
-        FSLog.verbose(logTag, "DataHelper formatFirebaseURL");
-        if(!firebaseURL.startsWith("https://"))
-            firebaseURL = "https://" + firebaseURL;
-        if(!firebaseURL.endsWith(".com"))
-            firebaseURL += ".com";
-
-        return firebaseURL;
-    }
 
     /*  Sync is between saved local file
     and remote saved storage.
@@ -185,8 +175,7 @@ public class DataHelper {
             firebaseListeners = myFirebaseRef.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot snapshot) {
-                    Boolean integrateFirebase = settings.getBoolean(MainController.Integrate_With_Firebase_Name, false);
-                    if(integrateFirebase) {
+                    if(Settings.isIntegrateFirebase()) {
                         Message message = mainServiceDataChangedHandler.obtainMessage();
                         message.obj = snapshot;
                         mainServiceDataChangedHandler.sendMessage(message);
@@ -219,10 +208,7 @@ public class DataHelper {
     private synchronized void sendFileChangedNotification(){
         FSLog.verbose(logTag, "DataHelper sendFileChangedNotification");
 
-        String temp = settings.getString(MainController.Notification_Frequency_Name, "0");
-        int notificationFrequency = temp==""?0:Integer.valueOf(temp);
-
-        NotificationEvents userSelectedNotifications = userSelectedNotificationEvents();
+        NotificationEvents userSelectedNotifications = Settings.getUserSelectedNotificationEvents();
         NotificationEvents mergedNotifications = new NotificationEvents();
         String notificationDescription = "Items have been ";
         if(userSelectedNotifications.remoteAdditions){
@@ -241,7 +227,7 @@ public class DataHelper {
         notificationDescription += ".";
         final String finalNotificationDescription = notificationDescription;
         if(mergedNotifications.isTrue()) {
-            if (notificationFrequency > 0) {
+            if (Settings.getNotificationDelay() > 0) {
                 TimerTask timerTask = new TimerTask() {
                     @Override
                     public void run() {
@@ -251,7 +237,7 @@ public class DataHelper {
                 timer.cancel();
                 timer.purge();
                 timer = new Timer();
-                timer.schedule(timerTask, notificationFrequency * 1000);
+                timer.schedule(timerTask, Settings.getNotificationDelay());
             }
             else
                 sendNotification(finalNotificationDescription);
@@ -285,26 +271,6 @@ public class DataHelper {
                 (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         // mId allows you to update the notification later on.
         mNotificationManager.notify(file_changed_notification_id, mBuilder.build());
-    }
-    private synchronized NotificationEvents userSelectedNotificationEvents(){
-        FSLog.verbose(logTag, "DataHelper userSelectedNotificationEvents");
-
-        Set<String> notificationEventsSettings = settings.getStringSet(MainController.Notification_Events_Name, new HashSet<String>());
-        NotificationEvents tempNotifications = new NotificationEvents();
-        for (String events : notificationEventsSettings) {
-            switch (events){
-                case "additions":
-                    tempNotifications.remoteAdditions = true;
-                    break;
-                case "modifications":
-                    tempNotifications.modifications = true;
-                    break;
-                case "deletions":
-                    tempNotifications.deletions = true;
-                    break;
-            }
-        }
-        return tempNotifications;
     }
 
     public synchronized ShoppingList merge(DataSnapshot snapshot, ShoppingList localList, NotificationEvents occuredNotificationEvents){

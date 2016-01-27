@@ -46,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(com.meerkats.familyshopper.R.layout.activity_main);
+        Settings.loadSettings(this);
 
         handlerThread = new HandlerThread("MainActivity.HandlerThread");
         handlerThread.start();
