@@ -22,6 +22,7 @@ import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
 import com.meerkats.familyshopper.model.ShoppingList;
+import com.meerkats.familyshopper.util.FSLog;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -53,6 +54,7 @@ public class DataHelper {
     private static boolean isValidFirebaseURL = false;
     NotificationEvents occuredNotificationEvents = new NotificationEvents();
     Timer timer = new Timer();
+    String logTag = "";
 
     class MainServiceDataChangedHandler extends Handler {
         public MainServiceDataChangedHandler(Looper looper) {
@@ -78,18 +80,16 @@ public class DataHelper {
         }
     }
 
-    public DataHelper(Context context, HandlerThread handlerThread) {
+    public DataHelper(Context context, HandlerThread handlerThread, String logTag) {
+        FSLog.verbose(logTag, "DataHelper constructor");
+
+        this.logTag = logTag;
         this.context = context;
         dataMerger = new DataMerger();
         this.handlerThread = handlerThread;
         mainServiceDataChangedHandler = new MainServiceDataChangedHandler(handlerThread.getLooper());
 
         settings = PreferenceManager.getDefaultSharedPreferences(context);
-
-      /*  SharedPreferences.Editor editor = settings.edit();
-        editor.clearao();
-        editor.commit();
-*/
         if (settings.contains(Last_Synced_Name)) {
             settings.getLong(Last_Synced_Name, System.currentTimeMillis());
             dataMerger.setLastSynced(settings.getLong(Last_Synced_Name, 0));
@@ -97,6 +97,8 @@ public class DataHelper {
     }
 
     public synchronized void instanciateFirebase(boolean fromService) {
+        FSLog.verbose(logTag, "DataHelper instanciateFirebase");
+
         try {
             if (settings.contains(MainController.Firebase_URL_Name)) {
                 String firebaseURL = formatFirebaseURL(settings.getString(MainController.Firebase_URL_Name, null));
@@ -122,12 +124,15 @@ public class DataHelper {
             }
         }
         catch (Exception ex){
+            FSLog.error(logTag, "DataHelper instanciateFirebase", ex);
             if(!fromService) {
                 Toast.makeText(context.getApplicationContext(), "Firebase not connected.", Toast.LENGTH_SHORT).show();
             }
         }
     }
     private synchronized void checkFirebaseURL(final boolean fromService) {
+        FSLog.verbose(logTag, "DataHelper checkFirebaseURL");
+
         isValidFirebaseURL = false;
         if (myFirebaseRef != null) {
             try {
@@ -148,6 +153,7 @@ public class DataHelper {
 
                         });
             } catch (Exception e) {
+                FSLog.error(logTag, "DataHelper checkFirebaseURL", e);
                 if (!fromService) {
                     Toast.makeText(context.getApplicationContext(), "Firebase not connected.", Toast.LENGTH_SHORT).show();
                 }
@@ -158,6 +164,7 @@ public class DataHelper {
         }
     }
     public synchronized String formatFirebaseURL(String firebaseURL){
+        FSLog.verbose(logTag, "DataHelper formatFirebaseURL");
         if(!firebaseURL.startsWith("https://"))
             firebaseURL = "https://" + firebaseURL;
         if(!firebaseURL.endsWith(".com"))
@@ -172,6 +179,8 @@ public class DataHelper {
     and remote storage
     */
     private synchronized void addFirebaseListeners(){
+        FSLog.verbose(logTag, "DataHelper addFirebaseListeners");
+
         if(myFirebaseRef != null) {
             firebaseListeners = myFirebaseRef.addValueEventListener(new ValueEventListener() {
                 @Override
@@ -193,6 +202,8 @@ public class DataHelper {
         }
     }
     public synchronized void removeFirebaseListeners() {
+        FSLog.verbose(logTag, "DataHelper removeFirebaseListeners");
+
         if (myFirebaseRef == null){
             if (firebaseListeners != null) {
                 firebaseListeners = null;
@@ -206,6 +217,8 @@ public class DataHelper {
     }
 
     private synchronized void sendFileChangedNotification(){
+        FSLog.verbose(logTag, "DataHelper sendFileChangedNotification");
+
         String temp = settings.getString(MainController.Notification_Frequency_Name, "0");
         int notificationFrequency = temp==""?0:Integer.valueOf(temp);
 
@@ -246,6 +259,8 @@ public class DataHelper {
     }
 
     private synchronized void sendNotification(String notificationDescription){
+        FSLog.verbose(logTag, "DataHelper sendNotification");
+
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(context)
                         .setSmallIcon(com.meerkats.familyshopper.R.mipmap.ic_launcher)
@@ -272,6 +287,8 @@ public class DataHelper {
         mNotificationManager.notify(file_changed_notification_id, mBuilder.build());
     }
     private synchronized NotificationEvents userSelectedNotificationEvents(){
+        FSLog.verbose(logTag, "DataHelper userSelectedNotificationEvents");
+
         Set<String> notificationEventsSettings = settings.getStringSet(MainController.Notification_Events_Name, new HashSet<String>());
         NotificationEvents tempNotifications = new NotificationEvents();
         for (String events : notificationEventsSettings) {
@@ -291,6 +308,8 @@ public class DataHelper {
     }
 
     public synchronized ShoppingList merge(DataSnapshot snapshot, ShoppingList localList, NotificationEvents occuredNotificationEvents){
+        FSLog.verbose(logTag, "DataHelper merge");
+
         HashMap<String, String> map = (HashMap<String, String>) snapshot.getValue();
         ShoppingList mergedList = new ShoppingList();
         ShoppingList remoteList = new ShoppingList();
@@ -314,6 +333,8 @@ public class DataHelper {
         return mergedList;
     }
     public synchronized ShoppingList loadShoppingListFromLocalStorage(){
+        FSLog.verbose(logTag, "DataHelper loadShoppingListFromLocalStorage");
+
         ShoppingList shoppingList = null;
         String gson = "";
         try {
@@ -325,11 +346,13 @@ public class DataHelper {
             }
         }
         catch (Exception e){
-            Log.e("Exception", "loadShoppingListFromLocalStorage failed: " + e.toString());
+            FSLog.error(logTag, "DataHelper loadShoppingListFromLocalStorage", e);
         }
         return shoppingList;
     }
     public synchronized String loadGsonFromLocalStorage(){
+        FSLog.verbose(logTag, "DataHelper loadGsonFromLocalStorage");
+
         StringBuilder text = new StringBuilder();
         File file = new File(context.getFilesDir(), localMasterFileName);
         if(!file.exists())
@@ -346,11 +369,13 @@ public class DataHelper {
             return text.toString();
         }
         catch (IOException e) {
-            Log.e("Exception", "File read failed: " + e.toString());
+            FSLog.error(logTag, "DataHelper loadGsonFromLocalStorage", e);
             return "";
         }
     }
     public synchronized boolean saveShoppingListToStorage(String jsonData){
+        FSLog.verbose(logTag, "DataHelper saveShoppingListToStorage");
+
         if(saveShoppingListToLocalStorage(jsonData)){
             if(myFirebaseRef != null)
                 myFirebaseRef.child("masterList").setValue(jsonData);
@@ -361,6 +386,8 @@ public class DataHelper {
         return true;
     }
     public synchronized boolean saveShoppingListToLocalStorage(String jsonData){
+        FSLog.verbose(logTag, "DataHelper saveShoppingListToLocalStorage");
+
         try {
             OutputStreamWriter outputStreamWriter = new OutputStreamWriter(
                     context.openFileOutput(localMasterFileName, Context.MODE_PRIVATE));
@@ -368,7 +395,7 @@ public class DataHelper {
             outputStreamWriter.close();
         }
         catch (IOException e) {
-            Log.e("Exception", "File write failed: " + e.toString());
+            FSLog.error(logTag, "DataHelper saveShoppingListToLocalStorage", e);
             return false;
         }
 
@@ -376,14 +403,22 @@ public class DataHelper {
     }
     public synchronized static boolean getIsValidFirebaseURL(){return isValidFirebaseURL;}
     public synchronized void clearShoppingListFromLocalStorage(){
+        FSLog.verbose(logTag, "DataHelper clearShoppingListFromLocalStorage");
+
         File file = new File(context.getFilesDir(), localMasterFileName);
         if(file.exists())
             saveShoppingListToLocalStorage(new ShoppingList(MainController.master_shopping_list_name).getJson());
     }
 
     public synchronized Firebase getMyFirebaseRef(){return myFirebaseRef;}
-    public synchronized void setMyFirebaseRefNull(){myFirebaseRef=null;}
+    public synchronized void setMyFirebaseRefNull(){
+        FSLog.verbose(logTag, "DataHelper setMyFirebaseRefNull");
+
+        myFirebaseRef=null;
+    }
     public synchronized void cleanUp(){
+        FSLog.verbose(logTag, "DataHelper cleanUp");
+
         handlerThread.quit();
     }
 }

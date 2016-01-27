@@ -22,8 +22,8 @@ public class FSLog {
         if(Settings.isDebugWarn())
             Log.w(tag, message);
     }
-    public static void error(String tag, String message){
+    public static void error(String tag, String message, Exception e){
         if(Settings.isDebugError())
-            Log.e(tag, message);
+            Log.e(tag, message + ": " + e.getMessage() + " " + e.getStackTrace());
     }
 }

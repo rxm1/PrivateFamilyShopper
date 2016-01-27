@@ -27,7 +27,7 @@ public class Settings {
     public static void loadSettings(Context context){
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
 
-        Set<String> notificationEventsSettings = settings.getStringSet(MainController.Notification_Events_Name, new HashSet<String>());
+        Set<String> notificationEventsSettings = settings.getStringSet(logging_name, new HashSet<String>());
         for (String events : notificationEventsSettings) {
             switch (events){
                 case "verbose":

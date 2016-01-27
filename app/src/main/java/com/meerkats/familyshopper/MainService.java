@@ -13,6 +13,7 @@ import android.os.Message;
 import android.support.v4.content.LocalBroadcastManager;
 
 import com.firebase.client.Firebase;
+import com.meerkats.familyshopper.util.FSLog;
 import com.meerkats.familyshopper.util.Settings;
 
 /**
@@ -27,10 +28,12 @@ public class MainService extends Service {
     private volatile HandlerThread mHandlerThread;
     private ServiceHandler mServiceHandler;
     SettingsChangedReceiver settingsChangedReceiver;
+    public static final String service_tag = "meerkats_MainService";
 
     private final class ServiceHandler extends Handler {
         public ServiceHandler(Looper looper) {
             super(looper);
+            FSLog.verbose(service_tag, "ServiceHandler constructor");
         }
 
         @Override
@@ -40,6 +43,8 @@ public class MainService extends Service {
     public class SettingsChangedReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(final Context context, Intent intent) {
+            FSLog.verbose(service_tag, "SettingsChangedReceiver onReceive");
+
             dataHelper.removeFirebaseListeners();
             dataHelper.setMyFirebaseRefNull();
             Settings.loadSettings(context);
@@ -54,6 +59,8 @@ public class MainService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+        FSLog.verbose(service_tag, "MainService onCreate");
+
         // An Android handler thread internally operates on a looper.
         mHandlerThread = new HandlerThread("MainService.HandlerThread");
         mHandlerThread.start();
@@ -61,7 +68,7 @@ public class MainService extends Service {
         mServiceHandler = new ServiceHandler(mHandlerThread.getLooper());
 
         Firebase.setAndroidContext(this);
-        dataHelper = new DataHelper(this, mHandlerThread);
+        dataHelper = new DataHelper(this, mHandlerThread, service_tag);
         settingsChangedReceiver = new SettingsChangedReceiver();
         IntentFilter filter = new IntentFilter(MainController.settings_updated_action);
         LocalBroadcastManager.getInstance(this).registerReceiver(settingsChangedReceiver, filter);
@@ -70,7 +77,7 @@ public class MainService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-
+        FSLog.verbose(service_tag, "MainService onStartCommand");
 
         mServiceHandler.post(new Runnable() {
             @Override
@@ -99,6 +106,8 @@ public class MainService extends Service {
 
     @Override
     public void onDestroy() {
+        FSLog.verbose(service_tag, "MainService onDestroy");
+
         // Cleanup service before destruction
         mHandlerThread.quit();
         dataHelper.cleanUp();

@@ -41,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int SETTINGS_RESULT = 1;
     private boolean isEditing = false;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
