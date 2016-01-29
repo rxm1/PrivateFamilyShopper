@@ -113,18 +113,26 @@ public class ShoppingList extends ArrayList<String>{
 
     public synchronized long getLastUpdated(){return innerShoppingList.getLastModified();}
 
+    public String getLastSyncedBy(){ return innerShoppingList.getLastSyncedBy(); }
+    public void setLastSyncedBy(String lastSyncedBy ){innerShoppingList.setLastSyncedBy(lastSyncedBy);}
+    public long getLastSyncedBySeen(){ return innerShoppingList.getLastSyncedBySeen(); }
+    public void setLastSyncedBySeen(long lastSyncedBySeen ){innerShoppingList.setLastSyncedBySeen(lastSyncedBySeen);}
+
     public boolean equals(ShoppingList other){return innerShoppingList.equals(other.innerShoppingList);}
     class InnerShoppingList
     {
         private String shoppingListName;
         private ArrayList<ShoppingListItem> shoppingListItems;
         private long lastModified;
+        private String lastSyncedBy;
+        private long lastSyncedBySeen;
 
         public InnerShoppingList(String shoppingListName)
         {
             shoppingListItems = new ArrayList<ShoppingListItem>();
             this.shoppingListName = shoppingListName;
             lastModified = 0;
+            lastSyncedBy = "";
         }
 
         public void add(ShoppingListItem shoppingListItem){
@@ -167,6 +175,10 @@ public class ShoppingList extends ArrayList<String>{
         }
         public long getLastModified(){return lastModified;}
         public void setLastModified(long lastModified){this.lastModified = lastModified;}
+        public void setLastSyncedBy(String lastSyncedBy){ this.lastSyncedBy = lastSyncedBy; }
+        public String getLastSyncedBy(){return lastSyncedBy;}
+        public void setLastSyncedBySeen(long lastSyncedBySeen){this.lastSyncedBySeen=lastSyncedBySeen;}
+        public long getLastSyncedBySeen(){return lastSyncedBySeen;}
 
         @Override
         public synchronized String toString(){
@@ -176,6 +188,8 @@ public class ShoppingList extends ArrayList<String>{
             }
             return "ShoppingList [shopping_list_name=" + shoppingListName + ", "
                     + "last_modified=" + lastModified + ", "
+                    + "last_synced_by=" + lastSyncedBy + ", "
+                    + "last_synced_by_seen=" + lastSyncedBySeen + ", "
                     + items + "]";
         }
 

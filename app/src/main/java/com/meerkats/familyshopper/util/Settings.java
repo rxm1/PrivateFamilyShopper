@@ -42,7 +42,7 @@ public class Settings {
         pushBatchDelay=1000*(pushBatchTime<1?1:pushBatchTime);
         temp = settings.getString(Notification_Frequency_Name, "0");
         notificationDelay = 1000*(temp==""?0:Integer.valueOf(temp));
-
+//to do: check for permissions
         firebaseURL = formatFirebaseURL(settings.getString(Firebase_URL_Name, null));
         integrateFirebase = settings.getBoolean(Integrate_With_Firebase_Name, false);
 

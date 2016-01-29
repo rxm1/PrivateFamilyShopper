@@ -21,9 +21,11 @@ import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
 import com.meerkats.familyshopper.model.ShoppingList;
 import com.meerkats.familyshopper.model.ShoppingListItem;
+import com.meerkats.familyshopper.util.Diagnostics;
 import com.meerkats.familyshopper.util.FSLog;
 import com.meerkats.familyshopper.util.Settings;
 
+import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -54,14 +56,18 @@ public class MainController {
             super(looper);
         }
         public void handleMessage(Message msg) {
-            DataSnapshot snapshot = (DataSnapshot)msg.obj;
             NotificationEvents occuredNoticifications = new NotificationEvents();
+            HashMap<String, String> map = (HashMap<String, String>) ((DataSnapshot)msg.obj).getValue();
+            ShoppingList remoteList = new ShoppingList();
+            if (map != null) {
+                remoteList.loadShoppingList(map.get("masterList"));
+                Diagnostics.saveLastSyncedBy(activity, remoteList);
+            }
 
-            ShoppingList mergedList = dataHelper.merge(snapshot, shoppingList, occuredNoticifications);
+            ShoppingList mergedList = dataHelper.merge(remoteList, shoppingList, occuredNoticifications);
             if(occuredNoticifications.isTrue()) {
-                String mergedData = mergedList.getJson();
-                dataHelper.saveShoppingListToStorage(mergedData);
-                shoppingList.loadShoppingList(mergedData);
+                dataHelper.saveShoppingListToStorage(mergedList);
+                shoppingList.loadShoppingList(mergedList.getJson());
                 mainUIHandler.post(new Runnable() {
                     @Override
                     public void run() {

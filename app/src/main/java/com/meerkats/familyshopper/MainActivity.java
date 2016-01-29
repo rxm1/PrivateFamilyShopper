@@ -100,6 +100,7 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             case com.meerkats.familyshopper.R.id.about:
                 mainController.about();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
 
@@ -229,4 +230,8 @@ public class MainActivity extends AppCompatActivity {
 
     public void setIsEditing(boolean isEditing){ this.isEditing=isEditing; }
     public boolean isEditing(){return isEditing;}
+
+    public void diagnosticsClick(View view){
+
+    }
 }

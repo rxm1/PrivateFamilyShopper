@@ -22,6 +22,7 @@ import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
 import com.meerkats.familyshopper.model.ShoppingList;
+import com.meerkats.familyshopper.util.Diagnostics;
 import com.meerkats.familyshopper.util.FSLog;
 import com.meerkats.familyshopper.util.Settings;
 
@@ -62,13 +63,18 @@ public class DataHelper {
             super(looper);
         }
         public void handleMessage(Message msg) {
-            DataSnapshot snapshot = (DataSnapshot)msg.obj;
+            HashMap<String, String> map = (HashMap<String, String>) ((DataSnapshot)msg.obj).getValue();
+            ShoppingList remoteList = new ShoppingList();
+            if (map != null) {
+                remoteList.loadShoppingList(map.get("masterList"));
+                Diagnostics.saveLastSyncedBy(context, remoteList);
+            }
             ShoppingList localList = loadShoppingListFromLocalStorage();
             occuredNotificationEvents.setFalse();
 
-            ShoppingList mergedList = merge(snapshot, localList, occuredNotificationEvents);
+            ShoppingList mergedList = merge(remoteList, localList, occuredNotificationEvents);
             if (occuredNotificationEvents.isTrue() && mergedList != null) {
-                saveShoppingListToStorage(mergedList.getJson());
+                saveShoppingListToStorage(mergedList);
                 Intent intent = new Intent(service_updated_file_action);
                 if (occuredNotificationEvents.forService().isTrue()) {
                     boolean recieversAvailable =
@@ -273,14 +279,11 @@ public class DataHelper {
         mNotificationManager.notify(file_changed_notification_id, mBuilder.build());
     }
 
-    public synchronized ShoppingList merge(DataSnapshot snapshot, ShoppingList localList, NotificationEvents occuredNotificationEvents){
+    public synchronized ShoppingList merge(ShoppingList remoteList, ShoppingList localList, NotificationEvents occuredNotificationEvents){
         FSLog.verbose(logTag, "DataHelper merge");
 
-        HashMap<String, String> map = (HashMap<String, String>) snapshot.getValue();
         ShoppingList mergedList = new ShoppingList();
-        ShoppingList remoteList = new ShoppingList();
-        if (map != null) {
-            remoteList.loadShoppingList(map.get("masterList"));
+        if (remoteList.size() != 0) {
             if (localList != null && !localList.equals(remoteList)) {
                 mergedList = dataMerger.merge(localList, remoteList, occuredNotificationEvents);
             }
@@ -339,8 +342,13 @@ public class DataHelper {
             return "";
         }
     }
-    public synchronized boolean saveShoppingListToStorage(String jsonData){
+    public synchronized boolean saveShoppingListToStorage(ShoppingList shoppingList){
         FSLog.verbose(logTag, "DataHelper saveShoppingListToStorage");
+
+        shoppingList.setLastSyncedBy(android.provider.Settings.Secure.getString(
+                context.getContentResolver(), android.provider.Settings.Secure.ANDROID_ID));
+        shoppingList.setLastSyncedBySeen(new Date().getTime());
+        String jsonData = shoppingList.getJson();
 
         if(saveShoppingListToLocalStorage(jsonData)){
             if(myFirebaseRef != null)
