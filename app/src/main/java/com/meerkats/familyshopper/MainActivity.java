@@ -24,6 +24,7 @@ import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
 
+import com.meerkats.familyshopper.util.DiagnosticsActivity;
 import com.meerkats.familyshopper.util.Settings;
 import com.meerkats.familyshopper.model.ShoppingList;
 
@@ -134,7 +135,7 @@ public class MainActivity extends AppCompatActivity {
                 if (shoppingList.getShoppingListItem(position).isCrossedOff())
                     contextMenuID = ((int) com.meerkats.familyshopper.R.array.shoppingListContextMenuValuesDeleteOnly);
 
-                AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(MainActivity.this, com.meerkats.familyshopper.R.style.ListContextMenu));
+                AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(MainActivity.this, R.style.AppTheme));
                 builder.setTitle(shoppingList.getShoppingListItem(position).getShoppingListItem()).setCancelable(true).setItems(contextMenuID,
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialoginterface, int index) {
@@ -232,6 +233,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean isEditing(){return isEditing;}
 
     public void diagnosticsClick(View view){
-
+        Intent intent = new Intent(this, DiagnosticsActivity.class);
+        startActivity(intent);
     }
 }

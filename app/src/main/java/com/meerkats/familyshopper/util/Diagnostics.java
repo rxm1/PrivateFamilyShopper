@@ -19,13 +19,12 @@ public class Diagnostics {
     private static final String logTag = "Diagnostics";
     private static ShoppingListMembers shoppingListMembers = new ShoppingListMembers();
 
-    public static void saveLastSyncedBy(Context context, ShoppingList shoppingList){
+    public synchronized static void saveLastSyncedBy(Context context, ShoppingList shoppingList) {
         String lastSyncedBy = shoppingList.getLastSyncedBy();
         long lastSeen = shoppingList.getLastSyncedBySeen();
-        if(shoppingListMembers.containsMember(lastSyncedBy)){
+        if (shoppingListMembers.containsMember(lastSyncedBy)) {
             shoppingListMembers.updateMember(lastSyncedBy, lastSeen);
-        }
-        else {
+        } else {
             shoppingListMembers.addMember(lastSyncedBy, lastSeen);
         }
 
@@ -33,11 +32,11 @@ public class Diagnostics {
             OutputStreamWriter outputStreamWriter = new OutputStreamWriter(
                     context.openFileOutput(ShoppingListMembersFilename, Context.MODE_PRIVATE));
             Gson gson = new Gson();
-            Type gsonType = new TypeToken<ShoppingListMembers>() {}.getType();
+            Type gsonType = new TypeToken<ShoppingListMembers>() {
+            }.getType();
             outputStreamWriter.write(gson.toJson(shoppingListMembers, gsonType));
             outputStreamWriter.close();
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             FSLog.error(logTag, "Diagnostics saveLastSyncedBy", e);
             return;
         }
@@ -45,5 +44,10 @@ public class Diagnostics {
         return;
     }
 
-    public static ShoppingListMembers getShoppingListMembers(){return shoppingListMembers;}
+    public static ShoppingListMembers getShoppingListMembers() {
+        if (shoppingListMembers == null)
+            shoppingListMembers = new ShoppingListMembers();
+
+        return shoppingListMembers;
+    }
 }

@@ -22,7 +22,7 @@ public class EditShoppingItemDialog extends Dialog implements
     public Activity activity;
 
     public EditShoppingItemDialog(Activity activity, String oldData) {
-        super(activity, com.meerkats.familyshopper.R.style.ListContextMenu);
+        super(activity, R.style.AppTheme);
         this.oldData = oldData;
         this.activity = activity;
         setCancelable(true);

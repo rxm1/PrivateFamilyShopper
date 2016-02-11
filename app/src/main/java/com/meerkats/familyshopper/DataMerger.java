@@ -50,6 +50,10 @@ public class DataMerger {
 
     public synchronized ShoppingList merge(ShoppingList localList, ShoppingList remoteList, NotificationEvents notificationEvents){
         ShoppingList mergedList = new ShoppingList();
+
+        if(localList.equals(remoteList))
+            return localList;
+
         HashMap<UUID, ShoppingListItem> remoteListHash = new HashMap<>(remoteList.size());
         for (ShoppingListItem i : remoteList.getShoppingListItems()) remoteListHash.put(i.getGuid(),i);
 

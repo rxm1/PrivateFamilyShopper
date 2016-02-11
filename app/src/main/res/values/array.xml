@@ -1,4 +1,5 @@
 <resources>
+
     <string-array name="listArray">
         <item>Additions</item>
         <item>Modifications</item>

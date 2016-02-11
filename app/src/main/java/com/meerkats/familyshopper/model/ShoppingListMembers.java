@@ -7,8 +7,9 @@ import java.util.Date;
  * Created by Rez on 28/01/2016.
  */
 public class ShoppingListMembers {
-    private String shoppingListName;
-    private ArrayList<ShoppingListMember> shoppingListMembers;
+    private String shoppingListName="";
+    private ArrayList<ShoppingListMember> shoppingListMembers=new ArrayList<ShoppingListMember>();
+
 
     public class ShoppingListMember{
         private String name;
@@ -23,6 +24,8 @@ public class ShoppingListMembers {
             return "ShoppingListMember [name=" + name + ", "
                     + "last_seen=" + lastSeen + "]";
         }
+        public String getName(){return name;}
+        public long getLastSeen(){return lastSeen;}
     }
 
     public void addMember(String name, long lastSeen){

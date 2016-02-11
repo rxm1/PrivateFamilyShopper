@@ -13,10 +13,7 @@
         android:layout_height="?attr/actionBarSize"
         android:layout_width="match_parent"
         android:minHeight="?attr/actionBarSize"
-        android:background="@android:color/white"
         android:elevation="4dp"
-        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
-        app.popupTheme="@style/ThemeOverlay.AppCompat.Light"
         />
 
     <ListView
@@ -24,14 +21,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:fadeScrollbars="false"
-        android:scrollbarSize="2dp"
-        android:scrollbarThumbVertical="@android:color/white"
-        android:background="@android:color/background_dark"
-        android:divider="#4d4d4d"
-        android:dividerHeight="1dp"
-        android:listSelector="#282828"
-        android:cacheColorHint="#282828"
+        style="@style/ListItemTheme"
         >
 
     </ListView>
@@ -40,10 +30,7 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:background="@drawable/border"
-        android:listSelector="@android:color/white"
-        android:cacheColorHint="@android:color/white"
-        >
+        android:background="@color/primaryListBackground">
         <EditText
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -53,7 +40,8 @@
             android:layout_gravity="bottom"
             android:background="@android:color/white"
             android:layout_marginLeft="3dp"
-
+            android:elevation="4dp"
+            android:padding="5dp"
             />
         <Button
             android:layout_width="wrap_content"
@@ -61,6 +49,8 @@
             android:layout_gravity="bottom"
             android:text="Add"
             android:id="@+id/addBtn"
-            android:onClick="addBtnClick"/>
+            android:onClick="addBtnClick"
+            android:elevation="4dp"/>
+            android:padding="5dp"
     </LinearLayout>
 </LinearLayout>

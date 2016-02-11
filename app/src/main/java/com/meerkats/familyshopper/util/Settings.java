@@ -89,6 +89,8 @@ public class Settings {
         editor.commit();
     }
     private static String formatFirebaseURL(String firebaseURL){
+        if(firebaseURL == null) return "";
+
         if(!firebaseURL.startsWith("https://"))
             firebaseURL = "https://" + firebaseURL;
         if(!firebaseURL.endsWith(".com"))

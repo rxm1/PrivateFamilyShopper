@@ -283,15 +283,9 @@ public class DataHelper {
         FSLog.verbose(logTag, "DataHelper merge");
 
         ShoppingList mergedList = new ShoppingList();
-        if (remoteList.size() != 0) {
-            if (localList != null && !localList.equals(remoteList)) {
-                mergedList = dataMerger.merge(localList, remoteList, occuredNotificationEvents);
-            }
-        }
-        else{
-            if(localList != null)
-                mergedList = localList;
-            occuredNotificationEvents.localAdditions=true;
+
+        if (localList != null && remoteList != null) {
+            mergedList = dataMerger.merge(localList, remoteList, occuredNotificationEvents);
         }
 
         SharedPreferences.Editor editor = settings.edit();

@@ -1,22 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.meerkats.familyshopper" >
+
     <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:supportsRtl="true">
+        android:supportsRtl="true" >
         <service
-            android:name="com.meerkats.familyshopper.MainService"
+            android:name=".MainService"
             android:icon="@mipmap/ic_launcher"
-            android:label="FamilyShopperService"
-            >
+            android:label="FamilyShopperService" >
         </service>
 
-        <activity android:name="com.meerkats.familyshopper.MainActivity" android:configChanges="orientation|screenSize"
-            android:theme="@style/DarkTheme">
-
+        <activity
+            android:name=".MainActivity"
+            android:configChanges="orientation|screenSize"
+            android:theme="@style/AppTheme" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -24,11 +26,15 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.meerkats.familyshopper.SettingsActivity"
+            android:name=".SettingsActivity"
             android:label="@string/app_name"
-            android:theme="@android:style/Theme.Holo.Light.Dialog.NoActionBar">
+            android:theme="@android:style/Theme.Holo.Light.Dialog.NoActionBar" >
         </activity>
-        <receiver android:name="com.meerkats.familyshopper.MainActivity$DataChangedReceiver" >
+        <activity android:name=".util.DiagnosticsActivity"
+            android:label="Diagnostics"
+            android:theme="@style/AppTheme" >
+        </activity>
+        <receiver android:name=".MainActivity$DataChangedReceiver" >
         </receiver>
     </application>
 
