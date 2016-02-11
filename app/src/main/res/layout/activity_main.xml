@@ -43,14 +43,16 @@
             android:elevation="4dp"
             android:padding="5dp"
             />
-        <Button
+        <android.support.design.widget.FloatingActionButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
-            android:text="Add"
+            android:layout_margin="16dp"
+            android:clickable="true"
+            android:src="@mipmap/ic_launcher"
             android:id="@+id/addBtn"
             android:onClick="addBtnClick"
-            android:elevation="4dp"/>
-            android:padding="5dp"
+            />
+
     </LinearLayout>
 </LinearLayout>
