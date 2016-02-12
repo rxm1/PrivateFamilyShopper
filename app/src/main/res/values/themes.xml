@@ -12,4 +12,11 @@
         <item name="toolbar">@style/ToolbarTheme.Red</item>
 
     </style>
+
+    <style name="ThemeBlue" parent="AppThemeBlue">
+        <item name="mainList">@style/ListItemThemeBlue</item>
+        <item name="mainListBackground">@style/mainListBackgroundBlue</item>
+        <item name="toolbar">@style/ToolbarTheme.Blue</item>
+
+    </style>
 </resources>

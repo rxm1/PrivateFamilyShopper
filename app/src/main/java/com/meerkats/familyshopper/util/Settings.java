@@ -117,6 +117,8 @@ public class Settings {
         switch (colorTheme){
             case "red":
                 return R.style.ThemeRed;
+            case "blue":
+                return R.style.ThemeBlue;
         }
         return R.style.ThemeGray;
     }

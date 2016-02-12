@@ -11,5 +11,6 @@
         android:id="@+id/shoppingListItemTextView"
         android:visibility="visible"
         android:textColor="@android:color/white"
+        android:layout_marginLeft="6dp"
         />
 </LinearLayout>
