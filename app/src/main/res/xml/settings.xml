@@ -26,6 +26,13 @@
             android:key="pushBatchTime"
             android:defaultValue="3"
             android:summary="Batches up changes to push. Increase delay to reduce data usage."/>
+        <ListPreference
+            android:title="Color Themes"
+            android:key="colorTheme"
+            android:summary="Change the theme color."
+            android:entries="@array/themeColorsListArray"
+            android:entryValues="@array/themeColorsListValues"
+            android:defaultValue="@array/themeColorsListDefaultValues"/>
         <MultiSelectListPreference
             android:title="Logging"
             android:key="logging"

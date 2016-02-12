@@ -7,6 +7,7 @@ import android.preference.PreferenceManager;
 
 import com.meerkats.familyshopper.MainController;
 import com.meerkats.familyshopper.NotificationEvents;
+import com.meerkats.familyshopper.R;
 
 import java.util.Date;
 import java.util.HashSet;
@@ -22,6 +23,7 @@ public class Settings {
     public static final String Notification_Frequency_Name = "notificationFrequency";
     public static final String Notification_Events_Name = "notificationEvents";
     public static final String Push_Batch_Time_Name = "pushBatchTime";
+    public static final String Color_Theme_Name = "colorTheme";
 
     private static NotificationEvents userSelectedNotificationEvents = new NotificationEvents();
     private static String firebaseURL = "";
@@ -33,6 +35,7 @@ public class Settings {
     private static boolean debugInfo=false;
     private static boolean debugWarn=false;
     private static boolean debugError=false;
+    private static String colorTheme="gray";
 
     public static void loadSettings(Context context){
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
@@ -45,6 +48,7 @@ public class Settings {
 //to do: check for permissions
         firebaseURL = formatFirebaseURL(settings.getString(Firebase_URL_Name, null));
         integrateFirebase = settings.getBoolean(Integrate_With_Firebase_Name, false);
+        colorTheme = settings.getString(Color_Theme_Name, "gray");
 
         Set<String> notificationEventsSettings = settings.getStringSet(Notification_Events_Name, new HashSet<String>());
         for (String events : notificationEventsSettings) {
@@ -109,4 +113,11 @@ public class Settings {
     public static boolean isDebugInfo(){return debugInfo;}
     public static boolean isDebugWarn(){return debugWarn;}
     public static boolean isDebugError(){return debugError;}
+    public static int getColorTheme(){
+        switch (colorTheme){
+            case "red":
+                return R.style.ThemeRed;
+        }
+        return R.style.ThemeGray;
+    }
 }

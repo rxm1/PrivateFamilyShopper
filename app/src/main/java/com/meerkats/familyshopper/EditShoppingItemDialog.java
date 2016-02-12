@@ -22,7 +22,7 @@ public class EditShoppingItemDialog extends Dialog implements
     public Activity activity;
 
     public EditShoppingItemDialog(Activity activity, String oldData) {
-        super(activity, R.style.AppTheme);
+        super(activity, R.style.AppThemeGray);
         this.oldData = oldData;
         this.activity = activity;
         setCancelable(true);

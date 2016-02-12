@@ -14,6 +14,7 @@
         android:layout_width="match_parent"
         android:minHeight="?attr/actionBarSize"
         android:elevation="4dp"
+        style="?toolbar"
         />
 
     <ListView
@@ -21,7 +22,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        style="@style/ListItemTheme"
+        style="?mainList"
         >
 
     </ListView>
@@ -30,7 +31,8 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:background="@color/primaryListBackground">
+        style="?mainListBackground"
+        >
         <EditText
             android:layout_width="0dp"
             android:layout_height="wrap_content"

@@ -46,8 +46,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(com.meerkats.familyshopper.R.layout.activity_main);
         Settings.loadSettings(this);
+        setTheme(Settings.getColorTheme());
+        setContentView(com.meerkats.familyshopper.R.layout.activity_main);
+
 
         handlerThread = new HandlerThread("MainActivity.HandlerThread");
         handlerThread.start();
@@ -59,7 +61,6 @@ public class MainActivity extends AppCompatActivity {
         shoppingList = mainController.getShoppingList();
         shoppingListAdapter = mainController.getShoppingListAdapter();
         dataChangedReceiver = new DataChangedReceiver();
-
 
         Toolbar myToolbar = (Toolbar) findViewById(com.meerkats.familyshopper.R.id.family_shopper_toolbar);
         setSupportActionBar(myToolbar);
@@ -74,6 +75,8 @@ public class MainActivity extends AppCompatActivity {
 
         Intent intent = new Intent(this, MainService.class);
         startService(intent);
+
+
     }
 
     @Override
@@ -121,6 +124,7 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent = new Intent(MainController.settings_updated_action);
                 LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
 
+                setTheme(Settings.getColorTheme());
                 break;
         }
     }
@@ -135,7 +139,7 @@ public class MainActivity extends AppCompatActivity {
                 if (shoppingList.getShoppingListItem(position).isCrossedOff())
                     contextMenuID = ((int) com.meerkats.familyshopper.R.array.shoppingListContextMenuValuesDeleteOnly);
 
-                AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(MainActivity.this, R.style.AppTheme));
+                AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(MainActivity.this, R.style.AppThemeRed));
                 builder.setTitle(shoppingList.getShoppingListItem(position).getShoppingListItem()).setCancelable(true).setItems(contextMenuID,
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialoginterface, int index) {

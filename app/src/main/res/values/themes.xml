@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="ThemeGray" parent="AppThemeGray">
+        <item name="mainList">@style/ListItemThemeGray</item>
+        <item name="mainListBackground">@style/mainListBackgroundGray</item>
+        <item name="toolbar">@style/ToolbarTheme.Gray</item>
+    </style>
+
+    <style name="ThemeRed" parent="AppThemeRed">
+        <item name="mainList">@style/ListItemThemeRed</item>
+        <item name="mainListBackground">@style/mainListBackgroundRed</item>
+        <item name="toolbar">@style/ToolbarTheme.Red</item>
+
+    </style>
+</resources>

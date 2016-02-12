@@ -18,7 +18,7 @@
         <activity
             android:name=".MainActivity"
             android:configChanges="orientation|screenSize"
-            android:theme="@style/AppTheme" >
+            android:theme="@style/ThemeGray" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -32,7 +32,7 @@
         </activity>
         <activity android:name=".util.DiagnosticsActivity"
             android:label="Diagnostics"
-            android:theme="@style/AppTheme" >
+            android:theme="@style/ThemeGray" >
         </activity>
         <receiver android:name=".MainActivity$DataChangedReceiver" >
         </receiver>
