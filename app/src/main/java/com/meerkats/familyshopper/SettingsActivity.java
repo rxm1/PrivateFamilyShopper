@@ -8,6 +8,7 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 
 import com.meerkats.familyshopper.util.Settings;
 
@@ -21,8 +22,11 @@ public class SettingsActivity extends AppCompatActivity {
         setTheme(Settings.getColorTheme());
         setContentView(R.layout.settings_with_toolbar);
 
-        getFragmentManager().beginTransaction().replace(R.id.settings_frame, new MyPreferenceFragment()).commit();
+        Toolbar myToolbar = (Toolbar) findViewById(com.meerkats.familyshopper.R.id.settings_toolbar);
+        setSupportActionBar(myToolbar);
+        myToolbar.setLogo(com.meerkats.familyshopper.R.mipmap.ic_launcher);
 
+        getFragmentManager().beginTransaction().replace(R.id.settings_frame, new MyPreferenceFragment()).commit();
         PreferenceManager.setDefaultValues(this, com.meerkats.familyshopper.R.xml.settings, false);
 
     }

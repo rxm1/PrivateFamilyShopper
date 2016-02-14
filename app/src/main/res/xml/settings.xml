@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
-    >
-    <PreferenceCategory >
+    xmlns:anandroid="http://schemas.android.com/apk/res/android">
         <CheckBoxPreference android:title="Integrate with Firebase"
             android:defaultValue="false"
             android:summary="Turns on syncing with Firebase."
@@ -41,5 +40,5 @@
             android:entries="@array/logListArray"
             android:entryValues="@array/logListValues"
             android:defaultValue="@array/logListDefaultValues"/>
-    </PreferenceCategory>
+
 </PreferenceScreen>
