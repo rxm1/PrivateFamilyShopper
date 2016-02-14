@@ -3,6 +3,7 @@ package com.meerkats.familyshopper;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.os.Handler;
@@ -294,6 +295,8 @@ public class MainController {
         catch (Exception e){
 
         }
+
+
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
         builder.setIcon(R.mipmap.ic_launcher);
         builder.setTitle(R.string.app_name);

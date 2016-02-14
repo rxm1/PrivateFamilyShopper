@@ -1,24 +1,37 @@
 package com.meerkats.familyshopper;
 
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
+import android.support.v7.app.AppCompatActivity;
 
 import com.meerkats.familyshopper.util.Settings;
 
-public class SettingsActivity extends PreferenceActivity {
+import java.util.Set;
+
+public class SettingsActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getFragmentManager().beginTransaction().replace(android.R.id.content, new MyPreferenceFragment()).commit();
+        setTheme(Settings.getColorTheme());
+        setContentView(R.layout.settings_with_toolbar);
+
+        getFragmentManager().beginTransaction().replace(R.id.settings_frame, new MyPreferenceFragment()).commit();
+
         PreferenceManager.setDefaultValues(this, com.meerkats.familyshopper.R.xml.settings, false);
 
     }
 
+    @Override
+    protected void onApplyThemeResource(Resources.Theme theme, int resid, boolean first) {
+
+        theme.applyStyle(Settings.getColorTheme(), true);
+    }
 
 
     public static class MyPreferenceFragment extends PreferenceFragment implements Preference.OnPreferenceChangeListener
@@ -78,4 +91,7 @@ public class SettingsActivity extends PreferenceActivity {
         }
 
     }
+
+
+
 }

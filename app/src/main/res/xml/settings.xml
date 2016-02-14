@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
-    <PreferenceCategory android:title="Private Family Shopper Settings" >
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    >
+    <PreferenceCategory >
         <CheckBoxPreference android:title="Integrate with Firebase"
             android:defaultValue="false"
             android:summary="Turns on syncing with Firebase."

@@ -2,20 +2,20 @@
 <resources>
     <style name="ThemeGray" parent="AppThemeGray">
         <item name="mainList">@style/ListItemThemeGray</item>
-        <item name="mainListBackground">@style/mainListBackgroundGray</item>
+        <!--item name="mainListBackground">@style/mainListBackgroundGray</item-->
         <item name="toolbar">@style/ToolbarTheme.Gray</item>
     </style>
 
     <style name="ThemeRed" parent="AppThemeRed">
         <item name="mainList">@style/ListItemThemeRed</item>
-        <item name="mainListBackground">@style/mainListBackgroundRed</item>
+        <!--item name="mainListBackground">@style/mainListBackgroundRed</item-->
         <item name="toolbar">@style/ToolbarTheme.Red</item>
 
     </style>
 
     <style name="ThemeBlue" parent="AppThemeBlue">
         <item name="mainList">@style/ListItemThemeBlue</item>
-        <item name="mainListBackground">@style/mainListBackgroundBlue</item>
+        <!--item name="mainListBackground">@style/mainListBackgroundBlue</item-->
         <item name="toolbar">@style/ToolbarTheme.Blue</item>
 
     </style>

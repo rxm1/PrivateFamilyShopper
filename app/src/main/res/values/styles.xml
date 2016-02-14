@@ -6,12 +6,12 @@
         <item name="colorPrimaryDark">@color/primaryDark</item>
         <item name="android:divider">#4d4d4d</item>
         <item name="android:dividerHeight">1px</item>
-    </style>
-    <style name="ListItemTheme" parent="BaseAppTheme">
         <item name="android:listSelector">#4d4d4d</item>
         <item name="android:scrollbarThumbVertical">@android:color/white</item>
         <item name="android:fadeScrollbars">false</item>
         <item name="android:scrollbarSize">2dp</item>
+    </style>
+    <style name="ListItemTheme" parent="BaseAppTheme">
     </style>
     <style name="ToolbarTheme" parent="BaseAppTheme">
 
@@ -21,6 +21,7 @@
     <style name="AppThemeGray" parent="BaseAppTheme">
         <item name="colorPrimary">@color/primaryGray</item>
         <item name="colorAccent">@color/primaryAccentGray</item>
+        <item name="android:windowBackground">@color/primaryListBackgroundGray</item>
     </style>
     <style name="mainListBackgroundGray" parent="BaseAppTheme">
         <item name="android:background">@color/primaryListBackgroundGray</item>
@@ -36,6 +37,7 @@
     <style name="AppThemeRed" parent="BaseAppTheme">
         <item name="colorPrimary">@color/primaryRed</item>
         <item name="colorAccent">@color/primaryAccentRed</item>
+        <item name="android:windowBackground">@color/primaryListBackgroundRed</item>
     </style>
     <style name="mainListBackgroundRed" parent="BaseAppTheme">
         <item name="android:background">@color/primaryListBackgroundRed</item>
@@ -51,6 +53,7 @@
     <style name="AppThemeBlue" parent="BaseAppTheme">
         <item name="colorPrimary">@color/primaryBlue</item>
         <item name="colorAccent">@color/primaryAccentBlue</item>
+        <item name="android:windowBackground">@color/primaryListBackgroundBlue</item>
     </style>
     <style name="mainListBackgroundBlue" parent="BaseAppTheme">
         <item name="android:background">@color/primaryListBackgroundBlue</item>
