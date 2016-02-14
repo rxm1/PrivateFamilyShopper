@@ -8,6 +8,8 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.meerkats.familyshopper.util.Settings;
+
 /**
  * Created by Rez on 21/12/2015.
  */
@@ -22,7 +24,7 @@ public class EditShoppingItemDialog extends Dialog implements
     public Activity activity;
 
     public EditShoppingItemDialog(Activity activity, String oldData) {
-        super(activity, R.style.AppThemeGray);
+        super(activity, Settings.getDialogColorTheme());
         this.oldData = oldData;
         this.activity = activity;
         setCancelable(true);

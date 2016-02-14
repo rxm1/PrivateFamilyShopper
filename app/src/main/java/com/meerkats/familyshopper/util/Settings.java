@@ -122,4 +122,13 @@ public class Settings {
         }
         return R.style.ThemeGray;
     }
+    public static int getDialogColorTheme(){
+        switch (colorTheme){
+            case "red":
+                return R.style.DialogThemeRed;
+            case "blue":
+                return R.style.DialogThemeBlue;
+        }
+        return R.style.DialogThemeGray;
+    }
 }

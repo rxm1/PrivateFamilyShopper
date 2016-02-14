@@ -139,7 +139,7 @@ public class MainActivity extends AppCompatActivity {
                 if (shoppingList.getShoppingListItem(position).isCrossedOff())
                     contextMenuID = ((int) com.meerkats.familyshopper.R.array.shoppingListContextMenuValuesDeleteOnly);
 
-                AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(MainActivity.this, R.style.AppThemeRed));
+                AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(MainActivity.this, Settings.getDialogColorTheme()));
                 builder.setTitle(shoppingList.getShoppingListItem(position).getShoppingListItem()).setCancelable(true).setItems(contextMenuID,
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialoginterface, int index) {
@@ -161,6 +161,13 @@ public class MainActivity extends AppCompatActivity {
                         setIsEditing(false);
                     }
                 }).show();
+
+                // Set title divider color
+                /*int titleDividerId = getResources().getIdentifier("titleDivider", "id", "android");
+                View titleDivider = dialog.findViewById(titleDividerId);
+                if (titleDivider != null)
+                    titleDivider.setBackgroundColor(getResources().getColor(android.R.color.holo_purple));
+                */
                 return true;
             }
         });
