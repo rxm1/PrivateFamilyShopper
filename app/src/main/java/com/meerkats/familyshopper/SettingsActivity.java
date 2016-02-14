@@ -25,6 +25,7 @@ public class SettingsActivity extends AppCompatActivity {
         Toolbar myToolbar = (Toolbar) findViewById(com.meerkats.familyshopper.R.id.settings_toolbar);
         setSupportActionBar(myToolbar);
         myToolbar.setLogo(com.meerkats.familyshopper.R.mipmap.ic_launcher);
+        getSupportActionBar().setTitle("Settings");
 
         getFragmentManager().beginTransaction().replace(R.id.settings_frame, new MyPreferenceFragment()).commit();
         PreferenceManager.setDefaultValues(this, com.meerkats.familyshopper.R.xml.settings, false);

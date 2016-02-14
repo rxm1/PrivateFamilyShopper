@@ -16,4 +16,9 @@
     <color name="primaryBlue">#455a64</color>
     <color name="primaryListBackgroundBlue">#263238</color>
     <color name="primaryAccentBlue">#b0bec5</color>
+
+    <!-- Misc Colors -->
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+
 </resources>

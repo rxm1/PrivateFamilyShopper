@@ -4,5 +4,6 @@
     <attr name="mainList" format="reference" />
     <attr name="mainListBackground" format="reference" />
     <attr name="toolbar" format="reference" />
+    <attr name="editText" format="reference" />
 
 </resources>
