@@ -3,7 +3,6 @@ package com.meerkats.familyshopper;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.os.Handler;
@@ -20,6 +19,7 @@ import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
+import com.meerkats.familyshopper.dialogs.EditShoppingItemDialog;
 import com.meerkats.familyshopper.model.ShoppingList;
 import com.meerkats.familyshopper.model.ShoppingListItem;
 import com.meerkats.familyshopper.util.Diagnostics;
@@ -123,8 +123,9 @@ public class MainController {
 
         shoppingList.markAsDeleted(position);
         sync(true, false, true);
+        ((MainActivity) activity).setIsEditing(false);
     }
-    public void editShoppingListItem(final AdapterView<?> parent, final View v, final int position, long id, final Activity activity){
+    public void editShoppingListItem(final int position, final Activity activity){
         FSLog.verbose(activity_tag, "MainController editShoppingListItem");
 
         final ShoppingListItem shoppingListItem = shoppingList.getShoppingListItem(position);
@@ -150,6 +151,15 @@ public class MainController {
                 shoppingList.setShoppingListItemEdit(shoppingListItem, position);
 
                 sync(true, false, true);
+
+                mainUIHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        ((MainActivity) activity).setIsEditing(false);
+                        ((MainActivity) activity).shoppingListView.setSelection(position);
+                    }
+                });
+
             }
         });
         cdd.show();

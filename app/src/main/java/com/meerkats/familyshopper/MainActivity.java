@@ -24,6 +24,7 @@ import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
 
+import com.meerkats.familyshopper.dialogs.ContextMenuDialog;
 import com.meerkats.familyshopper.util.DiagnosticsActivity;
 import com.meerkats.familyshopper.util.Settings;
 import com.meerkats.familyshopper.model.ShoppingList;
@@ -135,10 +136,20 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean onItemLongClick(final AdapterView<?> parent, final View v, final int position, final long id) {
                 setIsEditing(true);
-                int contextMenuID = ((int) com.meerkats.familyshopper.R.array.shoppingListContextMenuValues);
-                if (shoppingList.getShoppingListItem(position).isCrossedOff())
-                    contextMenuID = ((int) com.meerkats.familyshopper.R.array.shoppingListContextMenuValuesDeleteOnly);
 
+                ContextMenuDialog contextMenuDialog = new ContextMenuDialog(MainActivity.this, shoppingList.getShoppingListItem(position).isCrossedOff(), mainController, position, shoppingListView);
+                contextMenuDialog.setTitle(shoppingList.getShoppingListItem(position).getShoppingListItem());
+                contextMenuDialog.setCancelable(true);
+                contextMenuDialog.setCanceledOnTouchOutside(true);
+                contextMenuDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                    @Override
+                    public void onCancel(DialogInterface dialog) {
+                        loadLocalShoppingList();
+                        setIsEditing(false);
+                    }});
+                contextMenuDialog.show();
+
+                /*
                 AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(MainActivity.this, Settings.getDialogColorTheme()));
                 builder.setTitle(shoppingList.getShoppingListItem(position).getShoppingListItem()).setCancelable(true).setItems(contextMenuID,
                         new DialogInterface.OnClickListener() {
@@ -161,7 +172,7 @@ public class MainActivity extends AppCompatActivity {
                         setIsEditing(false);
                     }
                 }).show();
-
+*/
                 // Set title divider color
                 /*int titleDividerId = getResources().getIdentifier("titleDivider", "id", "android");
                 View titleDivider = dialog.findViewById(titleDividerId);

@@ -1,4 +1,4 @@
-package com.meerkats.familyshopper;
+package com.meerkats.familyshopper.dialogs;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -41,7 +41,6 @@ public class EditShoppingItemDialog extends Dialog implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(com.meerkats.familyshopper.R.layout.edit_shopping_item);
 
         editText = (EditText)findViewById(com.meerkats.familyshopper.R.id.edit_shopping_item_edit_text);

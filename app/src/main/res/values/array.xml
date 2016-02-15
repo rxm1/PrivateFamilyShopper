@@ -42,12 +42,4 @@
     <string-array name="themeColorsListDefaultValues">
         <item>gray</item>
     </string-array>
-
-    <string-array name="shoppingListContextMenuValues">
-        <item>Delete</item>
-        <item>Edit</item>
-    </string-array>
-    <string-array name="shoppingListContextMenuValuesDeleteOnly">
-        <item>Delete</item>
-    </string-array>
 </resources>
