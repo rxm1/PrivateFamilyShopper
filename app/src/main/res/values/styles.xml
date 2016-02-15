@@ -5,6 +5,10 @@
         <item name="android:textSize">22sp</item>
         <item name="colorPrimaryDark">@color/primaryDark</item>
         <item name="android:dividerHeight">1px</item>
+        <item name="android:textCursorDrawable">@null</item>
+        <item name="android:editTextBackground">@color/white</item>
+        <item name="android:textColor">@color/white</item>
+
     </style>
     <style name="EditText" parent="BaseAppTheme">
         <item name="android:background">@color/white</item>
@@ -26,6 +30,10 @@
         <item name="android:topDark">@color/primaryGray</item>
         <item name="android:windowIsFloating">true</item>
         <item name="android:windowNoTitle">false</item>
+        <item name="android:windowTitleStyle">@style/windowTitleStyleGray</item>
+    </style>
+    <style name="windowTitleStyleGray">
+        <item name="android:background">@color/primaryGray</item>
     </style>
     <style name="mainListBackgroundGray" parent="AppThemeGray">
         <item name="android:background">@color/primaryListBackgroundGray</item>
@@ -44,12 +52,17 @@
         <item name="colorAccent">@color/primaryAccentRed</item>
         <item name="android:windowBackground">@color/primaryListBackgroundRed</item>
         <item name="android:colorBackground">@color/primaryListBackgroundRed</item>
+
     </style>
     <style name="DialogThemeRed" parent="AppThemeRed">
-        <item name="android:bottomBright">@color/primaryListBackgroundRed</item>
         <item name="android:topDark">@color/primaryRed</item>
+        <item name="android:bottomBright">@color/primaryListBackgroundRed</item>
         <item name="android:windowIsFloating">true</item>
         <item name="android:windowNoTitle">false</item>
+        <item name="android:windowTitleStyle">@style/windowTitleStyleRed</item>
+    </style>
+    <style name="windowTitleStyleRed">
+        <item name="android:background">@color/primaryRed</item>
     </style>
     <style name="mainListBackgroundRed" parent="AppThemeRed">
         <item name="android:background">@color/primaryListBackgroundRed</item>
@@ -75,6 +88,10 @@
         <item name="android:topDark">@color/primaryBlue</item>
         <item name="android:windowIsFloating">true</item>
         <item name="android:windowNoTitle">false</item>
+        <item name="android:windowTitleStyle">@style/windowTitleStyleBlue</item>
+    </style>
+    <style name="windowTitleStyleBlue">
+        <item name="android:background">@color/primaryBlue</item>
     </style>
     <style name="mainListBackgroundBlue" parent="AppThemeBlue">
         <item name="android:background">@color/primaryListBackgroundBlue</item>

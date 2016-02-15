@@ -11,7 +11,10 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_weight="1"
-        style="?editText"
+        android:layout_margin="6dp"
+        android:padding="6dp"
+        android:textColor="@color/black"
+
         />
 
 
