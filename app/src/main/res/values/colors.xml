@@ -5,7 +5,7 @@
     <!-- Gray Colors -->
     <color name="primaryGray">#616161</color>
     <color name="primaryListBackgroundGray">#212121</color>
-    <color name="primaryAccentGray">#eeeeee</color>
+    <color name="primaryAccentGray">#bdbdbd</color>
 
     <!-- Red Colors -->
     <color name="primaryRed">#d32f2f</color>

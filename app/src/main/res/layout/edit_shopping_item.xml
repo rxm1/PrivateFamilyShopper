@@ -32,7 +32,10 @@
             android:clickable="true"
             android:text="OK"
             android:layout_weight="1"
-            android:layout_gravity="bottom"/>
+            android:layout_gravity="bottom"
+            android:background="?buttonBackground"
+            android:layout_margin="6dp"
+            />
 
         <Button
 
@@ -42,7 +45,9 @@
             android:clickable="true"
             android:text="Cancel"
             android:layout_weight="1"
-            android:layout_gravity="bottom"/>
+            android:layout_gravity="bottom"
+            android:background="?buttonBackground"
+            android:layout_margin="6dp"/>
     </LinearLayout>
 
 </LinearLayout>

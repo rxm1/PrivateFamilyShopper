@@ -5,6 +5,7 @@
         <item name="mainListBackground">@style/mainListBackgroundGray</item>
         <item name="toolbar">@style/ToolbarTheme.Gray</item>
         <item name="dialog">@style/DialogThemeGray</item>
+        <item name="buttonBackground">@color/primaryAccentGray</item>
     </style>
 
     <style name="ThemeRed" parent="AppThemeRed">
@@ -12,6 +13,7 @@
         <item name="mainListBackground">@style/mainListBackgroundRed</item>
         <item name="toolbar">@style/ToolbarTheme.Red</item>
         <item name="dialog">@style/DialogThemeRed</item>
+        <item name="buttonBackground">@color/primaryAccentRed</item>
     </style>
 
     <style name="ThemeBlue" parent="AppThemeBlue">
@@ -19,5 +21,6 @@
         <item name="mainListBackground">@style/mainListBackgroundBlue</item>
         <item name="toolbar">@style/ToolbarTheme.Blue</item>
         <item name="dialog">@style/DialogThemeBlue</item>
+        <item name="buttonBackground">@color/primaryAccentBlue</item>
     </style>
 </resources>

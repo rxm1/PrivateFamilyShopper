@@ -6,5 +6,6 @@
     <attr name="toolbar" format="reference" />
     <attr name="editText" format="reference" />
     <attr name="dialog" format="reference" />
+    <attr name="buttonBackground" format="color" />
 
 </resources>
