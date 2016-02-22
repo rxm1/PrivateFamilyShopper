@@ -50,6 +50,10 @@ public class SettingsActivity extends AppCompatActivity {
             bindPreferenceSummaryToValue(findPreference(Settings.Firebase_URL_Name));
             bindPreferenceSummaryToValue(findPreference(Settings.Notification_Frequency_Name));
             bindPreferenceSummaryToValue(findPreference(Settings.Push_Batch_Time_Name));
+            bindPreferenceSummaryToValue(findPreference(Settings.Integrate_With_Firebase_Name));
+            bindPreferenceSummaryToValue(findPreference(Settings.Notification_Frequency_Name));
+            bindPreferenceSummaryToValue(findPreference(Settings.Notification_Events_Name));
+            bindPreferenceSummaryToValue(findPreference(Settings.Color_Theme_Name));
         }
 
 
@@ -64,17 +68,32 @@ public class SettingsActivity extends AppCompatActivity {
 
             // Trigger the listener immediately with the preference's
             // current value.
-            onPreferenceChange(preference,
-                    PreferenceManager
-                            .getDefaultSharedPreferences(preference.getContext())
-                            .getString(preference.getKey(), ""));
+            //onPreferenceChange(preference,
+              //      PreferenceManager
+                //            .getDefaultSharedPreferences(preference.getContext())
+                  //          .getString(preference.getKey(), ""));
         }
 
         @Override
         public boolean onPreferenceChange (Preference preference, Object newValue){
             String stringValue = newValue.toString();
 
-            if (preference instanceof ListPreference) {
+            if(preference.getKey().equals(Settings.Integrate_With_Firebase_Name)) {
+                Settings.setDisconnectFromFirebase(stringValue.equals("false")
+                        && Settings.isIntegrateFirebase());
+
+                Settings.setConnectToFirebase(stringValue.equals("true")
+                        && !Settings.isIntegrateFirebase());
+
+            }
+            if(preference.getKey().equals(Settings.Firebase_URL_Name)) {
+                Settings.setConnectToFirebase(Settings.getFirebaseURL().equals("")
+                        && !stringValue.equals(""));
+                Settings.setReconnectToFirebase(!Settings.getFirebaseURL().equals("")
+                        && !Settings.getFirebaseURL().equals(stringValue));
+            }
+
+            /*if (preference instanceof ListPreference) {
                 // For list preferences, look up the correct display value in
                 // the preference's 'entries' list (since they have separate labels/values).
                 ListPreference listPreference = (ListPreference) preference;
@@ -85,7 +104,7 @@ public class SettingsActivity extends AppCompatActivity {
             } else {
                 // For other preferences, set the summary to the value's simple string representation.
                 preference.setSummary(stringValue);
-            }
+            }*/
 
             return true;
         }

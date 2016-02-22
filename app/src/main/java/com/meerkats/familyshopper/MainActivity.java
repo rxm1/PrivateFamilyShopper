@@ -118,12 +118,30 @@ public class MainActivity extends AppCompatActivity {
         switch (requestCode) {
             case SETTINGS_RESULT:
                 Settings.loadSettings(this);
-                mainController.clearShoppingListFromLocalStorage();
-                mainController.connect();
 
-                //notify service that settings have changed
-                Intent intent = new Intent(MainController.settings_updated_action);
-                LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+                if(Settings.disconnectFromFirbase()){
+                    mainController.disconnect();
+
+                    Intent intent = new Intent(MainController.disconnect_from_firebase_action);
+                    LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+                }
+                else if (Settings.reconnectToFirebase() || (Settings.connectToFirebase())){
+                    if (Settings.reconnectToFirebase()) {
+                        mainController.clearShoppingListFromLocalStorage();
+                    }
+
+                    mainController.connect();
+                    //notify service that settings have changed
+                    Intent intent = new Intent(MainController.reconnect_to_firebase_action);
+                    LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+                }
+                else {
+                    Intent intent = new Intent(MainController.settings_changed_action);
+                    LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+                }
+                Settings.setDisconnectFromFirebase(false);
+                Settings.setReconnectToFirebase(false);
+                Settings.setConnectToFirebase(false);
 
                 setTheme(Settings.getColorTheme());
                 break;

@@ -27,6 +27,8 @@ public class MainService extends Service {
     boolean mAllowRebind;
     private volatile HandlerThread mHandlerThread;
     private ServiceHandler mServiceHandler;
+    ReconnectToFirebaseReceiver reconnectToFirebaseReceiver;
+    DisconnectFromFirebaseReceiver disconnectFromFirebaseReceiver;
     SettingsChangedReceiver settingsChangedReceiver;
     public static final String service_tag = "meerkats_MainService";
 
@@ -40,21 +42,42 @@ public class MainService extends Service {
         public void handleMessage(Message message) {
         }
     }
-    public class SettingsChangedReceiver extends BroadcastReceiver {
+    public class ReconnectToFirebaseReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(final Context context, Intent intent) {
-            FSLog.verbose(service_tag, "SettingsChangedReceiver onReceive");
+            FSLog.verbose(service_tag, "ReconnectToFirebaseReceiver onReceive");
 
-            dataHelper.removeFirebaseListeners();
-            dataHelper.setMyFirebaseRefNull();
             Settings.loadSettings(context);
+            disconnect();
             mServiceHandler.post(new Runnable() {
                 @Override
                 public void run() {
                     dataHelper.instanciateFirebase(true);
+                    dataHelper.addFirebaseListeners();
                 }
             });
         }
+    }
+    public class DisconnectFromFirebaseReceiver extends BroadcastReceiver{
+        @Override
+        public void onReceive(final Context context, Intent intent){
+            FSLog.verbose(service_tag, "DisconnectFromFirebaseReceiver onReceive");
+
+            Settings.loadSettings(context);
+            disconnect();
+        }
+    }
+    public class SettingsChangedReceiver extends BroadcastReceiver{
+        @Override
+        public void onReceive(final Context context, Intent intent){
+            FSLog.verbose(service_tag, "SettingsChangedReceiver onReceive");
+
+            Settings.loadSettings(context);
+        }
+    }
+    private void disconnect(){
+        dataHelper.removeFirebaseListeners();
+        dataHelper.setMyFirebaseRefNull();
     }
     @Override
     public void onCreate() {
@@ -69,10 +92,16 @@ public class MainService extends Service {
 
         Firebase.setAndroidContext(this);
         dataHelper = new DataHelper(this, mHandlerThread, service_tag);
-        settingsChangedReceiver = new SettingsChangedReceiver();
-        IntentFilter filter = new IntentFilter(MainController.settings_updated_action);
-        LocalBroadcastManager.getInstance(this).registerReceiver(settingsChangedReceiver, filter);
 
+        reconnectToFirebaseReceiver = new ReconnectToFirebaseReceiver();
+        IntentFilter filter = new IntentFilter(MainController.reconnect_to_firebase_action);
+        LocalBroadcastManager.getInstance(this).registerReceiver(reconnectToFirebaseReceiver, filter);
+        disconnectFromFirebaseReceiver = new DisconnectFromFirebaseReceiver();
+        filter = new IntentFilter(MainController.disconnect_from_firebase_action);
+        LocalBroadcastManager.getInstance(this).registerReceiver(disconnectFromFirebaseReceiver, filter);
+        settingsChangedReceiver = new SettingsChangedReceiver();
+        filter = new IntentFilter(MainController.settings_changed_action);
+        LocalBroadcastManager.getInstance(this).registerReceiver(settingsChangedReceiver, filter);
     }
 
     @Override
@@ -111,7 +140,7 @@ public class MainService extends Service {
         // Cleanup service before destruction
         mHandlerThread.quit();
         dataHelper.cleanUp();
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(settingsChangedReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(reconnectToFirebaseReceiver);
     }
 
 }

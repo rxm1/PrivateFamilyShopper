@@ -37,6 +37,11 @@ public class Settings {
     private static boolean debugError=false;
     private static String colorTheme="gray";
 
+    private static boolean connectToFirebase = false;
+    private static boolean reconnectToFirebase = false;
+    private static boolean disconnectFromFirebase = false;
+
+
     public static void loadSettings(Context context){
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
 
@@ -130,5 +135,24 @@ public class Settings {
                 return R.style.DialogThemeBlue;
         }
         return R.style.DialogThemeGray;
+    }
+
+    public static boolean connectToFirebase(){
+        return connectToFirebase;
+    }
+    public static void setConnectToFirebase(boolean connectFirebase){
+        connectToFirebase = connectFirebase;
+    }
+    public static boolean reconnectToFirebase(){
+        return reconnectToFirebase;
+    }
+    public static void setReconnectToFirebase(boolean connectToFirebase){
+        reconnectToFirebase = connectToFirebase;
+    }
+    public static boolean disconnectFromFirbase(){
+        return disconnectFromFirebase;
+    }
+    public static void setDisconnectFromFirebase(boolean disconnectFirebase){
+        disconnectFromFirebase = disconnectFirebase;
     }
 }

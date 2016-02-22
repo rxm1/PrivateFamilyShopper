@@ -44,11 +44,14 @@ public class MainController {
     public static final String master_shopping_list_name = "Master_List";
     public static final String activity_tag = "meerkats_MainActivity";
 
+
     HandlerThread handlerThread;
     SyncHandler syncHandler;
     Handler mainUIHandler;
     Handler mainControllerHandler;
-    public static final String settings_updated_action = "com.meerkats.familyshopper.MainController.SettingsUpdated";
+    public static final String settings_changed_action = "com.meerkats.familyshopper.MainController.SettingsUpdated";
+    public static final String reconnect_to_firebase_action = "com.meerkats.familyshopper.MainController.ReconnectToFirebaseAction";
+    public static final String disconnect_from_firebase_action = "com.meerkats.familyshopper.MainController.DisconnectFromFirebaseAction";
     Timer timer = new Timer();
     SharedPreferences settings;
 
@@ -254,23 +257,25 @@ public class MainController {
     public void connect(){
         FSLog.verbose(activity_tag, "MainController connect");
 
-        dataHelper.setMyFirebaseRefNull();
+        disconnect();
         mainControllerHandler.post(new Runnable() {
             @Override
             public void run() {
                 dataHelper.instanciateFirebase(false);
                 myFirebaseRef = dataHelper.getMyFirebaseRef();
                 try {
-                    Thread.sleep(2*1000);
+                    Thread.sleep(2 * 1000);
 
                     sync(false, false, false);
-                }
-                catch (Exception e){
+                } catch (Exception e) {
                     FSLog.error(activity_tag, "MainController connect", e);
                 }
 
             }
         });
+    }
+    public void disconnect(){
+        dataHelper.setMyFirebaseRefNull();
     }
 
     public ShoppingList getShoppingList(){ return shoppingList; }

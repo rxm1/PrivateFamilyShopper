@@ -53,6 +53,7 @@ public class DataHelper {
     public static final int file_changed_notification_id = 123456;
     MainServiceDataChangedHandler mainServiceDataChangedHandler;
     HandlerThread handlerThread;
+    Handler mainUIHandler;
     private static boolean isValidFirebaseURL = false;
     NotificationEvents occuredNotificationEvents = new NotificationEvents();
     Timer timer = new Timer();
@@ -95,6 +96,7 @@ public class DataHelper {
         dataMerger = new DataMerger();
         this.handlerThread = handlerThread;
         mainServiceDataChangedHandler = new MainServiceDataChangedHandler(handlerThread.getLooper());
+        mainUIHandler = new Handler(Looper.getMainLooper());
 
         settings = PreferenceManager.getDefaultSharedPreferences(context);
         if (settings.contains(Last_Synced_Name)) {
@@ -112,27 +114,31 @@ public class DataHelper {
             if (integrateFirebase && firebaseURL != null && !firebaseURL.trim().isEmpty()) {
                 myFirebaseRef = new Firebase(firebaseURL);
                 if (myFirebaseRef != null)
-                    Toast.makeText(context.getApplicationContext(), "Connecting to Firebase...", Toast.LENGTH_SHORT).show();
+                    showToast("Connecting to Firebase...", fromService);
                 checkFirebaseURL(fromService);
-
-                if(fromService)
-                    addFirebaseListeners();
             }
             else {
-                if(fromService)
-                    removeFirebaseListeners();
                 myFirebaseRef = null;
-            }
-            if(!fromService) {
-                if (myFirebaseRef == null || !integrateFirebase)
-                    Toast.makeText(context.getApplicationContext(), "Firebase not connected.", Toast.LENGTH_LONG).show();
+
+            if (myFirebaseRef == null)
+                showToast("Firebase not connected.", fromService);
             }
         }
         catch (Exception ex){
             FSLog.error(logTag, "DataHelper instanciateFirebase", ex);
-            if(!fromService) {
-                Toast.makeText(context.getApplicationContext(), "Firebase not connected.", Toast.LENGTH_SHORT).show();
-            }
+            showToast("Firebase not connected.", fromService);
+        }
+    }
+
+    private void showToast(final String toastMessage, boolean fromService){
+        if(!fromService) {
+            mainUIHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(context.getApplicationContext(), toastMessage, Toast.LENGTH_SHORT).show();
+                }
+            });
+
         }
     }
     private synchronized void checkFirebaseURL(final boolean fromService) {
@@ -146,26 +152,20 @@ public class DataHelper {
                             @Override
                             public void onDataChange(DataSnapshot snapshot) {
                                 isValidFirebaseURL = true;
-                                if (!fromService) {
-                                    Toast.makeText(context.getApplicationContext(), "Firebase connected.", Toast.LENGTH_SHORT).show();
-                                }
+                                showToast("Firebase connected.", fromService);
                             }
 
                             @Override
-                            public void onCancelled(FirebaseError firebaseError) {
-
-                            }
+                            public void onCancelled(FirebaseError firebaseError) {}
 
                         });
             } catch (Exception e) {
                 FSLog.error(logTag, "DataHelper checkFirebaseURL", e);
-                if (!fromService) {
-                    Toast.makeText(context.getApplicationContext(), "Firebase not connected.", Toast.LENGTH_SHORT).show();
-                }
+                throw e;
             }
         }
         else{
-            Toast.makeText(context.getApplicationContext(), "Firebase not connected.", Toast.LENGTH_SHORT).show();
+            showToast("Firebase not connected.", fromService);
         }
     }
 
@@ -174,7 +174,7 @@ public class DataHelper {
     After merge, it updates local file
     and remote storage
     */
-    private synchronized void addFirebaseListeners(){
+    public synchronized void addFirebaseListeners(){
         FSLog.verbose(logTag, "DataHelper addFirebaseListeners");
 
         if(myFirebaseRef != null) {
