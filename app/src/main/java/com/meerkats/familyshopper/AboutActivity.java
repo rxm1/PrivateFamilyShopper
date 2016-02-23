@@ -1,13 +1,14 @@
 package com.meerkats.familyshopper;
 
+import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.View;
 import android.widget.TextView;
 
-import com.meerkats.familyshopper.util.FSLog;
-import com.meerkats.familyshopper.util.Settings;
+import com.meerkats.familyshopper.util.*;
 
 /**
  * Created by Rez on 23/02/2016.
@@ -34,5 +35,11 @@ public class AboutActivity extends AppCompatActivity {
         catch (Exception e){
             FSLog.error("about", "AboutActivity onCreate", e);
         }
+    }
+
+
+    public void diagnosticsClick(View view){
+        Intent intent = new Intent(this, DiagnosticsActivity.class);
+        startActivity(intent);
     }
 }

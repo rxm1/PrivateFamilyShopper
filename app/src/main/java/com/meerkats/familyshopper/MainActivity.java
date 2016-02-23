@@ -1,6 +1,5 @@
 package com.meerkats.familyshopper;
 
-import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -15,7 +14,6 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 
 import android.support.v7.widget.Toolbar;
-import android.view.ContextThemeWrapper;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.Menu;
@@ -25,7 +23,6 @@ import android.widget.EditText;
 import android.widget.ListView;
 
 import com.meerkats.familyshopper.dialogs.ContextMenuDialog;
-import com.meerkats.familyshopper.util.DiagnosticsActivity;
 import com.meerkats.familyshopper.util.Settings;
 import com.meerkats.familyshopper.model.ShoppingList;
 
@@ -165,7 +162,8 @@ public class MainActivity extends AppCompatActivity {
                     public void onCancel(DialogInterface dialog) {
                         loadLocalShoppingList();
                         setIsEditing(false);
-                    }});
+                    }
+                });
                 contextMenuDialog.show();
 
                 /*
@@ -273,8 +271,4 @@ public class MainActivity extends AppCompatActivity {
     public void setIsEditing(boolean isEditing){ this.isEditing=isEditing; }
     public boolean isEditing(){return isEditing;}
 
-    public void diagnosticsClick(View view){
-        Intent intent = new Intent(this, DiagnosticsActivity.class);
-        startActivity(intent);
-    }
 }

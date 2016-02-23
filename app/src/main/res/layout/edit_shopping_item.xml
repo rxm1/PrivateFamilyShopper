@@ -11,11 +11,12 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_weight="1"
-        android:layout_margin="6dp"
         android:padding="6dp"
         android:textColor="@color/black"
-
-        />
+        android:layout_marginLeft="12dp"
+        android:layout_marginRight="12dp"
+        android:layout_marginTop="12dp"
+        android:elevation="6dp"/>
 
 
     <LinearLayout
@@ -23,7 +24,8 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_weight="0"
-        android:orientation="horizontal" >
+        android:orientation="horizontal"
+        android:layout_margin="12dp">
 
         <Button
             android:id="@+id/edit_shopping_item_ok_btn"
@@ -34,11 +36,11 @@
             android:layout_weight="1"
             android:layout_gravity="bottom"
             android:background="?buttonBackground"
-            android:layout_margin="6dp"
+            android:elevation="6dp"
+            android:layout_marginRight="6dp"
             />
 
         <Button
-
             android:id="@+id/edit_shopping_item_cancel_btn"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
@@ -47,7 +49,8 @@
             android:layout_weight="1"
             android:layout_gravity="bottom"
             android:background="?buttonBackground"
-            android:layout_margin="6dp"/>
+            android:elevation="6dp"
+            android:layout_marginLeft="6dp"/>
     </LinearLayout>
 
 </LinearLayout>
