@@ -5,6 +5,7 @@
         <item name="mainListBackground">@style/mainListBackgroundGray</item>
         <item name="toolbar">@style/ToolbarTheme.Gray</item>
         <item name="dialog">@style/DialogThemeGray</item>
+        <item name="preferenceDialog">@style/PreferenceDialogThemeGray</item>
         <item name="buttonBackground">@color/primaryAccentGray</item>
     </style>
 
@@ -13,6 +14,7 @@
         <item name="mainListBackground">@style/mainListBackgroundRed</item>
         <item name="toolbar">@style/ToolbarTheme.Red</item>
         <item name="dialog">@style/DialogThemeRed</item>
+        <item name="preferenceDialog">@style/PreferenceDialogThemeRed</item>
         <item name="buttonBackground">@color/primaryAccentRed</item>
     </style>
 
@@ -21,6 +23,7 @@
         <item name="mainListBackground">@style/mainListBackgroundBlue</item>
         <item name="toolbar">@style/ToolbarTheme.Blue</item>
         <item name="dialog">@style/DialogThemeBlue</item>
+        <item name="preferenceDialog">@style/PreferenceDialogThemeBlue</item>
         <item name="buttonBackground">@color/primaryAccentBlue</item>
     </style>
 </resources>

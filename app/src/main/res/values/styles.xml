@@ -23,7 +23,10 @@
         <item name="colorAccent">@color/primaryAccentGray</item>
         <item name="android:windowBackground">@color/primaryListBackgroundGray</item>
         <item name="android:colorBackground">@color/primaryListBackgroundGray</item>
-
+    </style>
+    <style name="PreferenceDialogThemeGray" parent="DialogThemeGray" >
+        <item name="android:background">@color/white</item>
+        <item name="android:textColor">@color/black</item>
     </style>
     <style name="DialogThemeGray" parent="AppThemeGray">
         <item name="android:bottomBright">@color/primaryListBackgroundGray</item>
@@ -53,6 +56,11 @@
         <item name="android:windowBackground">@color/primaryListBackgroundRed</item>
         <item name="android:colorBackground">@color/primaryListBackgroundRed</item>
 
+
+    </style>
+    <style name="PreferenceDialogThemeRed" parent="DialogThemeRed" >
+        <item name="android:background">@color/white</item>
+        <item name="android:textColor">@color/black</item>
     </style>
     <style name="DialogThemeRed" parent="AppThemeRed">
         <item name="android:topDark">@color/primaryRed</item>
@@ -82,6 +90,10 @@
         <item name="android:windowBackground">@color/primaryListBackgroundBlue</item>
         <item name="android:popupBackground">@color/primaryListBackgroundBlue</item>
         <item name="android:colorBackground">@color/primaryListBackgroundBlue</item>
+    </style>
+    <style name="PreferenceDialogThemeBlue" parent="DialogThemeBlue" >
+        <item name="android:background">@color/white</item>
+        <item name="android:textColor">@color/black</item>
     </style>
     <style name="DialogThemeBlue" parent="AppThemeBlue">
         <item name="android:bottomBright">@color/primaryListBackgroundBlue</item>

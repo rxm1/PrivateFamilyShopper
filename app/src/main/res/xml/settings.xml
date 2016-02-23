@@ -1,44 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:anandroid="http://schemas.android.com/apk/res/android">
+    xmlns:anandroid="http://schemas.android.com/apk/res/android"
+    xmlns:style="http://schemas.android.com/apk/res-auto"
+    style="?preferenceDialog">
         <CheckBoxPreference android:title="Integrate with Firebase"
             android:defaultValue="false"
             android:summary="Turns on syncing with Firebase."
-            android:key="IntegrateFirebase" />
+            android:key="IntegrateFirebase"
+            style="?preferenceDialog"/>
         <EditTextPreference android:title="Firebase URL"
             android:key="FirebaseURLName"
             android:summary="Please provide the firebase URL"
-            android:defaultValue=""/>
+            android:defaultValue=""
+            style="?preferenceDialog" />
         <EditTextPreference android:inputType="number"
             android:title="Notification Delay (seconds)"
             android:key="notificationFrequency"
             android:defaultValue="60"
-            android:summary="Increase value to reduce notification frequency."/>
+            android:summary="Increase value to reduce notification frequency."
+            style="?preferenceDialog"/>
         <MultiSelectListPreference
             android:title="Notification Events"
             android:key="notificationEvents"
             android:summary="Select the kind of events you would like to be notified about"
             android:entries="@array/listArray"
             android:entryValues="@array/listValues"
-            android:defaultValue="@array/listValues"/>
+            android:defaultValue="@array/listValues"
+            style="?preferenceDialog"/>
         <EditTextPreference android:inputType="number"
             android:title="Push Delay (seconds)"
             android:key="pushBatchTime"
             android:defaultValue="3"
-            android:summary="Batches up changes to push. Increase delay to reduce data usage."/>
+            android:summary="Batches up changes to push. Increase delay to reduce data usage."
+            style="?preferenceDialog" />
         <ListPreference
             android:title="Color Themes"
             android:key="colorTheme"
             android:summary="Change the theme color."
             android:entries="@array/themeColorsListArray"
             android:entryValues="@array/themeColorsListValues"
-            android:defaultValue="@array/themeColorsListDefaultValues"/>
+            android:defaultValue="@array/themeColorsListDefaultValues"
+            style="?preferenceDialog"/>
         <MultiSelectListPreference
             android:title="Logging"
             android:key="logging"
             android:summary="Select the level of logging to produce."
             android:entries="@array/logListArray"
             android:entryValues="@array/logListValues"
-            android:defaultValue="@array/logListDefaultValues"/>
+            android:defaultValue="@array/logListDefaultValues"
+            style="?preferenceDialog"/>
 
 </PreferenceScreen>
