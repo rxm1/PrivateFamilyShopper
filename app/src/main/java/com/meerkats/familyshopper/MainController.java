@@ -290,33 +290,4 @@ public class MainController {
         handlerThread.quit();
         dataHelper.cleanUp();
     }
-
-    public void about(){
-        // Inflate the about message contents
-        View messageView = activity.getLayoutInflater().inflate(R.layout.about, null, false);
-
-        // When linking text, force to always use default color. This works
-        // around a pressed color state bug.
-        //TextView textView = (TextView) messageView.findViewById(R.id.about_credits);
-        //int defaultColor = textView.getTextColors().getDefaultColor();
-        //textView.setTextColor(defaultColor);
-        TextView versionCodeTextView = (TextView) messageView.findViewById(R.id.version_code);
-        TextView versionNameTextView = (TextView) messageView.findViewById(R.id.version_name);
-        try {
-            PackageInfo pInfo = activity.getPackageManager().getPackageInfo(activity.getPackageName(), 0);
-            versionCodeTextView.setText("Version Code: " + pInfo.versionCode);
-            versionNameTextView.setText("Version Name: " + pInfo.versionName);
-        }
-        catch (Exception e){
-
-        }
-
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-        builder.setIcon(R.mipmap.ic_launcher);
-        builder.setTitle(R.string.app_name);
-        builder.setView(messageView);
-        builder.create();
-        builder.show();
-    }
 }

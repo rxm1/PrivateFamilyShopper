@@ -100,11 +100,12 @@ public class MainActivity extends AppCompatActivity {
                 mainController.clearCrossedOffShoppingList();
                 return true;
             case com.meerkats.familyshopper.R.id.settings:
-                Intent i = new Intent(this, SettingsActivity.class);
-                startActivityForResult(i, SETTINGS_RESULT);
+                Intent settingsIntent = new Intent(this, SettingsActivity.class);
+                startActivityForResult(settingsIntent, SETTINGS_RESULT);
                 return true;
             case com.meerkats.familyshopper.R.id.about:
-                mainController.about();
+                Intent aboutIntent = new Intent(this, AboutActivity.class);
+                startActivity(aboutIntent);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

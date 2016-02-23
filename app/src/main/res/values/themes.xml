@@ -7,6 +7,7 @@
         <item name="dialog">@style/DialogThemeGray</item>
         <item name="preferenceDialog">@style/PreferenceDialogThemeGray</item>
         <item name="buttonBackground">@color/primaryAccentGray</item>
+        <item name="diagnosticsButton">@style/DiagonisticsButton.Gray</item>
     </style>
 
     <style name="ThemeRed" parent="AppThemeRed">
@@ -16,6 +17,7 @@
         <item name="dialog">@style/DialogThemeRed</item>
         <item name="preferenceDialog">@style/PreferenceDialogThemeRed</item>
         <item name="buttonBackground">@color/primaryAccentRed</item>
+        <item name="diagnosticsButton">@style/DiagonisticsButton.Red</item>
     </style>
 
     <style name="ThemeBlue" parent="AppThemeBlue">
@@ -25,5 +27,6 @@
         <item name="dialog">@style/DialogThemeBlue</item>
         <item name="preferenceDialog">@style/PreferenceDialogThemeBlue</item>
         <item name="buttonBackground">@color/primaryAccentBlue</item>
+        <item name="diagnosticsButton">@style/DiagonisticsButton.Blue</item>
     </style>
 </resources>

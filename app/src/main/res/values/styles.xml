@@ -16,13 +16,21 @@
         <item name="android:textCursorDrawable">@null</item>
         <item name="android:padding">6dp</item>
     </style>
-
+    <style name="TextView" parent="BaseAppTheme">
+        <item name="android:padding">6dp</item>
+    </style>
+    <style name="DiagonisticsButton">
+        <item name="android:textColor">@color/primaryGray</item>
+    </style>
     <!-- Gray styles -->
     <style name="AppThemeGray" parent="BaseAppTheme">
         <item name="colorPrimary">@color/primaryGray</item>
         <item name="colorAccent">@color/primaryAccentGray</item>
         <item name="android:windowBackground">@color/primaryListBackgroundGray</item>
         <item name="android:colorBackground">@color/primaryListBackgroundGray</item>
+    </style>
+    <style name="DiagonisticsButton.Gray" parent="DiagonisticsButton">
+        <item name="android:background">@color/primaryListBackgroundGray</item>
     </style>
     <style name="PreferenceDialogThemeGray" parent="DialogThemeGray" >
         <item name="android:background">@color/white</item>
@@ -55,8 +63,9 @@
         <item name="colorAccent">@color/primaryAccentRed</item>
         <item name="android:windowBackground">@color/primaryListBackgroundRed</item>
         <item name="android:colorBackground">@color/primaryListBackgroundRed</item>
-
-
+    </style>
+    <style name="DiagonisticsButton.Red" parent="DiagonisticsButton">
+        <item name="android:background">@color/primaryListBackgroundRed</item>
     </style>
     <style name="PreferenceDialogThemeRed" parent="DialogThemeRed" >
         <item name="android:background">@color/white</item>
@@ -90,6 +99,9 @@
         <item name="android:windowBackground">@color/primaryListBackgroundBlue</item>
         <item name="android:popupBackground">@color/primaryListBackgroundBlue</item>
         <item name="android:colorBackground">@color/primaryListBackgroundBlue</item>
+    </style>
+    <style name="DiagonisticsButton.Blue" parent="DiagonisticsButton">
+        <item name="android:background">@color/primaryListBackgroundBlue</item>
     </style>
     <style name="PreferenceDialogThemeBlue" parent="DialogThemeBlue" >
         <item name="android:background">@color/white</item>
