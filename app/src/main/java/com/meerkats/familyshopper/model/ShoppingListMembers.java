@@ -33,11 +33,21 @@ public class ShoppingListMembers {
     }
 
     public boolean containsMember(String name){
+        for (ShoppingListMember shoppingListMember:shoppingListMembers) {
+            if (shoppingListMember.name.equals(name))
+                return true;
+        }
         return false;
     }
 
     public void updateMember(String name, long lastSeen){
-
+        for (int i=0; i<shoppingListMembers.size(); i++) {
+            if (shoppingListMembers.get(i).name.equals(name)) {
+                ShoppingListMember member = shoppingListMembers.get(i);
+                member.lastSeen = lastSeen;
+                shoppingListMembers.set(i, member);
+            }
+        }
     }
 
     @Override

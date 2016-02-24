@@ -52,8 +52,7 @@ public class MainService extends Service {
             mServiceHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    dataHelper.instanciateFirebase(true);
-                    dataHelper.addFirebaseListeners();
+                    connect();
                 }
             });
         }
@@ -78,6 +77,10 @@ public class MainService extends Service {
     private void disconnect(){
         dataHelper.removeFirebaseListeners();
         dataHelper.setMyFirebaseRefNull();
+    }
+    private void connect(){
+        dataHelper.instanciateFirebase(true);
+        dataHelper.addFirebaseListeners();
     }
     @Override
     public void onCreate() {
@@ -111,7 +114,7 @@ public class MainService extends Service {
         mServiceHandler.post(new Runnable() {
             @Override
             public void run() {
-                dataHelper.instanciateFirebase(true);
+                connect();
             }
         });
 

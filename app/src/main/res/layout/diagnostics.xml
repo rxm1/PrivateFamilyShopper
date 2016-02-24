@@ -28,19 +28,21 @@
         android:layout_height="wrap_content"
         android:layout_width="fill_parent"
         android:layout_below="@id/current_device_ID_textview"
-        android:padding="6dp"
+        android:layout_marginTop="22dp"
         >
         <TextView android:id="@+id/diagnostics_list_Device_ID"
             android:layout_height="fill_parent"
             android:layout_width="wrap_content"
             android:text="Device ID"
             android:layout_weight="1"
+            android:padding="6dp"
             />
         <TextView android:id="@+id/diagnostics_list_Last_Seen"
             android:layout_height="fill_parent"
             android:layout_width="wrap_content"
             android:text="Last Seen"
             android:layout_weight="1"
+            android:padding="6dp"
             />
     </LinearLayout>
     <!-- List Divider -->
@@ -58,6 +60,16 @@
         style="?mainList"
         android:layout_weight="1"
         />
+    <Button android:id="@+id/clear_device_list"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Clear Device List"
+        android:onClick="clearDeviceListClick"
+        android:layout_margin="6dp"
+        android:padding="12dp"
+        style="?diagnosticsButton"
+        android:elevation="6dp"
+        />
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -65,8 +77,6 @@
         android:onClick="diagnosticsSettingsClick"
         android:layout_margin="6dp"
         android:padding="12dp"
-        android:layout_alignParentBottom="true"
-        android:layout_below="@id/diagnostics_listView"
         style="?diagnosticsButton"
         android:elevation="6dp"
         />

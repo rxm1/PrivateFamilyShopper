@@ -13,13 +13,13 @@ import android.widget.TextView;
 import com.meerkats.familyshopper.MainController;
 import com.meerkats.familyshopper.R;
 import com.meerkats.familyshopper.SettingsLoggingActivity;
-import com.meerkats.familyshopper.util.Settings;
 
 /**
  * Created by Rez on 23/02/2016.
  */
 public class DiagnosticsActivity extends AppCompatActivity {
     private static final int DIAGONOSTICS_SETTINGS_RESULT = 2;
+    SimpleAdapter simpleAdapter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -35,18 +35,24 @@ public class DiagnosticsActivity extends AppCompatActivity {
         currentDeviceIDTextView.setText("Current Device ID: " +
                 android.provider.Settings.Secure.getString(getContentResolver(), android.provider.Settings.Secure.ANDROID_ID));
 
+        refreshList();
+
+    }
+    private void refreshList(){
         ListView listView = (ListView) findViewById(R.id.diagnostics_listView);
         // create the grid item mapping
         String[] from = new String[] {"Device ID", "Last Seen"};
         int[] to = new int[] { R.id.shoppingListMemberName, R.id.shoppingListMemberLastSeen };
-        SimpleAdapter simpleAdapter = new SimpleAdapter(this, Diagnostics.getShoppingListMembers(this), R.layout.diagnostics_list_member, from, to);
+        simpleAdapter = new SimpleAdapter(this, Diagnostics.getShoppingListMembersArray(this), R.layout.diagnostics_list_member, from, to);
         listView.setAdapter(simpleAdapter);
-
     }
-
     public void diagnosticsSettingsClick(View view){
         Intent intent = new Intent(this, SettingsLoggingActivity.class);
         startActivityForResult(intent, DIAGONOSTICS_SETTINGS_RESULT);
+    }
+    public void clearDeviceListClick(View view){
+        Diagnostics.deleteMembersListFromLocalStorage(this);
+        refreshList();
     }
 
     @Override
