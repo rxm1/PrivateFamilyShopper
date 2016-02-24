@@ -49,7 +49,7 @@ public class Settings {
 //to do: check for permissions
         firebaseURL = formatFirebaseURL(settings.getString(Firebase_URL_Name, null));
         integrateFirebase = settings.getBoolean(Integrate_With_Firebase_Name, false);
-        colorTheme = settings.getString(Color_Theme_Name, "gray");
+        colorTheme = settings.getString(Color_Theme_Name, "1");
 
         Set<String> notificationEventsSettings = settings.getStringSet(Notification_Events_Name, new HashSet<String>());
         for (String events : notificationEventsSettings) {
@@ -66,25 +66,7 @@ public class Settings {
             }
         }
 
-        String loggingLevelString = settings.getString(logging_name, "error");
-        switch (loggingLevelString){
-            case "verbose":
-                loggingLevel = 5;
-                break;
-            case "debug":
-                loggingLevel = 4;
-                break;
-            case "info":
-                loggingLevel = 3;
-                break;
-            case "warn":
-                loggingLevel = 2;
-                break;
-            case "error":
-                loggingLevel = 1;
-                break;
-        }
-
+        loggingLevel = Integer.parseInt(settings.getString(logging_name, "1"));
     }
     public static void clearSettings(Context context){
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
@@ -110,9 +92,9 @@ public class Settings {
     public static int getPushBatchDelay(){return pushBatchDelay;}
     public static int getColorTheme(){
         switch (colorTheme){
-            case "red":
+            case "3":
                 return R.style.ThemeRed;
-            case "blue":
+            case "2":
                 return R.style.ThemeBlue;
         }
         return R.style.ThemeGray;

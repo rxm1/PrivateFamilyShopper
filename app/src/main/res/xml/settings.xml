@@ -39,6 +39,6 @@
             android:summary="Change the theme color."
             android:entries="@array/themeColorsListArray"
             android:entryValues="@array/themeColorsListValues"
-            android:defaultValue="@array/themeColorsListDefaultValues"
+            android:defaultValue="1"
             style="?preferenceDialog"/>
 </PreferenceScreen>

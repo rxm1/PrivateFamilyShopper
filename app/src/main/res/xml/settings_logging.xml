@@ -10,7 +10,7 @@
             android:summary="Select the level of logging to produce."
             android:entries="@array/logListArray"
             android:entryValues="@array/logListValues"
-            android:defaultValue="@array/logListDefaultValues"
+            android:defaultValue="1"
             style="?preferenceDialog"/>
 
 </PreferenceScreen>

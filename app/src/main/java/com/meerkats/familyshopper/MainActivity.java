@@ -44,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Settings.clearSettings(this);
         Settings.loadSettings(this);
         setTheme(Settings.getColorTheme());
         setContentView(com.meerkats.familyshopper.R.layout.activity_main);
