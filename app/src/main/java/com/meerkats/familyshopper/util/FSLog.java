@@ -7,23 +7,23 @@ import android.util.Log;
  */
 public class FSLog {
     public static void verbose(String tag, String message){
-        if(Settings.isDebugVerbose())
+        if(Settings.getLoggingLevel()==5)
             Log.v(tag, message);
     }
     public static void debug(String tag, String message){
-        if(Settings.isDebugDebug())
+        if(Settings.getLoggingLevel()>=4)
             Log.d(tag, message);
     }
     public static void info(String tag, String message){
-        if(Settings.isDebugInfo())
+        if(Settings.getLoggingLevel()>=3)
             Log.i(tag, message);
     }
     public static void warn(String tag, String message){
-        if(Settings.isDebugWarn())
+        if(Settings.getLoggingLevel()>=2)
             Log.w(tag, message);
     }
     public static void error(String tag, String message, Exception e){
-        if(Settings.isDebugError())
+        if(Settings.getLoggingLevel()>=1)
             Log.e(tag, message + ": " + e.getMessage() + " " + e.getStackTrace());
     }
 }

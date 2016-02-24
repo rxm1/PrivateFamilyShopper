@@ -30,11 +30,7 @@ public class Settings {
     private static boolean integrateFirebase = false;
     private static int notificationDelay = 0;
     private static int pushBatchDelay = 0;
-    private static boolean debugVerbose=false;
-    private static boolean debugDebug=false;
-    private static boolean debugInfo=false;
-    private static boolean debugWarn=false;
-    private static boolean debugError=false;
+    private static int loggingLevel = 1;
     private static String colorTheme="gray";
 
     private static boolean connectToFirebase = false;
@@ -70,26 +66,25 @@ public class Settings {
             }
         }
 
-        Set<String> logEventsSettings = settings.getStringSet(logging_name, new HashSet<String>());
-        for (String events : logEventsSettings) {
-            switch (events){
-                case "verbose":
-                    debugVerbose = true;
-                    break;
-                case "debug":
-                    debugDebug = true;
-                    break;
-                case "info":
-                    debugInfo = true;
-                    break;
-                case "warn":
-                    debugWarn= true;
-                    break;
-                case "error":
-                    debugError = true;
-                    break;
-            }
+        String loggingLevelString = settings.getString(logging_name, "error");
+        switch (loggingLevelString){
+            case "verbose":
+                loggingLevel = 5;
+                break;
+            case "debug":
+                loggingLevel = 4;
+                break;
+            case "info":
+                loggingLevel = 3;
+                break;
+            case "warn":
+                loggingLevel = 2;
+                break;
+            case "error":
+                loggingLevel = 1;
+                break;
         }
+
     }
     public static void clearSettings(Context context){
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
@@ -113,11 +108,6 @@ public class Settings {
     public static boolean isIntegrateFirebase(){return integrateFirebase;}
     public static String getFirebaseURL(){return firebaseURL;}
     public static int getPushBatchDelay(){return pushBatchDelay;}
-    public static boolean isDebugVerbose(){return debugVerbose;}
-    public static boolean isDebugDebug(){return debugDebug;}
-    public static boolean isDebugInfo(){return debugInfo;}
-    public static boolean isDebugWarn(){return debugWarn;}
-    public static boolean isDebugError(){return debugError;}
     public static int getColorTheme(){
         switch (colorTheme){
             case "red":
@@ -136,6 +126,7 @@ public class Settings {
         }
         return R.style.DialogThemeGray;
     }
+    public static int getLoggingLevel(){return loggingLevel;}
 
     public static boolean connectToFirebase(){
         return connectToFirebase;
