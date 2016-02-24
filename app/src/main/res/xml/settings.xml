@@ -41,13 +41,4 @@
             android:entryValues="@array/themeColorsListValues"
             android:defaultValue="@array/themeColorsListDefaultValues"
             style="?preferenceDialog"/>
-        <MultiSelectListPreference
-            android:title="Logging"
-            android:key="logging"
-            android:summary="Select the level of logging to produce."
-            android:entries="@array/logListArray"
-            android:entryValues="@array/logListValues"
-            android:defaultValue="@array/logListDefaultValues"
-            style="?preferenceDialog"/>
-
 </PreferenceScreen>

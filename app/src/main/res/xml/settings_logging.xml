@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:anandroid="http://schemas.android.com/apk/res/android"
+    xmlns:style="http://schemas.android.com/apk/res-auto"
+    style="?preferenceDialog">
+
+        <MultiSelectListPreference
+            android:title="Logging"
+            android:key="logging"
+            android:summary="Select the level of logging to produce."
+            android:entries="@array/logListArray"
+            android:entryValues="@array/logListValues"
+            android:defaultValue="@array/logListDefaultValues"
+            style="?preferenceDialog"/>
+
+</PreferenceScreen>

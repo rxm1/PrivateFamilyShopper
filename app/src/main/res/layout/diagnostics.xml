@@ -61,8 +61,8 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Logging"
-        android:onClick="loggingClick"
+        android:text="Diagnostics Settings"
+        android:onClick="diagnosticsSettingsClick"
         android:layout_margin="6dp"
         android:padding="12dp"
         android:layout_alignParentBottom="true"
