@@ -38,7 +38,6 @@ import java.util.HashMap;
 public class MainService extends Service implements ISynchronizeInterface {
 
     DataHelper dataHelper;
-    int mStartMode = START_STICKY;
     boolean mAllowRebind;
     private volatile HandlerThread mHandlerThread;
     private ServiceHandler mServiceHandler;
@@ -116,8 +115,9 @@ public class MainService extends Service implements ISynchronizeInterface {
     }
     @Override
     public void onCreate() {
-        super.onCreate();
         FSLog.verbose(service_log_tag, "MainService onCreate");
+        super.onCreate();
+
 
         // An Android handler thread internally operates on a looper.
         mHandlerThread = new HandlerThread("MainService.HandlerThread");
@@ -150,21 +150,11 @@ public class MainService extends Service implements ISynchronizeInterface {
             }
         });
 
-        return mStartMode;
+        return START_STICKY;
     }
 
     public IBinder onBind(Intent intent) {
-        return mBinder;
-    }
-    @Override
-    public boolean onUnbind(Intent intent) {
-        // All clients have unbound with unbindService()
-        return mAllowRebind;
-    }
-    @Override
-    public void onRebind(Intent intent) {
-        // A client is binding to the service with bindService(),
-        // after onUnbind() has already been called
+        return null;
     }
 
     @Override
@@ -185,19 +175,21 @@ public class MainService extends Service implements ISynchronizeInterface {
                 Synchronize synchronize = new Synchronize(getApplicationContext(), myFirebaseRef, service_log_tag, dataHelper);
                 @Override
                 public void onDataChange(final DataSnapshot snapshot) {
-                    if(Settings.isIntegrateFirebase()) {
-                        HashMap<String, String> map = (HashMap<String, String>) snapshot.getValue();
-                        if (map != null) {
-                            final ShoppingList remoteList = new ShoppingList(MainController.master_shopping_list_name, map.get("masterList"));
-                            final ShoppingList localList = new ShoppingList(MainController.master_shopping_list_name, dataHelper.loadGsonFromLocalStorage());
-                            mServiceHandler.post(new Runnable() {
-                                @Override
-                                public void run() {
+                    mServiceHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            if(Settings.isIntegrateFirebase()) {
+                                HashMap<String, String> map = (HashMap<String, String>) snapshot.getValue();
+                                if (map != null) {
+                                    final ShoppingList remoteList = new ShoppingList(MainController.master_shopping_list_name, map.get("masterList"));
+                                    final ShoppingList localList = new ShoppingList(MainController.master_shopping_list_name, dataHelper.loadGsonFromLocalStorage());
+
                                     synchronize.doSynchronize(MainService.this, localList, remoteList);
                                 }
-                            });
+
                         }
                     }
+                    });
                 }
 
                 @Override
@@ -256,25 +248,6 @@ public class MainService extends Service implements ISynchronizeInterface {
                 myFirebaseRef.removeEventListener(firebaseListeners);
             }
         }
-    }
-
-    public ShoppingList retrieveLatest(){
-        FSLog.verbose(service_log_tag, "MainService retrieveLatest");
-
-        ShoppingList shoppingList = null;
-        String gson = "";
-        try {
-            gson = dataHelper.loadGsonFromLocalStorage();
-
-            if(!gson.trim().isEmpty()) {
-                shoppingList = new ShoppingList();
-                shoppingList.loadShoppingList(gson);
-            }
-        }
-        catch (Exception e){
-            FSLog.error(service_log_tag, "DataHelper loadShoppingListFromLocalStorage", e);
-        }
-        return shoppingList;
     }
 
     public void notifyFileChanged(NotificationEvents occuredNotifications, ShoppingList mergedList){

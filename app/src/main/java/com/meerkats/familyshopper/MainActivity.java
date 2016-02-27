@@ -77,10 +77,7 @@ public class MainActivity extends AppCompatActivity {
         setShoppingListOnItemClick();
         setShoppingListOnItemLongClick();
 
-        Intent intent = new Intent(this, MainService.class);
-        startService(intent);
-
-
+        startService(new Intent(this, MainService.class));
     }
 
     @Override
@@ -227,8 +224,8 @@ public class MainActivity extends AppCompatActivity {
         super.onStart();
         FSLog.verbose(activity_log_tag, "MainActivity onStart");
 
-        Intent intent = new Intent(this, MainService.class);
-        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+        Intent intent = new Intent(getApplicationContext(), MainService.class);
+        //bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
     }
     /** Defines callbacks for service binding, passed to bindService() */
     private ServiceConnection mConnection = new ServiceConnection() {
