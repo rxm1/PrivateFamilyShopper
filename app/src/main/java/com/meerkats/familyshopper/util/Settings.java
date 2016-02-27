@@ -24,6 +24,7 @@ public class Settings {
     public static final String Notification_Events_Name = "notificationEvents";
     public static final String Push_Batch_Time_Name = "pushBatchTime";
     public static final String Color_Theme_Name = "colorTheme";
+    public static final String Last_Synced_Name = "LastSyncedName";
 
     private static NotificationEvents userSelectedNotificationEvents = new NotificationEvents();
     private static String firebaseURL = "";
@@ -32,6 +33,7 @@ public class Settings {
     private static int pushBatchDelay = 0;
     private static int loggingLevel = 1;
     private static String colorTheme="gray";
+    private static long lastSynced = 0;
 
     private static boolean connectToFirebase = false;
     private static boolean reconnectToFirebase = false;
@@ -85,6 +87,14 @@ public class Settings {
         return firebaseURL;
     }
 
+    public static void setLastSynced(long lastSyncedTime, Context context){
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putLong(Last_Synced_Name, lastSynced);
+        editor.commit();
+        lastSynced = lastSyncedTime;
+    }
+    public static long getLastSynced(){return lastSynced;}
     public static NotificationEvents getUserSelectedNotificationEvents(){return userSelectedNotificationEvents;}
     public static int getNotificationDelay(){return notificationDelay;}
     public static boolean isIntegrateFirebase(){return integrateFirebase;}

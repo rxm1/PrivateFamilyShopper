@@ -26,6 +26,9 @@ public class ShoppingList extends ArrayList<String>{
     public ShoppingList(){
         innerShoppingList = new InnerShoppingList("");
     }
+    public ShoppingList(String name, String json){
+        loadShoppingList(json);
+    }
 
     public synchronized String getShoppingListName() {
         return innerShoppingList.getShoppingListName();

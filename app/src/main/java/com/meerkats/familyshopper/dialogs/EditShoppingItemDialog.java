@@ -9,6 +9,8 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.meerkats.familyshopper.MainActivity;
+import com.meerkats.familyshopper.util.FSLog;
 import com.meerkats.familyshopper.util.Settings;
 
 /**
@@ -26,6 +28,8 @@ public class EditShoppingItemDialog extends Dialog implements
 
     public EditShoppingItemDialog(Activity activity, String oldData) {
         super(activity, Settings.getDialogColorTheme());
+        FSLog.verbose(MainActivity.activity_log_tag, "EditShoppingItemDialog EditShoppingItemDialog");
+
         this.oldData = oldData;
         this.activity = activity;
         setCancelable(true);
@@ -41,6 +45,8 @@ public class EditShoppingItemDialog extends Dialog implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        FSLog.verbose(MainActivity.activity_log_tag, "EditShoppingItemDialog onCreate");
+
         setContentView(com.meerkats.familyshopper.R.layout.edit_shopping_item);
 
         editText = (EditText)findViewById(com.meerkats.familyshopper.R.id.edit_shopping_item_edit_text);
@@ -59,6 +65,8 @@ public class EditShoppingItemDialog extends Dialog implements
 
     @Override
     public void onClick(View v) {
+        FSLog.verbose(MainActivity.activity_log_tag, "EditShoppingItemDialog onClick");
+
         newData = editText.getText().toString();
         switch (v.getId()) {
             case com.meerkats.familyshopper.R.id.edit_shopping_item_ok_btn:

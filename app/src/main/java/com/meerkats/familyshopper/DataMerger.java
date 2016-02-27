@@ -2,6 +2,7 @@ package com.meerkats.familyshopper;
 
 import com.meerkats.familyshopper.model.ShoppingList;
 import com.meerkats.familyshopper.model.ShoppingListItem;
+import com.meerkats.familyshopper.util.FSLog;
 
 import java.util.HashMap;
 import java.util.UUID;
@@ -10,12 +11,9 @@ import java.util.UUID;
  * Created by Rez on 07/01/2016.
  */
 public class DataMerger {
-
-    //gmt in milliseconds
-    private long lastSynced;
-
-    public DataMerger(){
-        lastSynced = 0;
+    String log_tag = "";
+    public DataMerger(String log_tag){
+        this.log_tag = log_tag;
     }
 
     /*public synchronized ShoppingList mergeData(ShoppingList localList, ShoppingList remoteList, NotificationEvents notificationEvents){
@@ -49,6 +47,8 @@ public class DataMerger {
     }*/
 
     public synchronized ShoppingList merge(ShoppingList localList, ShoppingList remoteList, NotificationEvents notificationEvents){
+        FSLog.verbose(log_tag, "DataMerger merge");
+
         ShoppingList mergedList = new ShoppingList();
 
         if(localList.equals(remoteList))
@@ -89,6 +89,4 @@ public class DataMerger {
 
         return mergedList;
     }
-
-    public synchronized void setLastSynced(long lastSynced){this.lastSynced = lastSynced;}
 }

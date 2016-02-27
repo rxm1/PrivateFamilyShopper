@@ -12,6 +12,7 @@ import android.widget.SimpleAdapter;
 import com.meerkats.familyshopper.MainActivity;
 import com.meerkats.familyshopper.MainController;
 import com.meerkats.familyshopper.R;
+import com.meerkats.familyshopper.util.FSLog;
 import com.meerkats.familyshopper.util.Settings;
 
 import java.util.ArrayList;
@@ -22,7 +23,7 @@ import java.util.SimpleTimeZone;
 /**
  * Created by Rez on 15/02/2016.
  */
-public class ContextMenuDialog extends Dialog implements android.view.View.OnClickListener {
+public class ContextMenuDialog extends Dialog {
 
     private boolean isCrossedOff = false;
     Activity activity;
@@ -32,6 +33,7 @@ public class ContextMenuDialog extends Dialog implements android.view.View.OnCli
 
     public ContextMenuDialog(Activity activity, boolean isCrossedOff, MainController mainController, int itemOriginalPosition, ListView shoppingListView){
         super(activity, Settings.getDialogColorTheme());
+        FSLog.verbose(MainActivity.activity_log_tag, "ContextMenuDialog ContextMenuDialog");
 
         this.isCrossedOff = isCrossedOff;
         this.activity = activity;
@@ -43,6 +45,8 @@ public class ContextMenuDialog extends Dialog implements android.view.View.OnCli
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
+        FSLog.verbose(MainActivity.activity_log_tag, "ContextMenuDialog onCreate");
+
         setContentView(R.layout.context_menu);
 
         String[] data = new String[]{"Delete"};
@@ -67,11 +71,5 @@ public class ContextMenuDialog extends Dialog implements android.view.View.OnCli
                 dismiss();
             }
         });
-    }
-
-
-    @Override
-    public void onClick(View view){
-
     }
 }
