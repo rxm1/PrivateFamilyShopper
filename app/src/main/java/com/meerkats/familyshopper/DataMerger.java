@@ -63,8 +63,11 @@ public class DataMerger {
                 if (!remoteItem.getIsDeleted()){ //do not add back in if its been deleted
                     if (remoteItem.getLastModified() > localItem.getLastModified()) {
                         mergedList.add(remoteItem);
-                    } else
+                        FSLog.debug(log_tag, "Remote selected " + remoteItem.getLastModified() + " " + remoteItem.getShoppingListItem() + " " + remoteItem.isCrossedOff());
+                    } else {
                         mergedList.add(localItem);
+                        FSLog.debug(log_tag, "local selected : " + localItem.getLastModified() + " " + localItem.getShoppingListItem() + " " + localItem.isCrossedOff());
+                    }
 
                     if(!remoteItem.equal(localItem))
                         notificationEvents.modifications = true;

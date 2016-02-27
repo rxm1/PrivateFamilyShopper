@@ -188,12 +188,12 @@ public class MainService extends Service implements ISynchronizeInterface {
                     if(Settings.isIntegrateFirebase()) {
                         HashMap<String, String> map = (HashMap<String, String>) snapshot.getValue();
                         if (map != null) {
-                            final ShoppingList changedList = new ShoppingList(MainController.master_shopping_list_name, map.get("masterList"));
-                            final ShoppingList currentList = new ShoppingList(MainController.master_shopping_list_name, dataHelper.loadGsonFromLocalStorage());
+                            final ShoppingList remoteList = new ShoppingList(MainController.master_shopping_list_name, map.get("masterList"));
+                            final ShoppingList localList = new ShoppingList(MainController.master_shopping_list_name, dataHelper.loadGsonFromLocalStorage());
                             mServiceHandler.post(new Runnable() {
                                 @Override
                                 public void run() {
-                                    synchronize.doSynchronize(MainService.this, changedList, currentList);
+                                    synchronize.doSynchronize(MainService.this, localList, remoteList);
                                 }
                             });
                         }
@@ -207,7 +207,7 @@ public class MainService extends Service implements ISynchronizeInterface {
         }
     }
 
-    public void postTaskFromActivity(final ShoppingList changedList, final ISynchronizeInterface synchronizeInterface, final Activity activity){
+    public void postTaskFromActivity(final ShoppingList localList, final ISynchronizeInterface synchronizeInterface, final Activity activity){
         mServiceHandler.post(new Runnable() {
             @Override
             public void run() {
@@ -222,11 +222,11 @@ public class MainService extends Service implements ISynchronizeInterface {
                                     public void run() {
                                         boolean isMainThread = Looper.myLooper() == Looper.getMainLooper();
                                         if(Settings.isIntegrateFirebase()) {
-                                            final Synchronize synchronize = new Synchronize(activity, myFirebaseRef, service_log_tag, dataHelper);
+                                            final Synchronize synchronize = new Synchronize(activity, myFirebaseRef, MainActivity.activity_log_tag, dataHelper);
                                             if (map != null) {
-                                                ShoppingList currentList = new ShoppingList(MainController.master_shopping_list_name, map.get("masterList"));
+                                                ShoppingList remoteList = new ShoppingList(MainController.master_shopping_list_name, map.get("masterList"));
 
-                                                synchronize.doSynchronize(synchronizeInterface, changedList, currentList);
+                                                synchronize.doSynchronize(synchronizeInterface, localList, remoteList);
                                             }
                                         }
                                     }

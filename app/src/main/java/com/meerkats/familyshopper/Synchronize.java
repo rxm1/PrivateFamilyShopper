@@ -30,11 +30,11 @@ public class Synchronize {
         this.dataHelper = dataHelper;
     }
 
-    public synchronized void doSynchronize(ISynchronizeInterface synchronizeInterface, ShoppingList changedList, ShoppingList currentList){
+    public synchronized void doSynchronize(ISynchronizeInterface synchronizeInterface, ShoppingList localList, ShoppingList remoteList){
         FSLog.verbose(log_tag, "Synchronize doSynchronize");
 
         NotificationEvents occuredNotificationEvents = new NotificationEvents();
-        ShoppingList mergedList = merge(currentList, changedList, occuredNotificationEvents);
+        ShoppingList mergedList = merge(localList, remoteList, occuredNotificationEvents);
         if (occuredNotificationEvents.isTrue() && mergedList != null) { //really need mergedList != null???
             save(mergedList);
             synchronizeInterface.notifyFileChanged(occuredNotificationEvents, mergedList);
@@ -42,13 +42,13 @@ public class Synchronize {
         synchronizeInterface.postSynchronize();
     }
 
-    private synchronized ShoppingList merge(ShoppingList currentList, ShoppingList changedList, NotificationEvents occuredNotificationEvents){
+    private synchronized ShoppingList merge(ShoppingList localList, ShoppingList remoteList, NotificationEvents occuredNotificationEvents){
         FSLog.verbose(log_tag, "Synchronize merge");
 
         DataMerger dataMerger = new DataMerger(log_tag);
 
-        if (currentList != null && changedList != null) {
-            return dataMerger.merge(currentList, changedList, occuredNotificationEvents);
+        if (localList != null && remoteList != null) {
+            return dataMerger.merge(localList, remoteList, occuredNotificationEvents);
         }
 
         return new ShoppingList();
