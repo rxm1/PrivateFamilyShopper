@@ -43,7 +43,7 @@ public class FSLog {
                 Log.d(tag, message);
                 break;
             case 5:
-                //Log.v(tag, message);
+                Log.v(tag, message);
                 break;
         }
     }
