@@ -115,6 +115,7 @@ public class MainService extends Service implements ISynchronizeInterface {
     }
     @Override
     public void onCreate() {
+        Settings.loadSettings(this);
         FSLog.verbose(service_log_tag, "MainService onCreate");
         super.onCreate();
 
@@ -141,6 +142,7 @@ public class MainService extends Service implements ISynchronizeInterface {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        Settings.loadSettings(this);
         FSLog.verbose(service_log_tag, "MainService onStartCommand");
 
         mServiceHandler.post(new Runnable() {

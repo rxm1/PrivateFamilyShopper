@@ -50,7 +50,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         FSLog.verbose(activity_log_tag, "MainActivity onCreate");
-
         Settings.loadSettings(this);
         setTheme(Settings.getColorTheme());
         setContentView(com.meerkats.familyshopper.R.layout.activity_main);
