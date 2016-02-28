@@ -1,18 +1,12 @@
 package com.meerkats.familyshopper;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
-import android.content.pm.PackageInfo;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
-import android.os.Message;
 import android.preference.PreferenceManager;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.firebase.client.DataSnapshot;
@@ -22,19 +16,18 @@ import com.firebase.client.ValueEventListener;
 import com.meerkats.familyshopper.dialogs.EditShoppingItemDialog;
 import com.meerkats.familyshopper.model.ShoppingList;
 import com.meerkats.familyshopper.model.ShoppingListItem;
-import com.meerkats.familyshopper.util.Diagnostics;
 import com.meerkats.familyshopper.util.FSLog;
+import com.meerkats.familyshopper.util.ISynchronizeInterface;
 import com.meerkats.familyshopper.util.Settings;
 
 import java.util.HashMap;
 import java.util.Timer;
-import java.util.TimerTask;
 
 
 /**
  * Created by Rez on 07/01/2016.
  */
-public class MainController {
+public class MainController implements ISynchronizeInterface {
     Firebase myFirebaseRef;
     Activity activity;
     DataHelper dataHelper;
@@ -42,11 +35,10 @@ public class MainController {
     ShoppingListAdapter shoppingListAdapter;
     public static final String PREFS_NAME = "MyPrefsFile";
     public static final String master_shopping_list_name = "Master_List";
-    public static final String activity_tag = "meerkats_MainActivity";
+    public String log_tag = "";
 
 
     HandlerThread handlerThread;
-    SyncHandler syncHandler;
     Handler mainUIHandler;
     Handler mainControllerHandler;
     public static final String settings_changed_action = "com.meerkats.familyshopper.MainController.SettingsUpdated";
@@ -54,56 +46,25 @@ public class MainController {
     public static final String disconnect_from_firebase_action = "com.meerkats.familyshopper.MainController.DisconnectFromFirebaseAction";
     Timer timer = new Timer();
     SharedPreferences settings;
-
-    class SyncHandler extends Handler {
-        public SyncHandler(Looper looper) {
-            super(looper);
-        }
-        public void handleMessage(Message msg) {
-            NotificationEvents occuredNoticifications = new NotificationEvents();
-            HashMap<String, String> map = (HashMap<String, String>) ((DataSnapshot)msg.obj).getValue();
-            ShoppingList remoteList = new ShoppingList();
-            if (map != null) {
-                remoteList.loadShoppingList(map.get("masterList"));
-                Diagnostics.saveLastSyncedBy(activity, remoteList);
-            }
-
-            ShoppingList mergedList = dataHelper.merge(remoteList, shoppingList, occuredNoticifications);
-            if(occuredNoticifications.isTrue()) {
-                dataHelper.saveShoppingListToStorage(mergedList);
-                shoppingList.loadShoppingList(mergedList.getJson());
-                mainUIHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        MainController.this.shoppingListAdapter.notifyDataSetChanged();
-                        ((MainActivity)activity).setIsEditing(false);
-                    }
-                });
-            }
-            else {
-                ((MainActivity)activity).setIsEditing(false);
-                ((MainActivity)activity).loadLocalShoppingList();
-            }
-
-        }
-    }
+    MainService mainService;
+    boolean mainServiceBound = false;
 
 
 
-    public MainController(Activity mainActivity, HandlerThread handlerThread) {
-        FSLog.verbose(activity_tag, "MainController constructor");
+    public MainController(Activity mainActivity, HandlerThread handlerThread, String log_tag) {
+        FSLog.verbose(log_tag, "MainController constructor");
 
         this.activity = mainActivity;
         Firebase.setAndroidContext(activity);
         shoppingList = new ShoppingList("mainList");
-        dataHelper = new DataHelper(mainActivity, handlerThread, activity_tag);
+        dataHelper = new DataHelper(mainActivity, handlerThread, log_tag);
         this.handlerThread = handlerThread;
+        this.log_tag = log_tag;
     }
 
     public void init(){
-        FSLog.verbose(activity_tag, "MainController init");
+        FSLog.verbose(log_tag, "MainController init");
 
-        syncHandler = new SyncHandler(handlerThread.getLooper());
         mainUIHandler = new Handler(Looper.getMainLooper());
         mainControllerHandler = new Handler(handlerThread.getLooper());
         settings = PreferenceManager.getDefaultSharedPreferences(activity);
@@ -114,22 +75,21 @@ public class MainController {
         mainControllerHandler.post(new Runnable() {
             @Override
             public void run() {
-                dataHelper.instanciateFirebase(false);
-                myFirebaseRef = dataHelper.getMyFirebaseRef();
-                sync(false, false, false);
+                myFirebaseRef = dataHelper.instanciateFirebase(false);
+                sync(false, false);
             }
         });
     }
 
     public void deleteShoppingListItem(int position){
-        FSLog.verbose(activity_tag, "MainController deleteShoppingListItem");
+        FSLog.verbose(log_tag, "MainController deleteShoppingListItem");
 
         shoppingList.markAsDeleted(position);
-        sync(true, false, true);
+        sync(true, false);
         ((MainActivity) activity).setIsEditing(false);
     }
     public void editShoppingListItem(final int position, final Activity activity){
-        FSLog.verbose(activity_tag, "MainController editShoppingListItem");
+        FSLog.verbose(log_tag, "MainController editShoppingListItem");
 
         final ShoppingListItem shoppingListItem = shoppingList.getShoppingListItem(position);
         EditShoppingItemDialog cdd=new EditShoppingItemDialog(activity, shoppingListItem.getShoppingListItem());
@@ -153,7 +113,7 @@ public class MainController {
                 shoppingListItem.setShoppingListItem(newData);
                 shoppingList.setShoppingListItemEdit(shoppingListItem, position);
 
-                sync(true, false, true);
+                sync(true, false);
 
                 mainUIHandler.post(new Runnable() {
                     @Override
@@ -168,59 +128,40 @@ public class MainController {
         cdd.show();
     }
     public void crossOffShoppingItem(int position){
-        FSLog.verbose(activity_tag, "MainController crossOffShoppingItem");
+        FSLog.verbose(log_tag, "MainController crossOffShoppingItem");
 
         shoppingList.setItemCrossedOff(position);
-        sync(true, false, true);
+        sync(true, false);
     }
     public void addItemToShoppingList(String item){
-        FSLog.verbose(activity_tag, "MainController addItemToShoppingList");
+        FSLog.verbose(log_tag, "MainController addItemToShoppingList");
 
         shoppingList.add(item);
-        sync(true, false, true);
+        sync(true, false);
     }
     public void clearShoppingList(){
-        FSLog.verbose(activity_tag, "MainController clearShoppingList");
+        FSLog.verbose(log_tag, "MainController clearShoppingList");
 
         shoppingList.deleteAll();
-        sync(true, false, true);
+        sync(true, false);
     }
     public void clearCrossedOffShoppingList(){
-        FSLog.verbose(activity_tag, "MainController clearCrossedOffShoppingList");
+        FSLog.verbose(log_tag, "MainController clearCrossedOffShoppingList");
 
         shoppingList.clearCrossedOff();
-        sync(true, false, true);
+        sync(true, false);
     }
 
-/*  Sync is between local shopping list object
-    and remote saved storage.
-    After merge, it updates all local object and file
-    and remote storage
- */
-    public synchronized void sync(boolean refresh, boolean showConnectionStatus, boolean withTimer){
-        FSLog.verbose(activity_tag, "MainController sync");
+    public synchronized void sync(boolean refresh, boolean showConnectionStatus){
+        FSLog.verbose(log_tag, "MainController sync");
 
         if(refresh){
             shoppingListAdapter.notifyDataSetChanged();
         }
+
         if(myFirebaseRef != null && DataHelper.getIsValidFirebaseURL()) {
-            if (withTimer) {
-                TimerTask timerTask = new TimerTask() {
-                    @Override
-                    public void run() {
-                        addListenerForSingleValueEvent();
-                    }
-                };
-                timer.cancel();
-                timer.purge();
-                timer = new Timer();
-                timer.schedule(timerTask, Settings.getPushBatchDelay());
-            }
-            else {
-                timer.cancel();
-                timer.purge();
-                addListenerForSingleValueEvent();
-            }
+            if(mainServiceBound)
+                mainService.postTaskFromActivity(shoppingList, MainController.this, activity);
         }
         else{
             if(showConnectionStatus)
@@ -228,66 +169,72 @@ public class MainController {
         }
 
     }
-    public void addListenerForSingleValueEvent(){
-        FSLog.verbose(activity_tag, "MainController addListenerForSingleValueEvent");
-
-        try {
-            myFirebaseRef.addListenerForSingleValueEvent(
-                    new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot snapshot) {
-                            Message message = syncHandler.obtainMessage();
-                            message.obj = snapshot;
-                            syncHandler.sendMessage(message);
-                        }
-
-                        @Override
-                        public void onCancelled(FirebaseError firebaseError) {
-                            Toast.makeText(activity.getApplicationContext(), "Firebase not connected", Toast.LENGTH_SHORT).show();
-                        }
-
-                    });
-        }
-        catch (Exception e){
-            FSLog.error(activity_tag, "MainController addListenerForSingleValueEvent", e);
-            Toast.makeText(activity.getApplicationContext(), "Firebase not connected", Toast.LENGTH_SHORT).show();
-        }
-    }
 
     public void connect(){
-        FSLog.verbose(activity_tag, "MainController connect");
+        FSLog.verbose(log_tag, "MainController connect");
 
         disconnect();
         mainControllerHandler.post(new Runnable() {
             @Override
             public void run() {
-                dataHelper.instanciateFirebase(false);
-                myFirebaseRef = dataHelper.getMyFirebaseRef();
+                myFirebaseRef = dataHelper.instanciateFirebase(false);
                 try {
                     Thread.sleep(2 * 1000);
 
-                    sync(false, false, false);
+                    sync(false, false);
                 } catch (Exception e) {
-                    FSLog.error(activity_tag, "MainController connect", e);
+                    FSLog.error(log_tag, "MainController connect", e);
                 }
 
             }
         });
     }
     public void disconnect(){
-        dataHelper.setMyFirebaseRefNull();
+        FSLog.verbose(log_tag, "MainController disconnect");
+
+        myFirebaseRef = null;
     }
 
-    public ShoppingList getShoppingList(){ return shoppingList; }
-    public ShoppingListAdapter getShoppingListAdapter(){return shoppingListAdapter;}
+    public ShoppingList getShoppingList(){
+        FSLog.verbose(log_tag, "MainController getShoppingList");
+
+        return shoppingList;
+    }
+    public ShoppingListAdapter getShoppingListAdapter(){
+        FSLog.verbose(log_tag, "MainController getShoppingListAdapter");
+
+        return shoppingListAdapter;
+    }
     public void clearShoppingListFromLocalStorage(){
-        FSLog.verbose(activity_tag, "MainController clearShoppingListFromLocalStorage");
-        dataHelper.clearShoppingListFromLocalStorage();
+        FSLog.verbose(log_tag, "MainController clearShoppingListFromLocalStorage");
+
+        dataHelper.saveGsonToLocalStorage(new ShoppingList(MainController.master_shopping_list_name).getJson());
     }
     public void cleanUp(){
-        FSLog.verbose(activity_tag, "MainController cleanUp");
+        FSLog.verbose(log_tag, "MainController cleanUp");
 
         handlerThread.quit();
         dataHelper.cleanUp();
+    }
+
+    public void notifyFileChanged(NotificationEvents occuredNotifications, ShoppingList mergedList){
+        FSLog.verbose(log_tag, "MainController notifyFileChanged");
+
+        ((MainActivity)activity).setIsEditing(false);
+        ((MainActivity)activity).loadLocalShoppingList();
+    }
+
+    public void setMainService(MainService mainService, boolean bound){
+        FSLog.verbose(log_tag, "MainController setMainService");
+
+        this.mainService = mainService;
+        this.mainServiceBound = bound;
+    }
+
+    public void postSynchronize(){
+        FSLog.verbose(log_tag, "MainController postSynchronize");
+
+        ((MainActivity)activity).setIsEditing(false);
+        ((MainActivity)activity).loadLocalShoppingList();
     }
 }
