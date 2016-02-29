@@ -26,6 +26,7 @@ import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
 import com.meerkats.familyshopper.model.ShoppingList;
+import com.meerkats.familyshopper.util.Diagnostics;
 import com.meerkats.familyshopper.util.FSLog;
 import com.meerkats.familyshopper.util.ISynchronizeInterface;
 import com.meerkats.familyshopper.util.Settings;
@@ -183,7 +184,7 @@ public class MainService extends Service implements ISynchronizeInterface {
                                 if (map != null) {
                                     final ShoppingList remoteList = new ShoppingList(MainController.master_shopping_list_name, map.get("masterList"), service_log_tag);
                                     final ShoppingList localList = new ShoppingList(MainController.master_shopping_list_name, dataHelper.loadGsonFromLocalStorage(), service_log_tag);
-
+                                    Diagnostics.saveLastSyncedBy(getApplicationContext(), remoteList);
                                     synchronize.doSynchronize(MainService.this, localList, remoteList);
                                 }
                             }
@@ -211,12 +212,14 @@ public class MainService extends Service implements ISynchronizeInterface {
                             @Override
                             public void onDataChange(DataSnapshot snapshot) {
                                 final HashMap<String, String> map = (HashMap<String, String>) snapshot.getValue();
+
                                 mServiceHandler.post(new Runnable() {
                                     @Override
                                     public void run() {
                                         final Synchronize synchronize = new Synchronize(activity, myFirebaseRef, MainActivity.activity_log_tag, dataHelper);
                                         if (map != null) {
                                             ShoppingList remoteList = new ShoppingList(MainController.master_shopping_list_name, map.get("masterList"), MainActivity.activity_log_tag);
+                                            Diagnostics.saveLastSyncedBy(getApplicationContext(), remoteList);
                                             synchronize.doSynchronize(synchronizeInterface, localList, remoteList);
                                         }
                                     }
