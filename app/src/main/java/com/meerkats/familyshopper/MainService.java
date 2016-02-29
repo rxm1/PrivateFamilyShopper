@@ -41,6 +41,7 @@ public class MainService extends Service implements ISynchronizeInterface {
     boolean mAllowRebind;
     private volatile HandlerThread mHandlerThread;
     private ServiceHandler mServiceHandler;
+    private Handler uiHandler;
     ReconnectToFirebaseReceiver reconnectToFirebaseReceiver;
     DisconnectFromFirebaseReceiver disconnectFromFirebaseReceiver;
     SettingsChangedReceiver settingsChangedReceiver;
@@ -115,16 +116,14 @@ public class MainService extends Service implements ISynchronizeInterface {
     }
     @Override
     public void onCreate() {
+        super.onCreate();
         Settings.loadSettings(this);
         FSLog.verbose(service_log_tag, "MainService onCreate");
-        super.onCreate();
 
-
-        // An Android handler thread internally operates on a looper.
         mHandlerThread = new HandlerThread("MainService.HandlerThread");
         mHandlerThread.start();
-        // An Android service handler is a handler running on a specific background thread.
         mServiceHandler = new ServiceHandler(mHandlerThread.getLooper());
+        uiHandler = new Handler(Looper.getMainLooper());
 
         Firebase.setAndroidContext(this);
         dataHelper = new DataHelper(this, mHandlerThread, service_log_tag);
@@ -156,7 +155,7 @@ public class MainService extends Service implements ISynchronizeInterface {
     }
 
     public IBinder onBind(Intent intent) {
-        return null;
+        return mBinder;
     }
 
     @Override
@@ -180,7 +179,7 @@ public class MainService extends Service implements ISynchronizeInterface {
                     mServiceHandler.post(new Runnable() {
                         @Override
                         public void run() {
-                            if(Settings.isIntegrateFirebase()) {
+                            if(Settings.isIntegrateFirebase() && myFirebaseRef != null && DataHelper.getIsValidFirebaseURL()) {
                                 HashMap<String, String> map = (HashMap<String, String>) snapshot.getValue();
                                 if (map != null) {
                                     final ShoppingList remoteList = new ShoppingList(MainController.master_shopping_list_name, map.get("masterList"));
@@ -188,14 +187,14 @@ public class MainService extends Service implements ISynchronizeInterface {
 
                                     synchronize.doSynchronize(MainService.this, localList, remoteList);
                                 }
-
+                            }
                         }
-                    }
                     });
                 }
 
                 @Override
                 public void onCancelled(FirebaseError firebaseError) {
+                    FSLog.error(service_log_tag, "MainService addFirebaseListeners", firebaseError.toException());
                 }
             });
         }
@@ -214,14 +213,10 @@ public class MainService extends Service implements ISynchronizeInterface {
                                 mServiceHandler.post(new Runnable() {
                                     @Override
                                     public void run() {
-                                        boolean isMainThread = Looper.myLooper() == Looper.getMainLooper();
-                                        if(Settings.isIntegrateFirebase()) {
-                                            final Synchronize synchronize = new Synchronize(activity, myFirebaseRef, MainActivity.activity_log_tag, dataHelper);
-                                            if (map != null) {
-                                                ShoppingList remoteList = new ShoppingList(MainController.master_shopping_list_name, map.get("masterList"));
-
-                                                synchronize.doSynchronize(synchronizeInterface, localList, remoteList);
-                                            }
+                                        final Synchronize synchronize = new Synchronize(activity, myFirebaseRef, MainActivity.activity_log_tag, dataHelper);
+                                        if (map != null) {
+                                            ShoppingList remoteList = new ShoppingList(MainController.master_shopping_list_name, map.get("masterList"));
+                                            synchronize.doSynchronize(synchronizeInterface, localList, remoteList);
                                         }
                                     }
                                 });
@@ -229,7 +224,14 @@ public class MainService extends Service implements ISynchronizeInterface {
 
                             @Override
                             public void onCancelled(FirebaseError firebaseError) {
-                                Toast.makeText(activity.getApplicationContext(), "Firebase not connected", Toast.LENGTH_SHORT).show();
+                                FSLog.error(MainActivity.activity_log_tag, "MainService postTaskFromActivity", firebaseError.toException());
+                                uiHandler.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText(activity.getApplicationContext(), "Firebase not connected", Toast.LENGTH_SHORT).show();
+
+                                    }
+                                });
                             }
 
                         });

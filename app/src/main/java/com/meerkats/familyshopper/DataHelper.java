@@ -50,8 +50,7 @@ public class DataHelper {
         Firebase myFirebaseRef = null;
         try {
             String firebaseURL = Settings.getFirebaseURL();
-            Boolean integrateFirebase = Settings.isIntegrateFirebase();
-            if (integrateFirebase && firebaseURL != null && !firebaseURL.trim().isEmpty()) {
+            if (Settings.isIntegrateFirebase() && firebaseURL != null && !firebaseURL.trim().isEmpty()) {
                 myFirebaseRef = new Firebase(firebaseURL);
                 if (myFirebaseRef != null)
                     showToast("Connecting to Firebase...", fromService);

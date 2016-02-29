@@ -49,8 +49,6 @@ public class MainController implements ISynchronizeInterface {
     MainService mainService;
     boolean mainServiceBound = false;
 
-
-
     public MainController(Activity mainActivity, HandlerThread handlerThread, String log_tag) {
         FSLog.verbose(log_tag, "MainController constructor");
 
@@ -76,7 +74,7 @@ public class MainController implements ISynchronizeInterface {
             @Override
             public void run() {
                 myFirebaseRef = dataHelper.instanciateFirebase(false);
-                sync(false, false);
+                sync(false, false, false);
             }
         });
     }
@@ -85,7 +83,7 @@ public class MainController implements ISynchronizeInterface {
         FSLog.verbose(log_tag, "MainController deleteShoppingListItem");
 
         shoppingList.markAsDeleted(position);
-        sync(true, false);
+        sync(true, false, true);
         ((MainActivity) activity).setIsEditing(false);
     }
     public void editShoppingListItem(final int position, final Activity activity){
@@ -113,7 +111,7 @@ public class MainController implements ISynchronizeInterface {
                 shoppingListItem.setShoppingListItem(newData);
                 shoppingList.setShoppingListItemEdit(shoppingListItem, position);
 
-                sync(true, false);
+                sync(true, false, true);
 
                 mainUIHandler.post(new Runnable() {
                     @Override
@@ -131,43 +129,54 @@ public class MainController implements ISynchronizeInterface {
         FSLog.verbose(log_tag, "MainController crossOffShoppingItem");
 
         shoppingList.setItemCrossedOff(position);
-        sync(true, false);
+        sync(true, false, true);
     }
     public void addItemToShoppingList(String item){
         FSLog.verbose(log_tag, "MainController addItemToShoppingList");
 
         shoppingList.add(item);
-        sync(true, false);
+        sync(true, false, true);
     }
     public void clearShoppingList(){
         FSLog.verbose(log_tag, "MainController clearShoppingList");
 
         shoppingList.deleteAll();
-        sync(true, false);
+        sync(true, false, true);
     }
     public void clearCrossedOffShoppingList(){
         FSLog.verbose(log_tag, "MainController clearCrossedOffShoppingList");
 
         shoppingList.clearCrossedOff();
-        sync(true, false);
+        sync(true, false, true);
     }
 
-    public synchronized void sync(boolean refresh, boolean showConnectionStatus){
+    public synchronized void sync(boolean refresh, final boolean showConnectionStatus, boolean saveShoppingList){
         FSLog.verbose(log_tag, "MainController sync");
 
         if(refresh){
-            shoppingListAdapter.notifyDataSetChanged();
+            mainUIHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    shoppingListAdapter.notifyDataSetChanged();
+                }
+            });
         }
+        if(saveShoppingList)
+            dataHelper.saveGsonToLocalStorage(shoppingList.getJson());
 
-        if(myFirebaseRef != null && DataHelper.getIsValidFirebaseURL()) {
-            if(mainServiceBound)
+        if(Settings.isIntegrateFirebase() && myFirebaseRef != null && DataHelper.getIsValidFirebaseURL() && mainServiceBound) {
                 mainService.postTaskFromActivity(shoppingList, MainController.this, activity);
         }
         else{
-            if(showConnectionStatus)
-                Toast.makeText(activity.getApplicationContext(), "Firebase not connected", Toast.LENGTH_SHORT).show();
+            if(showConnectionStatus) {
+                mainUIHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(activity.getApplicationContext(), "Firebase not connected", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
         }
-
     }
 
     public void connect(){
@@ -178,14 +187,12 @@ public class MainController implements ISynchronizeInterface {
             @Override
             public void run() {
                 myFirebaseRef = dataHelper.instanciateFirebase(false);
-                try {
-                    Thread.sleep(2 * 1000);
-
-                    sync(false, false);
-                } catch (Exception e) {
-                    FSLog.error(log_tag, "MainController connect", e);
-                }
-
+                mainControllerHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        sync(false, false, false);
+                    }
+                });
             }
         });
     }
@@ -210,13 +217,6 @@ public class MainController implements ISynchronizeInterface {
 
         dataHelper.saveGsonToLocalStorage(new ShoppingList(MainController.master_shopping_list_name).getJson());
     }
-    public void cleanUp(){
-        FSLog.verbose(log_tag, "MainController cleanUp");
-
-        handlerThread.quit();
-        dataHelper.cleanUp();
-    }
-
     public void notifyFileChanged(NotificationEvents occuredNotifications, ShoppingList mergedList){
         FSLog.verbose(log_tag, "MainController notifyFileChanged");
 
@@ -237,4 +237,12 @@ public class MainController implements ISynchronizeInterface {
         ((MainActivity)activity).setIsEditing(false);
         ((MainActivity)activity).loadLocalShoppingList();
     }
+
+    public void cleanUp(){
+        FSLog.verbose(log_tag, "MainController cleanUp");
+
+        handlerThread.quit();
+        dataHelper.cleanUp();
+    }
+
 }

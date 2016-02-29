@@ -32,14 +32,13 @@ import com.meerkats.familyshopper.model.ShoppingList;
 
 public class MainActivity extends AppCompatActivity {
 
-    EditText enterItemEditTxt;
     ShoppingList shoppingList;
     ShoppingListAdapter shoppingListAdapter;
     ListView shoppingListView;
     MainController mainController;
-    DataChangedReceiver dataChangedReceiver;
-    Handler mainUIHandler;
-    HandlerThread handlerThread;
+    DataChangedReceiver dataChangedReceiver = new DataChangedReceiver();;
+    Handler mainUIHandler = new Handler(Looper.getMainLooper());
+    HandlerThread handlerThread = new HandlerThread("MainActivity.HandlerThread");;
     private static final int SETTINGS_RESULT = 1;
     private boolean isEditing = false;
     boolean mBound = false;
@@ -49,27 +48,22 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        FSLog.verbose(activity_log_tag, "MainActivity onCreate");
         Settings.loadSettings(this);
+        FSLog.verbose(activity_log_tag, "MainActivity onCreate");
         setTheme(Settings.getColorTheme());
         setContentView(com.meerkats.familyshopper.R.layout.activity_main);
 
-
-        handlerThread = new HandlerThread("MainActivity.HandlerThread");
         handlerThread.start();
-        mainUIHandler = new Handler(Looper.getMainLooper());
 
         mainController = new MainController(this, handlerThread, activity_log_tag);
         mainController.init();
         shoppingList = mainController.getShoppingList();
         shoppingListAdapter = mainController.getShoppingListAdapter();
-        dataChangedReceiver = new DataChangedReceiver();
 
         Toolbar myToolbar = (Toolbar) findViewById(com.meerkats.familyshopper.R.id.family_shopper_toolbar);
         setSupportActionBar(myToolbar);
         myToolbar.setLogo(com.meerkats.familyshopper.R.mipmap.ic_launcher);
 
-        enterItemEditTxt = (EditText)findViewById(com.meerkats.familyshopper.R.id.enterItemTxt);
         shoppingListView = (ListView)findViewById(com.meerkats.familyshopper.R.id.shoppingListView);
         shoppingListView.setAdapter(shoppingListAdapter);
 
@@ -94,7 +88,7 @@ public class MainActivity extends AppCompatActivity {
 
         switch (item.getItemId()) {
             case com.meerkats.familyshopper.R.id.sync:
-                mainController.sync(false, true);
+                mainController.sync(false, true, false);
                 return true;
             case com.meerkats.familyshopper.R.id.clear_list:
                 mainController.clearShoppingList();
@@ -193,7 +187,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void addBtnClick(View view){
         FSLog.verbose(activity_log_tag, "MainActivity addBtnClick");
-
+        EditText enterItemEditTxt = (EditText)findViewById(com.meerkats.familyshopper.R.id.enterItemTxt);
         if (enterItemEditTxt.getText().toString().trim().length() > 0)
             mainController.addItemToShoppingList(enterItemEditTxt.getText().toString().trim());
         shoppingListView.setSelection(shoppingListAdapter.getCount() - 1);
@@ -224,7 +218,7 @@ public class MainActivity extends AppCompatActivity {
         FSLog.verbose(activity_log_tag, "MainActivity onStart");
 
         Intent intent = new Intent(getApplicationContext(), MainService.class);
-        //bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
     }
     /** Defines callbacks for service binding, passed to bindService() */
     private ServiceConnection mConnection = new ServiceConnection() {
@@ -283,18 +277,20 @@ public class MainActivity extends AppCompatActivity {
 
     public void loadLocalShoppingList(){
         FSLog.verbose(activity_log_tag, "MainActivity loadLocalShoppingList");
-                if(isEditing())
+                if(isEditing()) {
                     return;
+                }
 
                 String localFile = mainController.dataHelper.loadGsonFromLocalStorage().trim();
-                if(!localFile.isEmpty())
+                if(!localFile.isEmpty()) {
                     shoppingList.loadShoppingList(localFile);
-                mainUIHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        MainActivity.this.shoppingListAdapter.notifyDataSetChanged();
-                    }
-                });
+                    mainUIHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            shoppingListAdapter.notifyDataSetChanged();
+                        }
+                    });
+                }
     }
 
     public void setIsEditing(boolean isEditing){
