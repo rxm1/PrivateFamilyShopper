@@ -15,7 +15,7 @@ import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
-import android.provider.ContactsContract;
+import android.os.SystemClock;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.content.LocalBroadcastManager;
@@ -47,6 +47,8 @@ public class MainService extends Service implements ISynchronizeInterface {
     Firebase myFirebaseRef;
     ValueEventListener firebaseListeners;
     private final IBinder mBinder = new LocalBinder();
+    private static Object batchDelayObject = new Object();
+    private static Object pushNotificationsObject = new Object();
 
     public class LocalBinder extends Binder {
         MainService getService() {
@@ -198,10 +200,12 @@ public class MainService extends Service implements ISynchronizeInterface {
     }
 
     public void postTaskFromActivity(final ShoppingList localList, final ISynchronizeInterface synchronizeInterface, final Activity activity){
-        mServiceHandler.post(new Runnable() {
+        if(Settings.getPushBatchDelay()>0) {
+            mServiceHandler.removeCallbacksAndMessages(batchDelayObject);
+        }
+        Runnable uiRunnable = new Runnable() {
             @Override
             public void run() {
-
                 myFirebaseRef.addListenerForSingleValueEvent(
                         new ValueEventListener() {
                             @Override
@@ -218,7 +222,6 @@ public class MainService extends Service implements ISynchronizeInterface {
                                     }
                                 });
                             }
-
                             @Override
                             public void onCancelled(FirebaseError firebaseError) {
                                 FSLog.error(MainActivity.activity_log_tag, "MainService postTaskFromActivity", firebaseError.toException());
@@ -234,7 +237,8 @@ public class MainService extends Service implements ISynchronizeInterface {
 
                         });
             }
-        });
+        };
+        mServiceHandler.postAtTime(uiRunnable, batchDelayObject, SystemClock.uptimeMillis()+Settings.getPushBatchDelay());
     }
 
     public synchronized void removeFirebaseListeners() {
@@ -252,15 +256,23 @@ public class MainService extends Service implements ISynchronizeInterface {
         }
     }
 
-    public void notifyFileChanged(NotificationEvents occuredNotifications, ShoppingList mergedList){
+    public void notifyFileChanged(final NotificationEvents occuredNotifications, ShoppingList mergedList){
         FSLog.verbose(service_log_tag, "MainService notifyFileChanged");
 
         Intent intent = new Intent(DataHelper.service_updated_file_action);
         if (occuredNotifications.forService().isTrue()) {
-            boolean recieversAvailable =
-                    LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+            boolean recieversAvailable = LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
             if (!recieversAvailable) {
-                sendFileChangedNotification(occuredNotifications);
+                if(Settings.getNotificationDelay() > 0) {
+                    mServiceHandler.removeCallbacksAndMessages(pushNotificationsObject);
+                }
+                Runnable fileChangedRunnable = new Runnable() {
+                    @Override
+                    public void run() {
+                        sendFileChangedNotification(occuredNotifications);
+                    }
+                };
+                mServiceHandler.postAtTime(fileChangedRunnable, pushNotificationsObject, SystemClock.uptimeMillis()+Settings.getNotificationDelay());
             }
         }
     }
