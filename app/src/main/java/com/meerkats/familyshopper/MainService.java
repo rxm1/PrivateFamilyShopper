@@ -38,10 +38,8 @@ import java.util.HashMap;
 public class MainService extends Service implements ISynchronizeInterface {
 
     DataHelper dataHelper;
-    boolean mAllowRebind;
     private volatile HandlerThread mHandlerThread;
     private ServiceHandler mServiceHandler;
-    private Handler uiHandler;
     ReconnectToFirebaseReceiver reconnectToFirebaseReceiver;
     DisconnectFromFirebaseReceiver disconnectFromFirebaseReceiver;
     SettingsChangedReceiver settingsChangedReceiver;
@@ -123,10 +121,9 @@ public class MainService extends Service implements ISynchronizeInterface {
         mHandlerThread = new HandlerThread("MainService.HandlerThread");
         mHandlerThread.start();
         mServiceHandler = new ServiceHandler(mHandlerThread.getLooper());
-        uiHandler = new Handler(Looper.getMainLooper());
 
         Firebase.setAndroidContext(this);
-        dataHelper = new DataHelper(this, mHandlerThread, service_log_tag);
+        dataHelper = new DataHelper(this, service_log_tag);
 
         reconnectToFirebaseReceiver = new ReconnectToFirebaseReceiver();
         IntentFilter filter = new IntentFilter(MainController.reconnect_to_firebase_action);
@@ -182,8 +179,8 @@ public class MainService extends Service implements ISynchronizeInterface {
                             if(Settings.isIntegrateFirebase() && myFirebaseRef != null && DataHelper.getIsValidFirebaseURL()) {
                                 HashMap<String, String> map = (HashMap<String, String>) snapshot.getValue();
                                 if (map != null) {
-                                    final ShoppingList remoteList = new ShoppingList(MainController.master_shopping_list_name, map.get("masterList"));
-                                    final ShoppingList localList = new ShoppingList(MainController.master_shopping_list_name, dataHelper.loadGsonFromLocalStorage());
+                                    final ShoppingList remoteList = new ShoppingList(MainController.master_shopping_list_name, map.get("masterList"), service_log_tag);
+                                    final ShoppingList localList = new ShoppingList(MainController.master_shopping_list_name, dataHelper.loadGsonFromLocalStorage(), service_log_tag);
 
                                     synchronize.doSynchronize(MainService.this, localList, remoteList);
                                 }
@@ -215,7 +212,7 @@ public class MainService extends Service implements ISynchronizeInterface {
                                     public void run() {
                                         final Synchronize synchronize = new Synchronize(activity, myFirebaseRef, MainActivity.activity_log_tag, dataHelper);
                                         if (map != null) {
-                                            ShoppingList remoteList = new ShoppingList(MainController.master_shopping_list_name, map.get("masterList"));
+                                            ShoppingList remoteList = new ShoppingList(MainController.master_shopping_list_name, map.get("masterList"), MainActivity.activity_log_tag);
                                             synchronize.doSynchronize(synchronizeInterface, localList, remoteList);
                                         }
                                     }
@@ -225,6 +222,7 @@ public class MainService extends Service implements ISynchronizeInterface {
                             @Override
                             public void onCancelled(FirebaseError firebaseError) {
                                 FSLog.error(MainActivity.activity_log_tag, "MainService postTaskFromActivity", firebaseError.toException());
+                                Handler uiHandler = new Handler(Looper.getMainLooper());
                                 uiHandler.post(new Runnable() {
                                     @Override
                                     public void run() {

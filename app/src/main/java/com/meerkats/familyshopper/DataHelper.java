@@ -27,21 +27,18 @@ public class DataHelper {
     Context context;
     DataMerger dataMerger;
 
-    HandlerThread handlerThread;
-    Handler mainUIHandler;
     private static boolean isValidFirebaseURL = false;
     String log_tag = "";
     public String localMasterFileName = "localShoppingListMasterFile.json";
     public static final String service_updated_file_action = "com.meerkats.familyshopper.MainService.FileChanged";
 
-    public DataHelper(Context context, HandlerThread handlerThread, String logTag) {
+    public DataHelper(Context context, String logTag) {
         FSLog.verbose(logTag, "DataHelper constructor");
 
         this.log_tag = logTag;
         this.context = context;
         dataMerger = new DataMerger(log_tag);
-        this.handlerThread = handlerThread;
-        mainUIHandler = new Handler(Looper.getMainLooper());
+
     }
 
     public synchronized Firebase instanciateFirebase(boolean fromService) {
@@ -101,6 +98,7 @@ public class DataHelper {
         FSLog.verbose(log_tag, "DataHelper showToast");
 
         if(!fromService) {
+            Handler mainUIHandler = new Handler(Looper.getMainLooper());
             mainUIHandler.post(new Runnable() {
                 @Override
                 public void run() {
@@ -159,7 +157,5 @@ public class DataHelper {
 
     public synchronized void cleanUp(){
         FSLog.verbose(log_tag, "DataHelper cleanUp");
-
-        handlerThread.quit();
     }
 }

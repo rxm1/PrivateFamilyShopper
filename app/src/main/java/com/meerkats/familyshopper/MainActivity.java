@@ -37,7 +37,6 @@ public class MainActivity extends AppCompatActivity {
     ListView shoppingListView;
     MainController mainController;
     DataChangedReceiver dataChangedReceiver = new DataChangedReceiver();;
-    Handler mainUIHandler = new Handler(Looper.getMainLooper());
     HandlerThread handlerThread = new HandlerThread("MainActivity.HandlerThread");;
     private static final int SETTINGS_RESULT = 1;
     private boolean isEditing = false;
@@ -88,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
 
         switch (item.getItemId()) {
             case com.meerkats.familyshopper.R.id.sync:
-                mainController.sync(false, true, false);
+                mainController.sync(true, false);
                 return true;
             case com.meerkats.familyshopper.R.id.clear_list:
                 mainController.clearShoppingList();
@@ -130,7 +129,6 @@ public class MainActivity extends AppCompatActivity {
                     }
 
                     mainController.connect();
-                    //notify service that settings have changed
                     Intent intent = new Intent(MainController.reconnect_to_firebase_action);
                     LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
                 }
@@ -163,7 +161,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onCancel(DialogInterface dialog) {
                         setIsEditing(false);
-                        loadLocalShoppingList();
+                        mainController.loadLocalShoppingList();
                     }
                 });
                 contextMenuDialog.show();
@@ -202,7 +200,7 @@ public class MainActivity extends AppCompatActivity {
         IntentFilter filter = new IntentFilter(DataHelper.service_updated_file_action);
         LocalBroadcastManager.getInstance(this).registerReceiver(dataChangedReceiver, filter);
 
-        loadLocalShoppingList();
+        mainController.loadLocalShoppingList();
     }
     @Override
     protected void onPause() {
@@ -271,26 +269,8 @@ public class MainActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
               FSLog.verbose(activity_log_tag, "MainActivity onReceive");
 
-              loadLocalShoppingList();
+              mainController.loadLocalShoppingList();
         }
-    }
-
-    public void loadLocalShoppingList(){
-        FSLog.verbose(activity_log_tag, "MainActivity loadLocalShoppingList");
-                if(isEditing()) {
-                    return;
-                }
-
-                String localFile = mainController.dataHelper.loadGsonFromLocalStorage().trim();
-                if(!localFile.isEmpty()) {
-                    shoppingList.loadShoppingList(localFile);
-                    mainUIHandler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            shoppingListAdapter.notifyDataSetChanged();
-                        }
-                    });
-                }
     }
 
     public void setIsEditing(boolean isEditing){

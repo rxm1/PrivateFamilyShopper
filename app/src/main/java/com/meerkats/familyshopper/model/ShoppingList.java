@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.meerkats.familyshopper.util.FSLog;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -26,8 +27,8 @@ public class ShoppingList extends ArrayList<String>{
     public ShoppingList(){
         innerShoppingList = new InnerShoppingList("");
     }
-    public ShoppingList(String name, String json){
-        loadShoppingList(json);
+    public ShoppingList(String name, String json, String logTag){
+        loadShoppingList(json, logTag);
     }
 
     public synchronized String getShoppingListName() {
@@ -78,7 +79,7 @@ public class ShoppingList extends ArrayList<String>{
     }
 
 
-    public synchronized void loadShoppingList(String newGson){
+    public synchronized void loadShoppingList(String newGson, String logTag){
             super.clear();
             if (newGson != null && !newGson.isEmpty()) {
                 try {
@@ -86,7 +87,7 @@ public class ShoppingList extends ArrayList<String>{
                 }
                 catch (Exception e){
                     innerShoppingList = new InnerShoppingList("");
-                    Log.e("Exception", "loadShoppingList from ShoppingList failed: " + e.toString());
+                    FSLog.error(logTag, "ShoppingList loadShoppingList", e);
                 }
             }
             else
