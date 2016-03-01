@@ -53,5 +53,9 @@ public class ShoppingListAdapter extends ArrayAdapter<String> {
 
     }
 
-
+    @Override
+    public void notifyDataSetChanged(){
+        //shoppingList.sort();
+        super.notifyDataSetChanged();
+    }
 }

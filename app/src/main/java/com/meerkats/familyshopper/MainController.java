@@ -15,6 +15,7 @@ import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
 import com.meerkats.familyshopper.dialogs.EditShoppingItemDialog;
 import com.meerkats.familyshopper.model.ShoppingList;
+import com.meerkats.familyshopper.model.ShoppingListComparator;
 import com.meerkats.familyshopper.model.ShoppingListItem;
 import com.meerkats.familyshopper.util.FSLog;
 import com.meerkats.familyshopper.util.ISynchronizeInterface;
@@ -65,6 +66,7 @@ public class MainController implements ISynchronizeInterface {
 
         shoppingList = new ShoppingList(master_shopping_list_name);
         shoppingListAdapter = new ShoppingListAdapter(activity, shoppingList);
+        //shoppingListAdapter.sort(ShoppingListComparator.getComparator());
         shoppingListAdapter.notifyDataSetChanged();
         mainControllerHandler.post(new Runnable() {
             @Override

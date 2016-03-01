@@ -1,12 +1,13 @@
 package com.meerkats.familyshopper.model;
 
+import java.util.Comparator;
 import java.util.Date;
 import java.util.UUID;
 
 /**
  * Created by Rez on 19/12/2015.
  */
-public class ShoppingListItem {
+public class ShoppingListItem implements Comparable<ShoppingListItem>{
     private String shoppingListItem;
     private boolean isCrossedOff;
     private long lastModified;
@@ -70,4 +71,13 @@ public class ShoppingListItem {
 
         return false;
     }
+    public int compareTo(ShoppingListItem shoppingListItem){
+      return 1;
+    }
+    public static Comparator<ShoppingListItem> ShoppingListItemComparator = new Comparator<ShoppingListItem>() {
+        @Override
+        public int compare(ShoppingListItem lhs, ShoppingListItem rhs) {
+            return 0;
+        }
+    };
 }

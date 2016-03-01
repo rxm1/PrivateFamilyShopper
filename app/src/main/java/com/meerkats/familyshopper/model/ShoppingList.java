@@ -8,6 +8,7 @@ import com.meerkats.familyshopper.util.FSLog;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.UUID;
@@ -80,7 +81,6 @@ public class ShoppingList extends ArrayList<String>{
 
 
     public synchronized void loadShoppingList(String newGson, String logTag){
-            super.clear();
             if (newGson != null && !newGson.isEmpty()) {
                 try {
                     innerShoppingList = gson.fromJson(newGson, gsonType);
@@ -93,9 +93,13 @@ public class ShoppingList extends ArrayList<String>{
             else
                 innerShoppingList = new InnerShoppingList("");
 
-            for (int i = 0; i < innerShoppingList.getShoppingListItems().size(); i++) {
-                this.add(i, innerShoppingList.getShoppingListItems().get(i).getShoppingListItem());
-            }
+        resetOuterShoppingList();
+    }
+    private void resetOuterShoppingList(){
+        super.clear();
+        for (int i = 0; i < innerShoppingList.getShoppingListItems().size(); i++) {
+            this.add(i, innerShoppingList.getShoppingListItems().get(i).getShoppingListItem());
+        }
     }
     public synchronized String getJson(){
         return gson.toJson(innerShoppingList, gsonType);
@@ -121,8 +125,12 @@ public class ShoppingList extends ArrayList<String>{
     public void setLastSyncedBy(String lastSyncedBy ){innerShoppingList.setLastSyncedBy(lastSyncedBy);}
     public long getLastSyncedBySeen(){ return innerShoppingList.getLastSyncedBySeen(); }
     public void setLastSyncedBySeen(long lastSyncedBySeen ){innerShoppingList.setLastSyncedBySeen(lastSyncedBySeen);}
-
     public boolean equals(ShoppingList other){return innerShoppingList.equals(other.innerShoppingList);}
+    public void sort()
+    {
+        //Arrays.sort(innerShoppingList.shoppingListItems.toArray(), ShoppingListItem.ShoppingListItemComparator);
+        //resetOuterShoppingList();
+    }
     class InnerShoppingList
     {
         private String shoppingListName;
