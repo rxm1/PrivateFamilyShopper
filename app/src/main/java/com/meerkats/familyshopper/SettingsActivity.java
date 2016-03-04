@@ -1,5 +1,7 @@
 package com.meerkats.familyshopper;
 
+
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Resources;
@@ -11,6 +13,8 @@ import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
+import android.support.v4.app.TaskStackBuilder;
+import android.support.v4.content.IntentCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.widget.Toast;
@@ -25,6 +29,8 @@ public class SettingsActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Settings.loadSettings(this, MainActivity.activity_log_tag);
+        FSLog.verbose(MainActivity.activity_log_tag, "SettingsActivity onCreate");
 
         setTheme(Settings.getColorTheme());
         setContentView(R.layout.settings_with_toolbar);
@@ -55,7 +61,9 @@ public class SettingsActivity extends AppCompatActivity {
         @Override
         public void onCreate(final Bundle savedInstanceState)
         {
+            FSLog.verbose(MainActivity.activity_log_tag, "MyPreferenceFragment onCreate");
             super.onCreate(savedInstanceState);
+
             try {
                 addPreferencesFromResource(com.meerkats.familyshopper.R.xml.settings);
 
@@ -66,6 +74,7 @@ public class SettingsActivity extends AppCompatActivity {
                 bindPreferenceSummaryToValue(findPreference(Settings.Notification_Frequency_Name));
                 bindPreferenceSummaryToValue(findPreference(Settings.Notification_Events_Name));
                 bindPreferenceSummaryToValue(findPreference(Settings.Color_Theme_Name));
+                bindPreferenceSummaryToValue(findPreference(Settings.screen_orientation_name));
             }catch (Exception e){
                 FSLog.error(MainActivity.activity_log_tag, "MyPreferenceFragment onCreate", e);
                 Settings.clearSettings(getActivity(), MainActivity.activity_log_tag);
@@ -93,6 +102,8 @@ public class SettingsActivity extends AppCompatActivity {
 
         @Override
         public boolean onPreferenceChange (Preference preference, Object newValue){
+            FSLog.verbose(MainActivity.activity_log_tag, "MyPreferenceFragment onPreferenceChange");
+
             String stringValue = newValue.toString();
 
             if(preference.getKey().equals(Settings.Integrate_With_Firebase_Name)) {
@@ -108,6 +119,18 @@ public class SettingsActivity extends AppCompatActivity {
                         && !stringValue.equals(""));
                 Settings.setReconnectToFirebase(!Settings.getFirebaseURL().equals("")
                         && !Settings.getFirebaseURL().equals(stringValue));
+            }
+            if(preference.getKey().equals(Settings.Color_Theme_Name)) {
+                if(!Settings.getColorThemeString().equals(stringValue)){
+                    Settings.setRestartActivity(true);
+                    //restartActivities();
+                }
+            }
+            if(preference.getKey().equals(Settings.screen_orientation_name)) {
+                if(!Settings.isPortraitOrientation() && stringValue.equals("true")
+                        || Settings.isPortraitOrientation() && stringValue.equals("false")){
+                    restartActivities();
+                }
             }
 
             /*if (preference instanceof ListPreference) {
@@ -126,6 +149,13 @@ public class SettingsActivity extends AppCompatActivity {
             return true;
         }
 
+        private void restartActivities(){
+            Intent settingsActivityIntent = new Intent(getActivity(), SettingsActivity.class);
+            TaskStackBuilder stackBuilder = TaskStackBuilder.create(getActivity());
+            stackBuilder.addParentStack(SettingsActivity.class);
+            stackBuilder.addNextIntent(settingsActivityIntent);
+            stackBuilder.startActivities();
+        }
         @Override
         public void onPause(){
             super.onPause();

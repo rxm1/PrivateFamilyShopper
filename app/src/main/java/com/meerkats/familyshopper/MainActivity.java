@@ -14,6 +14,7 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.Looper;
+import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 
@@ -138,15 +139,22 @@ public class MainActivity extends AppCompatActivity {
                     Intent intent = new Intent(MainController.reconnect_to_firebase_action);
                     LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
                 }
-                else {
-                    Intent intent = new Intent(MainController.settings_changed_action);
-                    LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+
+                if(Settings.restartActivity()){
+                    Intent i = getBaseContext().getPackageManager()
+                            .getLaunchIntentForPackage( getBaseContext().getPackageName() );
+                    i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(i);
                 }
+
+                Intent intent = new Intent(MainController.settings_changed_action);
+                LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+
+
                 Settings.setDisconnectFromFirebase(false);
                 Settings.setReconnectToFirebase(false);
                 Settings.setConnectToFirebase(false);
-
-                setTheme(Settings.getColorTheme());
+                Settings.setRestartActivity(false);
                 break;
         }
     }

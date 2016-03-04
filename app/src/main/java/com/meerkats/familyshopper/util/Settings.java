@@ -20,7 +20,7 @@ import java.util.Set;
  * Created by Rez on 24/01/2016.
  */
 public class Settings {
-    private static final String screen_orientation_name = "screenOrientation";
+    public static final String screen_orientation_name = "screenOrientation";
     private static final String logging_name = "logging";
     public static final String Firebase_URL_Name = "FirebaseURLName";
     public static final String Integrate_With_Firebase_Name = "IntegrateFirebase";
@@ -43,6 +43,7 @@ public class Settings {
     private static boolean connectToFirebase = false;
     private static boolean reconnectToFirebase = false;
     private static boolean disconnectFromFirebase = false;
+    private static boolean restartActivity = false;
 
 
     public static void loadSettings(final Context context, String logTag){
@@ -134,6 +135,7 @@ public class Settings {
         }
         return R.style.ThemeGray;
     }
+    public static String getColorThemeString(){return colorTheme;}
     public static int getDialogColorTheme(){
         switch (colorTheme){
             case "red":
@@ -162,5 +164,11 @@ public class Settings {
     }
     public static void setDisconnectFromFirebase(boolean disconnectFirebase){
         disconnectFromFirebase = disconnectFirebase;
+    }
+    public static boolean restartActivity(){
+        return restartActivity;
+    }
+    public static void setRestartActivity(boolean restartActivitySet){
+        restartActivity = restartActivitySet;
     }
 }
