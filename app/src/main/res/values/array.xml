@@ -36,4 +36,17 @@
         <item>2</item>
         <item>3</item>
     </string-array>
+
+    <string-array name="sortByListArray">
+        <item>Alphabetical Asc</item>
+        <item>Alphabetical Desc</item>
+        <item>Date Entered Asc</item>
+        <item>Date Entered Desc</item>
+    </string-array>
+    <string-array name="sortByListValues">
+        <item>AlphabetAsc</item>
+        <item>AlphabetDesc</item>
+        <item>DateEnteredAsc</item>
+        <item>DateEnteredDesc</item>
+    </string-array>
 </resources>

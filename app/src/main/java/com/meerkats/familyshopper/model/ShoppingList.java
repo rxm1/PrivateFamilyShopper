@@ -9,6 +9,7 @@ import com.meerkats.familyshopper.util.FSLog;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.UUID;
@@ -41,6 +42,7 @@ public class ShoppingList extends ArrayList<String>{
     public synchronized boolean add(String item){
         super.add(item);
         innerShoppingList.add(new ShoppingListItem(item));
+        sort();
         return true;
     }
     public synchronized void add(ShoppingListItem shoppingListItem){
@@ -77,6 +79,7 @@ public class ShoppingList extends ArrayList<String>{
         shoppingListItem.setIsCrossedOff(!shoppingListItem.isCrossedOff());
         shoppingListItem.setLastModified(new Date().getTime());
         innerShoppingList.setShoppingListItem(position, shoppingListItem);
+        sort();
     }
 
 
@@ -84,6 +87,7 @@ public class ShoppingList extends ArrayList<String>{
             if (newGson != null && !newGson.isEmpty()) {
                 try {
                     innerShoppingList = gson.fromJson(newGson, gsonType);
+                    sort();
                 }
                 catch (Exception e){
                     innerShoppingList = new InnerShoppingList("");
@@ -126,10 +130,9 @@ public class ShoppingList extends ArrayList<String>{
     public long getLastSyncedBySeen(){ return innerShoppingList.getLastSyncedBySeen(); }
     public void setLastSyncedBySeen(long lastSyncedBySeen ){innerShoppingList.setLastSyncedBySeen(lastSyncedBySeen);}
     public boolean equals(ShoppingList other){return innerShoppingList.equals(other.innerShoppingList);}
-    public void sort()
+    public synchronized void sort()
     {
-        //Arrays.sort(innerShoppingList.shoppingListItems.toArray(), ShoppingListItem.ShoppingListItemComparator);
-        //resetOuterShoppingList();
+        ShoppingListItemComparators.sort(innerShoppingList.getShoppingListItems());
     }
     class InnerShoppingList
     {

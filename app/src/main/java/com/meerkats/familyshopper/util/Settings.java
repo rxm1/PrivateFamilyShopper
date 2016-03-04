@@ -21,6 +21,8 @@ import java.util.Set;
  */
 public class Settings {
     public static final String screen_orientation_name = "screenOrientation";
+    public static final String sort_by_name = "sortBy";
+    public static final String crossed_off_items_at_bottom_name = "crossedOffItems";
     private static final String logging_name = "logging";
     public static final String Firebase_URL_Name = "FirebaseURLName";
     public static final String Integrate_With_Firebase_Name = "IntegrateFirebase";
@@ -34,11 +36,13 @@ public class Settings {
     private static String firebaseURL = "";
     private static boolean integrateFirebase = false;
     private static boolean portraitOrientation = false;
+    private static boolean crossedOffItemsAtBottom = true;
     private static int notificationDelay = 0;
     private static int pushBatchDelay = 0;
     private static int loggingLevel = 1;
-    private static String colorTheme="gray";
+    private static String colorTheme="1";
     private static long lastSynced = 0;
+    private static String sortBy="gray";
 
     private static boolean connectToFirebase = false;
     private static boolean reconnectToFirebase = false;
@@ -58,8 +62,10 @@ public class Settings {
             //to do: check for permissions
             firebaseURL = formatFirebaseURL(settings.getString(Firebase_URL_Name, null), logTag);
             integrateFirebase = settings.getBoolean(Integrate_With_Firebase_Name, false);
+            crossedOffItemsAtBottom = settings.getBoolean(crossed_off_items_at_bottom_name, false);
             portraitOrientation = settings.getBoolean(screen_orientation_name, false);
             colorTheme = settings.getString(Color_Theme_Name, "1");
+            sortBy = settings.getString(sort_by_name, "1");
 
             Set<String> notificationEventsSettings = settings.getStringSet(Notification_Events_Name, new HashSet<String>());
             for (String events : notificationEventsSettings) {
@@ -123,9 +129,13 @@ public class Settings {
     public static NotificationEvents getUserSelectedNotificationEvents(){return userSelectedNotificationEvents;}
     public static int getNotificationDelay(){return notificationDelay;}
     public static boolean isIntegrateFirebase(){return integrateFirebase;}
+    public static boolean crossedOffItemsAtBottom(){return crossedOffItemsAtBottom;}
     public static boolean isPortraitOrientation(){return portraitOrientation;}
     public static String getFirebaseURL(){return firebaseURL;}
     public static int getPushBatchDelay(){return pushBatchDelay;}
+    public static String getSortBy(){
+        return sortBy;
+    }
     public static int getColorTheme(){
         switch (colorTheme){
             case "3":
@@ -138,9 +148,9 @@ public class Settings {
     public static String getColorThemeString(){return colorTheme;}
     public static int getDialogColorTheme(){
         switch (colorTheme){
-            case "red":
+            case "3":
                 return R.style.DialogThemeRed;
-            case "blue":
+            case "2":
                 return R.style.DialogThemeBlue;
         }
         return R.style.DialogThemeGray;

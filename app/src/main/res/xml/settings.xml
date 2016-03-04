@@ -33,6 +33,19 @@
             android:defaultValue="3"
             android:summary="Batches up changes to push. Increase delay to reduce data usage."
             style="?preferenceDialog" />
+        <ListPreference
+            android:title="Sort By"
+            android:key="sortBy"
+            android:summary="Select the sorting order."
+            android:entries="@array/sortByListArray"
+            android:entryValues="@array/sortByListValues"
+            android:defaultValue="AlphabetAsc"
+            style="?preferenceDialog"/>
+        <CheckBoxPreference android:title="Crossed-off items"
+            android:defaultValue="true"
+            android:summary="Place crossed-off items at the bottom of the list."
+            android:key="crossedOffItems"
+            style="?preferenceDialog"/>
         <CheckBoxPreference android:title="Screen Orientation"
             android:defaultValue="false"
             android:summary="Lock screen orientation to portrait"

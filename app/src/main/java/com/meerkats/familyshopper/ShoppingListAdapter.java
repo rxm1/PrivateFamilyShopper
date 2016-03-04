@@ -10,7 +10,10 @@ import android.widget.TextView;
 
 import com.meerkats.familyshopper.model.ShoppingList;
 import com.meerkats.familyshopper.model.ShoppingListItem;
+import com.meerkats.familyshopper.model.ShoppingListItemComparators;
 import com.meerkats.familyshopper.util.FSLog;
+
+import java.util.Collections;
 
 /**
  * Created by Rez on 18/12/2015.
@@ -51,11 +54,5 @@ public class ShoppingListAdapter extends ArrayAdapter<String> {
 
         return rowView;
 
-    }
-
-    @Override
-    public void notifyDataSetChanged(){
-        //shoppingList.sort();
-        super.notifyDataSetChanged();
     }
 }

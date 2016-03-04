@@ -7,12 +7,11 @@ import java.util.UUID;
 /**
  * Created by Rez on 19/12/2015.
  */
-public class ShoppingListItem implements Comparable<ShoppingListItem>{
+public class ShoppingListItem {
     private String shoppingListItem;
     private boolean isCrossedOff;
     private long lastModified;
-    private int postitonEntered;
-    private int positionOrdered;
+    private long dateCreated;
     private UUID guid;
     private boolean isDeleted;
 
@@ -30,6 +29,7 @@ public class ShoppingListItem implements Comparable<ShoppingListItem>{
         isDeleted = false;
         guid = UUID.randomUUID();
         lastModified = new Date().getTime();
+        dateCreated = new Date().getTime();
     }
 
     @Override
@@ -37,6 +37,7 @@ public class ShoppingListItem implements Comparable<ShoppingListItem>{
         return "ShoppingListItem [shopping_list_item=" + shoppingListItem + ", "
                 + "uuid=" + guid + ", "
                 + "last_modified=" + lastModified + ", "
+                + "date_created=" + dateCreated + ", "
                 + "is_crossed_off=" + isCrossedOff + ", "
                 + "is_deleted=" + isDeleted + "]";
     }
@@ -53,12 +54,10 @@ public class ShoppingListItem implements Comparable<ShoppingListItem>{
     }
     public synchronized boolean getIsDeleted(){return isDeleted;}
     public synchronized void setIsDeleted(boolean isDeleted){this.isDeleted=isDeleted;}
-    public synchronized int getPostitonEntered(){return postitonEntered;}
-    public synchronized void setPostitonEntered(int postitonEntered){this.postitonEntered = postitonEntered;}
-    public synchronized void setPositionOrdered(int positionOrdered){this.positionOrdered = positionOrdered;}
-    public synchronized int getPositionOrdered(){return positionOrdered;}
     public synchronized long getLastModified(){return lastModified;}
     public synchronized void setLastModified(long lastModified){this.lastModified = lastModified;}
+    public synchronized long getDateCreated(){return dateCreated;}
+    public synchronized void setDateCreated(long dateCreated){this.dateCreated = dateCreated;}
     public synchronized UUID getGuid(){return guid;}
 
     public synchronized boolean equal(ShoppingListItem other){
@@ -71,13 +70,4 @@ public class ShoppingListItem implements Comparable<ShoppingListItem>{
 
         return false;
     }
-    public int compareTo(ShoppingListItem shoppingListItem){
-      return 1;
-    }
-    public static Comparator<ShoppingListItem> ShoppingListItemComparator = new Comparator<ShoppingListItem>() {
-        @Override
-        public int compare(ShoppingListItem lhs, ShoppingListItem rhs) {
-            return 0;
-        }
-    };
 }

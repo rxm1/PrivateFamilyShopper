@@ -2,27 +2,18 @@ package com.meerkats.familyshopper;
 
 import android.app.Activity;
 import android.content.DialogInterface;
-import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
-import android.preference.PreferenceManager;
 import android.widget.Toast;
 
-import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
-import com.firebase.client.FirebaseError;
-import com.firebase.client.ValueEventListener;
 import com.meerkats.familyshopper.dialogs.EditShoppingItemDialog;
 import com.meerkats.familyshopper.model.ShoppingList;
-import com.meerkats.familyshopper.model.ShoppingListComparator;
 import com.meerkats.familyshopper.model.ShoppingListItem;
 import com.meerkats.familyshopper.util.FSLog;
 import com.meerkats.familyshopper.util.ISynchronizeInterface;
 import com.meerkats.familyshopper.util.Settings;
-
-import java.util.HashMap;
-import java.util.Timer;
 
 
 /**
@@ -66,7 +57,6 @@ public class MainController implements ISynchronizeInterface {
 
         shoppingList = new ShoppingList(master_shopping_list_name);
         shoppingListAdapter = new ShoppingListAdapter(activity, shoppingList);
-        //shoppingListAdapter.sort(ShoppingListComparator.getComparator());
         shoppingListAdapter.notifyDataSetChanged();
         mainControllerHandler.post(new Runnable() {
             @Override
