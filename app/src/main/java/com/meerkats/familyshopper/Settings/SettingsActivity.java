@@ -1,4 +1,4 @@
-package com.meerkats.familyshopper;
+package com.meerkats.familyshopper.Settings;
 
 
 import android.app.PendingIntent;
@@ -19,6 +19,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.widget.Toast;
 
+import com.meerkats.familyshopper.MainActivity;
+import com.meerkats.familyshopper.R;
 import com.meerkats.familyshopper.util.FSLog;
 import com.meerkats.familyshopper.util.Settings;
 
@@ -123,13 +125,12 @@ public class SettingsActivity extends AppCompatActivity {
             if(preference.getKey().equals(Settings.Color_Theme_Name)) {
                 if(!Settings.getColorThemeString().equals(stringValue)){
                     Settings.setRestartActivity(true);
-                    //restartActivities();
                 }
             }
             if(preference.getKey().equals(Settings.screen_orientation_name)) {
                 if(!Settings.isPortraitOrientation() && stringValue.equals("true")
                         || Settings.isPortraitOrientation() && stringValue.equals("false")){
-                    restartActivities();
+                    Settings.setRestartActivity(true);
                 }
             }
 
@@ -149,13 +150,6 @@ public class SettingsActivity extends AppCompatActivity {
             return true;
         }
 
-        private void restartActivities(){
-            Intent settingsActivityIntent = new Intent(getActivity(), SettingsActivity.class);
-            TaskStackBuilder stackBuilder = TaskStackBuilder.create(getActivity());
-            stackBuilder.addParentStack(SettingsActivity.class);
-            stackBuilder.addNextIntent(settingsActivityIntent);
-            stackBuilder.startActivities();
-        }
         @Override
         public void onPause(){
             super.onPause();

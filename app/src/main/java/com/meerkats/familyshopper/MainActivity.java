@@ -10,11 +10,8 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
-import android.os.Looper;
-import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 
@@ -26,8 +23,8 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.Toast;
 
+import com.meerkats.familyshopper.Settings.SettingsActivity;
 import com.meerkats.familyshopper.dialogs.ContextMenuDialog;
 import com.meerkats.familyshopper.util.FSLog;
 import com.meerkats.familyshopper.util.Settings;
@@ -140,13 +137,6 @@ public class MainActivity extends AppCompatActivity {
                     LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
                 }
 
-                if(Settings.restartActivity()){
-                    Intent i = getBaseContext().getPackageManager()
-                            .getLaunchIntentForPackage( getBaseContext().getPackageName() );
-                    i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    startActivity(i);
-                }
-
                 Intent intent = new Intent(MainController.settings_changed_action);
                 LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
 
@@ -154,7 +144,15 @@ public class MainActivity extends AppCompatActivity {
                 Settings.setDisconnectFromFirebase(false);
                 Settings.setReconnectToFirebase(false);
                 Settings.setConnectToFirebase(false);
-                Settings.setRestartActivity(false);
+
+                if(Settings.restartActivity()){
+                    Settings.setRestartActivity(false);
+                    Intent i = getBaseContext().getPackageManager()
+                            .getLaunchIntentForPackage( getBaseContext().getPackageName() );
+                    i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(i);
+                }
+
                 break;
         }
     }

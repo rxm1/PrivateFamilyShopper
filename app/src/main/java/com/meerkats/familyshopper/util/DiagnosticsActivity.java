@@ -14,7 +14,7 @@ import android.widget.Toast;
 import com.meerkats.familyshopper.MainActivity;
 import com.meerkats.familyshopper.MainController;
 import com.meerkats.familyshopper.R;
-import com.meerkats.familyshopper.SettingsLoggingActivity;
+import com.meerkats.familyshopper.Settings.SettingsLoggingActivity;
 
 /**
  * Created by Rez on 23/02/2016.
