@@ -1,7 +1,11 @@
 package com.meerkats.familyshopper;
 
+import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
@@ -9,7 +13,9 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.widget.Toast;
 
+import com.meerkats.familyshopper.util.FSLog;
 import com.meerkats.familyshopper.util.Settings;
 
 import java.util.Set;
@@ -19,8 +25,13 @@ public class SettingsActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setTheme(Settings.getColorTheme());
         setContentView(R.layout.settings_with_toolbar);
+        if(Settings.isPortraitOrientation())
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        else
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
 
         Toolbar myToolbar = (Toolbar) findViewById(com.meerkats.familyshopper.R.id.settings_toolbar);
         setSupportActionBar(myToolbar);
@@ -45,15 +56,21 @@ public class SettingsActivity extends AppCompatActivity {
         public void onCreate(final Bundle savedInstanceState)
         {
             super.onCreate(savedInstanceState);
-            addPreferencesFromResource(com.meerkats.familyshopper.R.xml.settings);
+            try {
+                addPreferencesFromResource(com.meerkats.familyshopper.R.xml.settings);
 
-            bindPreferenceSummaryToValue(findPreference(Settings.Firebase_URL_Name));
-            bindPreferenceSummaryToValue(findPreference(Settings.Notification_Frequency_Name));
-            bindPreferenceSummaryToValue(findPreference(Settings.Push_Batch_Time_Name));
-            bindPreferenceSummaryToValue(findPreference(Settings.Integrate_With_Firebase_Name));
-            bindPreferenceSummaryToValue(findPreference(Settings.Notification_Frequency_Name));
-            bindPreferenceSummaryToValue(findPreference(Settings.Notification_Events_Name));
-            bindPreferenceSummaryToValue(findPreference(Settings.Color_Theme_Name));
+                bindPreferenceSummaryToValue(findPreference(Settings.Firebase_URL_Name));
+                bindPreferenceSummaryToValue(findPreference(Settings.Notification_Frequency_Name));
+                bindPreferenceSummaryToValue(findPreference(Settings.Push_Batch_Time_Name));
+                bindPreferenceSummaryToValue(findPreference(Settings.Integrate_With_Firebase_Name));
+                bindPreferenceSummaryToValue(findPreference(Settings.Notification_Frequency_Name));
+                bindPreferenceSummaryToValue(findPreference(Settings.Notification_Events_Name));
+                bindPreferenceSummaryToValue(findPreference(Settings.Color_Theme_Name));
+            }catch (Exception e){
+                FSLog.error(MainActivity.activity_log_tag, "MyPreferenceFragment onCreate", e);
+                Settings.clearSettings(getActivity(), MainActivity.activity_log_tag);
+                Toast.makeText(getActivity(), "Settings cleared.", Toast.LENGTH_SHORT).show();
+            }
         }
 
 

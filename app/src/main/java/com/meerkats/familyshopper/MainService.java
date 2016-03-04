@@ -72,7 +72,7 @@ public class MainService extends Service implements ISynchronizeInterface {
         public void onReceive(final Context context, Intent intent) {
             FSLog.verbose(service_log_tag, "ReconnectToFirebaseReceiver onReceive");
 
-            Settings.loadSettings(context);
+            Settings.loadSettings(context, service_log_tag);
             disconnect();
             mServiceHandler.post(new Runnable() {
                 @Override
@@ -87,7 +87,7 @@ public class MainService extends Service implements ISynchronizeInterface {
         public void onReceive(final Context context, Intent intent){
             FSLog.verbose(service_log_tag, "DisconnectFromFirebaseReceiver onReceive");
 
-            Settings.loadSettings(context);
+            Settings.loadSettings(context, service_log_tag);
             disconnect();
         }
     }
@@ -96,7 +96,7 @@ public class MainService extends Service implements ISynchronizeInterface {
         public void onReceive(final Context context, Intent intent){
             FSLog.verbose(service_log_tag, "SettingsChangedReceiver onReceive");
 
-            Settings.loadSettings(context);
+            Settings.loadSettings(context, service_log_tag);
         }
     }
 
@@ -118,7 +118,7 @@ public class MainService extends Service implements ISynchronizeInterface {
     @Override
     public void onCreate() {
         super.onCreate();
-        Settings.loadSettings(this);
+        Settings.loadSettings(this, service_log_tag);
         FSLog.verbose(service_log_tag, "MainService onCreate");
 
         mHandlerThread = new HandlerThread("MainService.HandlerThread");
@@ -141,7 +141,7 @@ public class MainService extends Service implements ISynchronizeInterface {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Settings.loadSettings(this);
+        Settings.loadSettings(this, service_log_tag);
         FSLog.verbose(service_log_tag, "MainService onStartCommand");
 
         mServiceHandler.post(new Runnable() {

@@ -8,6 +8,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -24,6 +25,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.meerkats.familyshopper.dialogs.ContextMenuDialog;
 import com.meerkats.familyshopper.util.FSLog;
@@ -38,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
     MainController mainController;
     DataChangedReceiver dataChangedReceiver = new DataChangedReceiver();;
     HandlerThread handlerThread = new HandlerThread("MainActivity.HandlerThread");;
-    private static final int SETTINGS_RESULT = 1;
+    public static final int SETTINGS_RESULT = 1;
     private boolean isEditing = false;
     boolean mBound = false;
     public static final String activity_log_tag = "meerkats_MainActivity";
@@ -47,10 +49,14 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Settings.loadSettings(this);
+        Settings.loadSettings(this, activity_log_tag);
         FSLog.verbose(activity_log_tag, "MainActivity onCreate");
         setTheme(Settings.getColorTheme());
         setContentView(com.meerkats.familyshopper.R.layout.activity_main);
+        if(Settings.isPortraitOrientation())
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        else
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
 
         handlerThread.start();
 
@@ -115,7 +121,7 @@ public class MainActivity extends AppCompatActivity {
 
         switch (requestCode) {
             case SETTINGS_RESULT:
-                Settings.loadSettings(this);
+                Settings.loadSettings(this, activity_log_tag);
 
                 if(Settings.disconnectFromFirbase()){
                     mainController.disconnect();

@@ -9,7 +9,9 @@ import android.view.View;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.meerkats.familyshopper.MainActivity;
 import com.meerkats.familyshopper.MainController;
 import com.meerkats.familyshopper.R;
 import com.meerkats.familyshopper.SettingsLoggingActivity;
@@ -50,6 +52,10 @@ public class DiagnosticsActivity extends AppCompatActivity {
         Intent intent = new Intent(this, SettingsLoggingActivity.class);
         startActivityForResult(intent, DIAGONOSTICS_SETTINGS_RESULT);
     }
+    public void clearSettingsClick(View view){
+        Settings.clearSettings(this, MainActivity.activity_log_tag);
+        Toast.makeText(this, "Settings Cleared", Toast.LENGTH_SHORT).show();
+    }
     public void clearDeviceListClick(View view){
         Diagnostics.deleteMembersListFromLocalStorage(this);
         refreshList();
@@ -61,7 +67,7 @@ public class DiagnosticsActivity extends AppCompatActivity {
 
         switch (requestCode) {
             case DIAGONOSTICS_SETTINGS_RESULT:
-                Settings.loadSettings(this);
+                Settings.loadSettings(this, MainActivity.activity_log_tag);
                 //notify service that settings have changed
                 Intent intent = new Intent(MainController.settings_changed_action);
                 LocalBroadcastManager.getInstance(this).sendBroadcast(intent);

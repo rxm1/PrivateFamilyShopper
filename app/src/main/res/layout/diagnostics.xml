@@ -70,6 +70,17 @@
         style="?diagnosticsButton"
         android:elevation="6dp"
         />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Clear Settings"
+        android:onClick="clearSettingsClick"
+        android:layout_margin="6dp"
+        android:padding="12dp"
+        style="?diagnosticsButton"
+        android:elevation="6dp"
+        />
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -80,5 +91,4 @@
         style="?diagnosticsButton"
         android:elevation="6dp"
         />
-
 </LinearLayout>

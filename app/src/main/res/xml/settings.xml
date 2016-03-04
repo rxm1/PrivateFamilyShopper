@@ -33,6 +33,16 @@
             android:defaultValue="3"
             android:summary="Batches up changes to push. Increase delay to reduce data usage."
             style="?preferenceDialog" />
+    <!--CheckBoxPreference android:title="Screen Orientation"
+        android:defaultValue="false"
+        android:summary="Lock screen orientation to portrait"
+        android:key="ScreenOrientation"
+        style="?preferenceDialog"/-->
+    <EditTextPreference android:title="Screen Orientation"
+        android:key="ScreenOrientation"
+        android:summary="Lock screen orientation to portrait"
+        android:defaultValue=""
+        style="?preferenceDialog" />
         <ListPreference
             android:title="Color Themes"
             android:key="colorTheme"

@@ -1,6 +1,7 @@
 package com.meerkats.familyshopper;
 
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageInfo;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -19,6 +20,10 @@ public class AboutActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setTheme(Settings.getColorTheme());
         setContentView(R.layout.about);
+        if(Settings.isPortraitOrientation())
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        else
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
 
         Toolbar myToolbar = (Toolbar) findViewById(R.id.about_toolbar);
         setSupportActionBar(myToolbar);
