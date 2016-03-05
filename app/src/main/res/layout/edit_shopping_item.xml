@@ -38,6 +38,7 @@
             android:background="?buttonBackground"
             android:elevation="6dp"
             android:layout_marginRight="6dp"
+            android:padding="6dp"
             />
 
         <Button
@@ -50,7 +51,8 @@
             android:layout_gravity="bottom"
             android:background="?buttonBackground"
             android:elevation="6dp"
-            android:layout_marginLeft="6dp"/>
+            android:layout_marginLeft="6dp"
+            android:padding="6dp"/>
     </LinearLayout>
 
 </LinearLayout>

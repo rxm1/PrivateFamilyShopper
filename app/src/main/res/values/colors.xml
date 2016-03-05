@@ -8,9 +8,9 @@
     <color name="primaryAccentGray">#bdbdbd</color>
 
     <!-- Red Colors -->
-    <color name="primaryRed">#d32f2f</color>
-    <color name="primaryListBackgroundRed">#b71c1c</color>
-    <color name="primaryAccentRed">#ef9a9a</color>
+    <color name="primaryRed">#AC3333</color>
+    <color name="primaryListBackgroundRed">#832727</color>
+    <color name="primaryAccentRed">#F4BDBD</color>
 
     <!-- Blue Colors -->
     <color name="primaryBlue">#455a64</color>
