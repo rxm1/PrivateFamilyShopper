@@ -20,15 +20,21 @@
     <style name="DiagonisticsButton">
         <item name="android:textColor">@color/primaryGray</item>
     </style>
+    <style name="SettingsButton">
+        <item name="android:layout_marginLeft">3dp</item>
+        <item name="android:layout_marginRight">3dp</item>
+        <item name="android:padding">6dp</item>
+        <item name="android:layout_gravity">center</item>
+    </style>
     <!-- Gray styles -->
     <style name="AppThemeGray" parent="BaseAppTheme">
         <item name="colorPrimary">@color/primaryGray</item>
         <item name="colorAccent">@color/primaryAccentGray</item>
         <item name="android:windowBackground">@color/primaryListBackgroundGray</item>
         <item name="android:colorBackground">@color/primaryListBackgroundGray</item>
-        <item name="android:alertDialogTheme">@style/SettingsDialogThemeGray</item>
+        <item name="android:alertDialogTheme">@style/SettingsDialogGray</item>
     </style>
-    <style name="SettingsDialogThemeGray" parent="Theme.AppCompat.Dialog.Alert">
+    <style name="SettingsDialogGray">
         <item name="android:windowTitleStyle">@style/SettingsTitleGray</item>
         <item name="android:buttonBarButtonStyle">@style/SettingsButtonGray</item>
         <item name="android:background">@color/primaryListBackgroundGray</item>
@@ -36,13 +42,9 @@
     <style name="SettingsTitleGray">
         <item name="android:textColor">@color/white</item>
     </style>
-    <style name="SettingsButtonGray">
+    <style name="SettingsButtonGray" parent="SettingsButton">
         <item name="android:textColor">@color/white</item>
         <item name="android:background">@color/primaryAccentGray</item>
-        <item name="android:layout_marginLeft">3dp</item>
-        <item name="android:layout_marginRight">3dp</item>
-        <item name="android:padding">6dp</item>
-        <item name="android:layout_gravity">center</item>
     </style>
     <style name="DiagonisticsButton.Gray" parent="DiagonisticsButton">
         <item name="android:background">@color/primaryListBackgroundGray</item>
@@ -78,9 +80,9 @@
         <item name="colorAccent">@color/primaryAccentRed</item>
         <item name="android:windowBackground">@color/primaryListBackgroundRed</item>
         <item name="android:colorBackground">@color/primaryListBackgroundRed</item>
-        <item name="android:alertDialogTheme">@style/SettingsDialogThemeRed</item>
+        <item name="android:alertDialogTheme">@style/SettingsDialogRed</item>
     </style>
-    <style name="SettingsDialogThemeRed" parent="Theme.AppCompat.Dialog.Alert">
+    <style name="SettingsDialogRed" parent="Theme.AppCompat.Dialog.Alert">
         <item name="android:windowTitleStyle">@style/SettingsTitleRed</item>
         <item name="android:buttonBarButtonStyle">@style/SettingsButtonRed</item>
         <item name="android:background">@color/primaryListBackgroundRed</item>
@@ -88,13 +90,9 @@
     <style name="SettingsTitleRed">
         <item name="android:textColor">@color/white</item>
     </style>
-    <style name="SettingsButtonRed">
+    <style name="SettingsButtonRed" parent="SettingsButton">
         <item name="android:textColor">@color/white</item>
         <item name="android:background">@color/primaryAccentRed</item>
-        <item name="android:layout_marginLeft">3dp</item>
-        <item name="android:layout_marginRight">3dp</item>
-        <item name="android:padding">6dp</item>
-        <item name="android:layout_gravity">center</item>
     </style>
     <style name="DiagonisticsButton.Red" parent="DiagonisticsButton">
         <item name="android:background">@color/primaryListBackgroundRed</item>
@@ -131,9 +129,9 @@
         <item name="android:windowBackground">@color/primaryListBackgroundBlue</item>
         <item name="android:popupBackground">@color/primaryListBackgroundBlue</item>
         <item name="android:colorBackground">@color/primaryListBackgroundBlue</item>
-        <item name="android:alertDialogTheme">@style/SettingsDialogThemeBlue</item>
+        <item name="android:alertDialogTheme">@style/SettingsDialogBlue</item>
     </style>
-    <style name="SettingsDialogThemeBlue" parent="Theme.AppCompat.Dialog.Alert">
+    <style name="SettingsDialogBlue" parent="Theme.AppCompat.Dialog.Alert">
         <item name="android:windowTitleStyle">@style/SettingsTitleBlue</item>
         <item name="android:buttonBarButtonStyle">@style/SettingsButtonBlue</item>
         <item name="android:background">@color/primaryListBackgroundBlue</item>
@@ -141,13 +139,9 @@
     <style name="SettingsTitleBlue">
         <item name="android:textColor">@color/white</item>
     </style>
-    <style name="SettingsButtonBlue">
+    <style name="SettingsButtonBlue" parent="SettingsButton">
         <item name="android:textColor">@color/white</item>
         <item name="android:background">@color/primaryAccentBlue</item>
-        <item name="android:layout_marginLeft">3dp</item>
-        <item name="android:layout_marginRight">3dp</item>
-        <item name="android:padding">6dp</item>
-        <item name="android:layout_gravity">center</item>
     </style>
     <style name="DiagonisticsButton.Blue" parent="DiagonisticsButton">
         <item name="android:background">@color/primaryListBackgroundBlue</item>
