@@ -52,7 +52,7 @@ public class Diagnostics {
         }
     }
 
-    private static ShoppingListMembers getShoppingListMembers(Context context){
+    private synchronized static ShoppingListMembers getShoppingListMembers(Context context){
         FSLog.verbose(logTag, "Diagnostics getShoppingListMembers");
 
         ShoppingListMembers shoppingListMembers = new ShoppingListMembers();
@@ -89,11 +89,13 @@ public class Diagnostics {
         if(file.exists())
             file.delete();
     }
-    public static ArrayList<Map<String, String>> getShoppingListMembersArray(Context context) {
+    public synchronized static ArrayList<Map<String, String>> getShoppingListMembersArray(Context context) {
         FSLog.verbose(logTag, "Diagnostics getShoppingListMembersArray");
 
         ArrayList<Map<String, String>> membersArray = new ArrayList<Map<String, String>>();
         ShoppingListMembers shoppingListMembers = getShoppingListMembers(context);
+        if(shoppingListMembers == null)
+            return membersArray;
 
         for (ShoppingListMembers.ShoppingListMember shoppingListMember: shoppingListMembers.getShoppingListMembers()) {
             Map<String, String> memberMap = new HashMap<String, String>();
@@ -104,7 +106,6 @@ public class Diagnostics {
 
             memberMap.put("Device ID", shoppingListMember.getName());
             memberMap.put("Last Seen", dateText);
-            //memberMap.put("Last Seen", Long.toString(shoppingListMember.getLastSeen()));
             membersArray.add(memberMap);
         }
 

@@ -8,8 +8,8 @@ android {
         applicationId "com.meerkats.familyshopper"
         minSdkVersion 15
         targetSdkVersion 23
-        versionCode 16
-        versionName "0.7"
+        versionCode 17
+        versionName "0.71"
     }
     buildTypes {
         release {
