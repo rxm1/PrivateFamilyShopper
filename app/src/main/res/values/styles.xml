@@ -29,11 +29,11 @@
         <item name="android:alertDialogTheme">@style/SettingsDialogThemeGray</item>
     </style>
     <style name="SettingsDialogThemeGray" parent="Theme.AppCompat.Dialog.Alert">
-        <item name="android:windowTitleStyle">@style/SettingsTitleStyleGray</item>
+        <item name="android:windowTitleStyle">@style/SettingsTitleGray</item>
         <item name="android:buttonBarButtonStyle">@style/SettingsButtonGray</item>
         <item name="android:background">@color/primaryListBackgroundGray</item>
     </style>
-    <style name="SettingsTitleStyleGray">
+    <style name="SettingsTitleGray">
         <item name="android:textColor">@color/white</item>
     </style>
     <style name="SettingsButtonGray">
@@ -81,11 +81,11 @@
         <item name="android:alertDialogTheme">@style/SettingsDialogThemeRed</item>
     </style>
     <style name="SettingsDialogThemeRed" parent="Theme.AppCompat.Dialog.Alert">
-        <item name="android:windowTitleStyle">@style/SettingsTitleStyleRed</item>
+        <item name="android:windowTitleStyle">@style/SettingsTitleRed</item>
         <item name="android:buttonBarButtonStyle">@style/SettingsButtonRed</item>
         <item name="android:background">@color/primaryListBackgroundRed</item>
     </style>
-    <style name="SettingsTitleStyleRed">
+    <style name="SettingsTitleRed">
         <item name="android:textColor">@color/white</item>
     </style>
     <style name="SettingsButtonRed">
@@ -134,11 +134,11 @@
         <item name="android:alertDialogTheme">@style/SettingsDialogThemeBlue</item>
     </style>
     <style name="SettingsDialogThemeBlue" parent="Theme.AppCompat.Dialog.Alert">
-        <item name="android:windowTitleStyle">@style/SettingsTitleStyleBlue</item>
+        <item name="android:windowTitleStyle">@style/SettingsTitleBlue</item>
         <item name="android:buttonBarButtonStyle">@style/SettingsButtonBlue</item>
         <item name="android:background">@color/primaryListBackgroundBlue</item>
     </style>
-    <style name="SettingsTitleStyleBlue">
+    <style name="SettingsTitleBlue">
         <item name="android:textColor">@color/white</item>
     </style>
     <style name="SettingsButtonBlue">
