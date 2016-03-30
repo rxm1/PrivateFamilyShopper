@@ -1,7 +1,6 @@
 package com.meerkats.familyshopper.dialogs;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.os.Bundle;
 import android.view.View;
@@ -11,7 +10,7 @@ import android.widget.EditText;
 
 import com.meerkats.familyshopper.MainActivity;
 import com.meerkats.familyshopper.util.FSLog;
-import com.meerkats.familyshopper.util.Settings;
+import com.meerkats.familyshopper.Settings.Settings;
 
 /**
  * Created by Rez on 21/12/2015.

@@ -27,7 +27,7 @@ import android.widget.ListView;
 import com.meerkats.familyshopper.Settings.SettingsActivity;
 import com.meerkats.familyshopper.dialogs.ContextMenuDialog;
 import com.meerkats.familyshopper.util.FSLog;
-import com.meerkats.familyshopper.util.Settings;
+import com.meerkats.familyshopper.Settings.Settings;
 import com.meerkats.familyshopper.model.ShoppingList;
 
 public class MainActivity extends AppCompatActivity {
@@ -36,7 +36,8 @@ public class MainActivity extends AppCompatActivity {
     ShoppingListAdapter shoppingListAdapter;
     ListView shoppingListView;
     MainController mainController;
-    DataChangedReceiver dataChangedReceiver = new DataChangedReceiver();;
+    ShoppingListChangedReceiver shoppingListChangedReceiver = new ShoppingListChangedReceiver();
+    FirebaseConnectedReceiver firebaseConnectedReceiver = new FirebaseConnectedReceiver();
     HandlerThread handlerThread = new HandlerThread("MainActivity.HandlerThread");;
     public static final int SETTINGS_RESULT = 1;
     private boolean isEditing = false;
@@ -44,11 +45,30 @@ public class MainActivity extends AppCompatActivity {
     public static final String activity_log_tag = "meerkats_MainActivity";
 
 
+    public class FirebaseConnectedReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            FSLog.verbose(activity_log_tag, "FirebaseConnectedReceiver onReceive");
+
+            mainController.firebaseConnected();
+        }
+    }
+    public class ShoppingListChangedReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            FSLog.verbose(activity_log_tag, "ShoppingListChangedReceiver onReceive");
+
+            mainController.loadLocalShoppingList();
+        }
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Settings.loadSettings(this, activity_log_tag);
         FSLog.verbose(activity_log_tag, "MainActivity onCreate");
+
+        startService(new Intent(this, MainService.class));
+
         setTheme(Settings.getColorTheme());
         setContentView(com.meerkats.familyshopper.R.layout.activity_main);
         if(Settings.isPortraitOrientation())
@@ -72,8 +92,6 @@ public class MainActivity extends AppCompatActivity {
 
         setShoppingListOnItemClick();
         setShoppingListOnItemLongClick();
-
-        startService(new Intent(this, MainService.class));
     }
 
     @Override
@@ -119,13 +137,10 @@ public class MainActivity extends AppCompatActivity {
 
         switch (requestCode) {
             case SETTINGS_RESULT:
-                Settings.loadSettings(this, activity_log_tag);
+                mainController.loadSettings();
 
                 if(Settings.disconnectFromFirbase()){
                     mainController.disconnect();
-
-                    Intent intent = new Intent(MainController.disconnect_from_firebase_action);
-                    LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
                 }
                 else if (Settings.reconnectToFirebase() || (Settings.connectToFirebase())){
                     if (Settings.reconnectToFirebase()) {
@@ -133,13 +148,7 @@ public class MainActivity extends AppCompatActivity {
                     }
 
                     mainController.connect();
-                    Intent intent = new Intent(MainController.reconnect_to_firebase_action);
-                    LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
                 }
-
-                Intent intent = new Intent(MainController.settings_changed_action);
-                LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
-
 
                 Settings.setDisconnectFromFirebase(false);
                 Settings.setReconnectToFirebase(false);
@@ -209,8 +218,10 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         FSLog.verbose(activity_log_tag, "MainActivity onResume");
 
-        IntentFilter filter = new IntentFilter(DataHelper.service_updated_file_action);
-        LocalBroadcastManager.getInstance(this).registerReceiver(dataChangedReceiver, filter);
+        IntentFilter shoppingListChangedFilter = new IntentFilter(MainService.service_updated_file_action);
+        LocalBroadcastManager.getInstance(this).registerReceiver(shoppingListChangedReceiver, shoppingListChangedFilter);
+        IntentFilter firebaseConnectedFilter = new IntentFilter(MainService.firebase_connected_action);
+        LocalBroadcastManager.getInstance(this).registerReceiver(firebaseConnectedReceiver, firebaseConnectedFilter);
 
         mainController.loadLocalShoppingList();
     }
@@ -219,7 +230,8 @@ public class MainActivity extends AppCompatActivity {
         super.onPause();
         FSLog.verbose(activity_log_tag, "MainActivity onPause");
 
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(dataChangedReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(shoppingListChangedReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(firebaseConnectedReceiver);
     }
 
     @Override
@@ -229,6 +241,7 @@ public class MainActivity extends AppCompatActivity {
 
         Intent intent = new Intent(getApplicationContext(), MainService.class);
         bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+
     }
     /** Defines callbacks for service binding, passed to bindService() */
     private ServiceConnection mConnection = new ServiceConnection() {
@@ -242,8 +255,6 @@ public class MainActivity extends AppCompatActivity {
             MainService.LocalBinder binder = (MainService.LocalBinder) service;
             MainService mainService = binder.getService();
             mBound = true;
-
-            mainController.setMainService(mainService, mBound);
         }
 
         @Override
@@ -273,16 +284,6 @@ public class MainActivity extends AppCompatActivity {
         FSLog.verbose(activity_log_tag, "MainActivity onDestroy");
 
         mainController.cleanUp();
-    }
-
-    // Define the callback for what to do when message is received
-    public class DataChangedReceiver extends BroadcastReceiver {
-          @Override
-        public void onReceive(Context context, Intent intent) {
-              FSLog.verbose(activity_log_tag, "MainActivity onReceive");
-
-              mainController.loadLocalShoppingList();
-        }
     }
 
     public void setIsEditing(boolean isEditing){

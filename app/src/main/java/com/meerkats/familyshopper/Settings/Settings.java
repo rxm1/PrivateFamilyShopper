@@ -1,4 +1,4 @@
-package com.meerkats.familyshopper.util;
+package com.meerkats.familyshopper.Settings;
 
 import android.app.Activity;
 import android.content.Context;
@@ -11,6 +11,7 @@ import android.widget.Toast;
 import com.meerkats.familyshopper.MainController;
 import com.meerkats.familyshopper.NotificationEvents;
 import com.meerkats.familyshopper.R;
+import com.meerkats.familyshopper.util.FSLog;
 
 import java.util.Date;
 import java.util.HashSet;

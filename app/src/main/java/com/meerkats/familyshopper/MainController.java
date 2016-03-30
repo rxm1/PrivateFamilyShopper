@@ -8,19 +8,18 @@ import android.os.Looper;
 import android.widget.Toast;
 
 import com.firebase.client.Firebase;
+import com.meerkats.familyshopper.Settings.Settings;
 import com.meerkats.familyshopper.dialogs.EditShoppingItemDialog;
 import com.meerkats.familyshopper.model.ShoppingList;
 import com.meerkats.familyshopper.model.ShoppingListItem;
 import com.meerkats.familyshopper.util.FSLog;
 import com.meerkats.familyshopper.util.ISynchronizeInterface;
-import com.meerkats.familyshopper.util.Settings;
 
 
 /**
  * Created by Rez on 07/01/2016.
  */
 public class MainController implements ISynchronizeInterface {
-    Firebase myFirebaseRef;
     Activity activity;
     DataHelper dataHelper;
     ShoppingList shoppingList;
@@ -32,9 +31,6 @@ public class MainController implements ISynchronizeInterface {
     HandlerThread handlerThread;
     Handler mainUIHandler;
     Handler mainControllerHandler;
-    public static final String settings_changed_action = "com.meerkats.familyshopper.MainController.SettingsUpdated";
-    public static final String reconnect_to_firebase_action = "com.meerkats.familyshopper.MainController.ReconnectToFirebaseAction";
-    public static final String disconnect_from_firebase_action = "com.meerkats.familyshopper.MainController.DisconnectFromFirebaseAction";
     MainService mainService;
     boolean mainServiceBound = false;
 
@@ -58,13 +54,10 @@ public class MainController implements ISynchronizeInterface {
         shoppingList = new ShoppingList(master_shopping_list_name);
         shoppingListAdapter = new ShoppingListAdapter(activity, shoppingList);
         shoppingListAdapter.notifyDataSetChanged();
-        mainControllerHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                myFirebaseRef = dataHelper.instanciateFirebase(false);
-                sync(false, false);
-            }
-        });
+        if(mainServiceBound) {
+            mainService.postConnectToFirebaseTaskFromActivity();
+            mainService.postSyncTaskFromActivity(shoppingList, MainController.this, activity);
+        }
     }
 
     public void deleteShoppingListItem(int position){
@@ -144,8 +137,8 @@ public class MainController implements ISynchronizeInterface {
         if(saveShoppingList)
             dataHelper.saveGsonToLocalStorage(shoppingList.getJson());
 
-        if(Settings.isIntegrateFirebase() && myFirebaseRef != null && DataHelper.getIsValidFirebaseURL() && mainServiceBound) {
-                mainService.postTaskFromActivity(shoppingList, MainController.this, activity);
+        if(mainServiceBound) {
+                mainService.postSyncTaskFromActivity(shoppingList, MainController.this, activity);
         }
         else{
             if(showConnectionStatus) {
@@ -162,26 +155,26 @@ public class MainController implements ISynchronizeInterface {
     public void connect(){
         FSLog.verbose(log_tag, "MainController connect");
 
-        disconnect();
-        mainControllerHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                myFirebaseRef = dataHelper.instanciateFirebase(false);
-                mainControllerHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        sync(false, false);
-                    }
-                });
-            }
-        });
+        if(mainServiceBound) {
+            mainService.postReconnectToFirebaseTaskFromActivity(activity);
+            mainService.postSyncTaskFromActivity(shoppingList, MainController.this, activity);
+        }
     }
+
     public void disconnect(){
         FSLog.verbose(log_tag, "MainController disconnect");
 
-        myFirebaseRef = null;
+        if(mainServiceBound) {
+            mainService.postDisconnectFromFirebaseTaskFromActivity(activity);
+        }
     }
 
+    public void loadSettings(){
+        Settings.loadSettings(activity, log_tag);
+        if(mainServiceBound) {
+            mainService.postLoadSettingsFromActivity(activity);
+        }
+    }
     public synchronized void loadLocalShoppingList(){
         FSLog.verbose(log_tag, "MainController loadLocalShoppingList");
         if(((MainActivity)activity).isEditing()) {
@@ -240,6 +233,19 @@ public class MainController implements ISynchronizeInterface {
 
         ((MainActivity)activity).setIsEditing(false);
         loadLocalShoppingList();
+    }
+
+    public void firebaseConnected(){
+        if(mainServiceBound) {
+            if(mainService.postIsValidFirebaseConnection()){
+                mainUIHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(activity.getApplicationContext(), "Firebase connected", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+        }
     }
 
     public void cleanUp(){

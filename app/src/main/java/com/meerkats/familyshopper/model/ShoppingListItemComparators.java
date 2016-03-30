@@ -1,6 +1,6 @@
 package com.meerkats.familyshopper.model;
 
-import com.meerkats.familyshopper.util.Settings;
+import com.meerkats.familyshopper.Settings.Settings;
 
 import java.util.ArrayList;
 import java.util.Collections;

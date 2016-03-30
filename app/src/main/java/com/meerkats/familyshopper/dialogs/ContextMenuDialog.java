@@ -7,18 +7,12 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.SimpleAdapter;
 
 import com.meerkats.familyshopper.MainActivity;
 import com.meerkats.familyshopper.MainController;
 import com.meerkats.familyshopper.R;
 import com.meerkats.familyshopper.util.FSLog;
-import com.meerkats.familyshopper.util.Settings;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.SimpleTimeZone;
+import com.meerkats.familyshopper.Settings.Settings;
 
 /**
  * Created by Rez on 15/02/2016.

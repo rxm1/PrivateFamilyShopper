@@ -25,11 +25,12 @@ import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
+import com.meerkats.familyshopper.Storage.FirebaseConnection;
 import com.meerkats.familyshopper.model.ShoppingList;
 import com.meerkats.familyshopper.util.Diagnostics;
 import com.meerkats.familyshopper.util.FSLog;
 import com.meerkats.familyshopper.util.ISynchronizeInterface;
-import com.meerkats.familyshopper.util.Settings;
+import com.meerkats.familyshopper.Settings.Settings;
 
 import java.util.HashMap;
 
@@ -39,17 +40,18 @@ import java.util.HashMap;
 public class MainService extends Service implements ISynchronizeInterface {
 
     DataHelper dataHelper;
+    FirebaseConnection firebaseConnection;
     private volatile HandlerThread mHandlerThread;
     private ServiceHandler mServiceHandler;
-    ReconnectToFirebaseReceiver reconnectToFirebaseReceiver;
-    DisconnectFromFirebaseReceiver disconnectFromFirebaseReceiver;
-    SettingsChangedReceiver settingsChangedReceiver;
     public static final String service_log_tag = "meerkats_MainService";
     Firebase myFirebaseRef;
     ValueEventListener firebaseListeners;
     private final IBinder mBinder = new LocalBinder();
     private static Object batchDelayObject = new Object();
     private static Object pushNotificationsObject = new Object();
+    public static final String service_updated_file_action = "com.meerkats.familyshopper.MainService.FileChanged";
+    public static final String firebase_connected_action = "com.meerkats.familyshopper.MainService.FirebaseConnected";
+    public static final int firebaseConnectionWhat = 7357;
 
     public class LocalBinder extends Binder {
         MainService getService() {
@@ -65,55 +67,33 @@ public class MainService extends Service implements ISynchronizeInterface {
 
         @Override
         public void handleMessage(Message message) {
+
         }
     }
-    public class ReconnectToFirebaseReceiver extends BroadcastReceiver {
-        @Override
-        public void onReceive(final Context context, Intent intent) {
-            FSLog.verbose(service_log_tag, "ReconnectToFirebaseReceiver onReceive");
-
-            Settings.loadSettings(context, service_log_tag);
-            disconnect();
-            mServiceHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    connect();
-                }
-            });
-        }
-    }
-    public class DisconnectFromFirebaseReceiver extends BroadcastReceiver{
-        @Override
-        public void onReceive(final Context context, Intent intent){
-            FSLog.verbose(service_log_tag, "DisconnectFromFirebaseReceiver onReceive");
-
-            Settings.loadSettings(context, service_log_tag);
-            disconnect();
-        }
-    }
-    public class SettingsChangedReceiver extends BroadcastReceiver{
-        @Override
-        public void onReceive(final Context context, Intent intent){
-            FSLog.verbose(service_log_tag, "SettingsChangedReceiver onReceive");
-
-            Settings.loadSettings(context, service_log_tag);
-        }
-    }
-
 
     public static final int file_changed_notification_id = 123456;
 
     private void disconnect(){
         FSLog.verbose(service_log_tag, "MainService disconnect");
 
-        removeFirebaseListeners();
-        myFirebaseRef = null;
+        firebaseConnection.removeFirebaseListeners(firebaseListeners);
+        firebaseConnection.disconnect();
     }
     private void connect(){
         FSLog.verbose(service_log_tag, "MainService connect");
 
-        myFirebaseRef = dataHelper.instanciateFirebase(true);
-        addFirebaseListeners();
+        if(!mServiceHandler.hasMessages(firebaseConnectionWhat)) {
+            Message message = Message.obtain(mServiceHandler, new Runnable() {
+                @Override
+                public void run() {
+                    myFirebaseRef = firebaseConnection.instanciateFirebase(getApplicationContext());
+                    firebaseListeners = firebaseConnection.addFirebaseListeners(dataHelper, MainService.this, mServiceHandler);
+                }
+            });
+            message.what = firebaseConnectionWhat;
+            mServiceHandler.dispatchMessage(message);
+        }
+
     }
     @Override
     public void onCreate() {
@@ -127,29 +107,14 @@ public class MainService extends Service implements ISynchronizeInterface {
 
         Firebase.setAndroidContext(this);
         dataHelper = new DataHelper(this, service_log_tag);
-
-        reconnectToFirebaseReceiver = new ReconnectToFirebaseReceiver();
-        IntentFilter filter = new IntentFilter(MainController.reconnect_to_firebase_action);
-        LocalBroadcastManager.getInstance(this).registerReceiver(reconnectToFirebaseReceiver, filter);
-        disconnectFromFirebaseReceiver = new DisconnectFromFirebaseReceiver();
-        filter = new IntentFilter(MainController.disconnect_from_firebase_action);
-        LocalBroadcastManager.getInstance(this).registerReceiver(disconnectFromFirebaseReceiver, filter);
-        settingsChangedReceiver = new SettingsChangedReceiver();
-        filter = new IntentFilter(MainController.settings_changed_action);
-        LocalBroadcastManager.getInstance(this).registerReceiver(settingsChangedReceiver, filter);
+        firebaseConnection = new FirebaseConnection();
     }
-
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Settings.loadSettings(this, service_log_tag);
         FSLog.verbose(service_log_tag, "MainService onStartCommand");
 
-        mServiceHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                connect();
-            }
-        });
+        connect();
 
         return START_STICKY;
     }
@@ -158,49 +123,12 @@ public class MainService extends Service implements ISynchronizeInterface {
         return mBinder;
     }
 
-    @Override
-    public void onDestroy() {
-        FSLog.verbose(service_log_tag, "MainService onDestroy");
+    public void postSyncTaskFromActivity(final ShoppingList localList, final ISynchronizeInterface synchronizeInterface, final Activity activity){
+        FSLog.verbose(service_log_tag, "MainService postSyncTaskFromActivity");
 
-        // Cleanup service before destruction
-        mHandlerThread.quit();
-        dataHelper.cleanUp();
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(reconnectToFirebaseReceiver);
-    }
+        if(!firebaseConnection.isValidFirebaseConnection(myFirebaseRef))
+            return;
 
-    public synchronized void addFirebaseListeners(){
-        FSLog.verbose(service_log_tag, "MainService addFirebaseListeners");
-
-        if(myFirebaseRef != null) {
-            firebaseListeners = myFirebaseRef.addValueEventListener(new ValueEventListener() {
-                Synchronize synchronize = new Synchronize(getApplicationContext(), myFirebaseRef, service_log_tag, dataHelper);
-                @Override
-                public void onDataChange(final DataSnapshot snapshot) {
-                    mServiceHandler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            if(Settings.isIntegrateFirebase() && myFirebaseRef != null && DataHelper.getIsValidFirebaseURL()) {
-                                HashMap<String, String> map = (HashMap<String, String>) snapshot.getValue();
-                                if (map != null) {
-                                    final ShoppingList remoteList = new ShoppingList(MainController.master_shopping_list_name, map.get("masterList"), service_log_tag);
-                                    final ShoppingList localList = new ShoppingList(MainController.master_shopping_list_name, dataHelper.loadGsonFromLocalStorage(), service_log_tag);
-                                    Diagnostics.saveLastSyncedBy(getApplicationContext(), remoteList);
-                                    synchronize.doSynchronize(MainService.this, localList, remoteList);
-                                }
-                            }
-                        }
-                    });
-                }
-
-                @Override
-                public void onCancelled(FirebaseError firebaseError) {
-                    FSLog.error(service_log_tag, "MainService addFirebaseListeners", firebaseError.toException());
-                }
-            });
-        }
-    }
-
-    public void postTaskFromActivity(final ShoppingList localList, final ISynchronizeInterface synchronizeInterface, final Activity activity){
         if(Settings.getPushBatchDelay()>0) {
             mServiceHandler.removeCallbacksAndMessages(batchDelayObject);
         }
@@ -241,28 +169,45 @@ public class MainService extends Service implements ISynchronizeInterface {
                         });
             }
         };
-        mServiceHandler.postAtTime(uiRunnable, batchDelayObject, SystemClock.uptimeMillis()+Settings.getPushBatchDelay());
+        mServiceHandler.postAtTime(uiRunnable, batchDelayObject, SystemClock.uptimeMillis() + Settings.getPushBatchDelay());
     }
+    public void postConnectToFirebaseTaskFromActivity(){
+        FSLog.verbose(service_log_tag, "MainService postConnectToFirebaseTaskFromActivity");
 
-    public synchronized void removeFirebaseListeners() {
-        FSLog.verbose(service_log_tag, "MainService removeFirebaseListeners");
+        if(!firebaseConnection.isValidFirebaseConnection(myFirebaseRef))
+            connect();
+    }
+    public void postReconnectToFirebaseTaskFromActivity(Context context) {
+        FSLog.verbose(service_log_tag, "MainService postReconnectToFirebaseTaskFromActivity");
 
-        if (myFirebaseRef == null){
-            if (firebaseListeners != null) {
-                firebaseListeners = null;
+        Settings.loadSettings(context, service_log_tag);
+        disconnect();
+        connect();
+    }
+    public void postDisconnectFromFirebaseTaskFromActivity(Context context) {
+        FSLog.verbose(service_log_tag, "MainService postDisconnectFromFirebaseTaskFromActivity");
+
+        Settings.loadSettings(context, service_log_tag);
+        disconnect();
+    }
+    public void postLoadSettingsFromActivity(final Context context) {
+        FSLog.verbose(service_log_tag, "MainService postLoadSettingsFromActivity");
+
+        mServiceHandler.post(new Runnable() { //queued in the handler so it can run before the connect tasks
+            @Override
+            public void run() {
+                Settings.loadSettings(context, service_log_tag);
             }
-        }
-        else {
-            if (firebaseListeners != null) {
-                myFirebaseRef.removeEventListener(firebaseListeners);
-            }
-        }
+        });
+    }
+    public boolean postIsValidFirebaseConnection(){
+        return firebaseConnection.isValidFirebaseConnection(myFirebaseRef);
     }
 
     public void notifyFileChanged(final NotificationEvents occuredNotifications, ShoppingList mergedList){
         FSLog.verbose(service_log_tag, "MainService notifyFileChanged");
 
-        Intent intent = new Intent(DataHelper.service_updated_file_action);
+        Intent intent = new Intent(service_updated_file_action);
         if (occuredNotifications.forService().isTrue()) {
             boolean recieversAvailable = LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
             if (!recieversAvailable) {
@@ -275,7 +220,7 @@ public class MainService extends Service implements ISynchronizeInterface {
                         sendFileChangedNotification(occuredNotifications);
                     }
                 };
-                mServiceHandler.postAtTime(fileChangedRunnable, pushNotificationsObject, SystemClock.uptimeMillis()+Settings.getNotificationDelay());
+                mServiceHandler.postAtTime(fileChangedRunnable, pushNotificationsObject, SystemClock.uptimeMillis() + Settings.getNotificationDelay());
             }
         }
     }
@@ -334,4 +279,14 @@ public class MainService extends Service implements ISynchronizeInterface {
     }
 
     public void postSynchronize(){}
+
+    @Override
+    public void onDestroy() {
+        FSLog.verbose(service_log_tag, "MainService onDestroy");
+
+        // Cleanup service before destruction
+        mHandlerThread.quit();
+        dataHelper.cleanUp();
+    }
+
 }

@@ -2,14 +2,12 @@ package com.meerkats.familyshopper.Settings;
 
 import android.content.res.Resources;
 import android.os.Bundle;
-import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
 import com.meerkats.familyshopper.R;
-import com.meerkats.familyshopper.util.Settings;
 
 public class SettingsLoggingActivity extends AppCompatActivity {
 

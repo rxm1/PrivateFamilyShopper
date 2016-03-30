@@ -1,20 +1,12 @@
 package com.meerkats.familyshopper.Settings;
 
 
-import android.app.PendingIntent;
-import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Resources;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
-import android.preference.ListPreference;
 import android.preference.Preference;
-import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
-import android.support.v4.app.TaskStackBuilder;
-import android.support.v4.content.IntentCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.widget.Toast;
@@ -22,9 +14,6 @@ import android.widget.Toast;
 import com.meerkats.familyshopper.MainActivity;
 import com.meerkats.familyshopper.R;
 import com.meerkats.familyshopper.util.FSLog;
-import com.meerkats.familyshopper.util.Settings;
-
-import java.util.Set;
 
 public class SettingsActivity extends AppCompatActivity {
 

@@ -9,6 +9,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.TextView;
 
+import com.meerkats.familyshopper.Settings.Settings;
 import com.meerkats.familyshopper.util.*;
 
 /**

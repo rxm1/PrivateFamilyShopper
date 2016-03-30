@@ -2,6 +2,8 @@ package com.meerkats.familyshopper.util;
 
 import android.util.Log;
 
+import com.meerkats.familyshopper.Settings.Settings;
+
 /**
  * Created by Rez on 24/01/2016.
  */
