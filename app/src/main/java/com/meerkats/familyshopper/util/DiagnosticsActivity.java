@@ -68,12 +68,9 @@ public class DiagnosticsActivity extends AppCompatActivity {
 
         switch (requestCode) {
             case DIAGONOSTICS_SETTINGS_RESULT:
-                Settings.loadSettings(this, MainActivity.activity_log_tag);
-                //notify service that settings have changed
-                Intent intent = new Intent(MainController.settings_changed_action);
-                LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+                Intent intent = new Intent(MainActivity.settings_changed_action);
+                LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
         }
     }
-
 
 }

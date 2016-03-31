@@ -43,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
     private boolean isEditing = false;
     boolean mBound = false;
     public static final String activity_log_tag = "meerkats_MainActivity";
+    public static final String settings_changed_action = "com.meerkats.familyshopper.MainActivity.SettingsChanged";
 
 
     public class FirebaseConnectedReceiver extends BroadcastReceiver {
@@ -59,6 +60,14 @@ public class MainActivity extends AppCompatActivity {
             FSLog.verbose(activity_log_tag, "ShoppingListChangedReceiver onReceive");
 
             mainController.loadLocalShoppingList();
+        }
+    }
+    public class SettingsChangedReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            FSLog.verbose(activity_log_tag, "SettingsChangedReceiver onReceive");
+
+            mainController.loadSettings();
         }
     }
     @Override
@@ -255,6 +264,7 @@ public class MainActivity extends AppCompatActivity {
             MainService.LocalBinder binder = (MainService.LocalBinder) service;
             MainService mainService = binder.getService();
             mBound = true;
+            mainController.setMainService(mainService, mBound);
         }
 
         @Override

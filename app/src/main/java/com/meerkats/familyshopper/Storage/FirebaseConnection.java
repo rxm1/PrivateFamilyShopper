@@ -62,6 +62,7 @@ public class FirebaseConnection {
 
             @Override
             public void onAuthenticationError(FirebaseError firebaseError) {
+                isFirebaseAuthenticated = true;
                 FSLog.error(MainService.service_log_tag, "FirebaseConnection onAuthenticationError", firebaseError.toException());
             }
         });
