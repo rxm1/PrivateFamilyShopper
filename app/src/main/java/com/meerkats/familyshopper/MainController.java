@@ -54,10 +54,7 @@ public class MainController implements ISynchronizeInterface {
         shoppingList = new ShoppingList(master_shopping_list_name);
         shoppingListAdapter = new ShoppingListAdapter(activity, shoppingList);
         shoppingListAdapter.notifyDataSetChanged();
-        if(mainServiceBound) {
-            mainService.postConnectToFirebaseTaskFromActivity();
-            mainService.postSyncTaskFromActivity(shoppingList, MainController.this, activity);
-        }
+        connect(false);
     }
 
     public void deleteShoppingListItem(int position){
@@ -137,7 +134,7 @@ public class MainController implements ISynchronizeInterface {
         if(saveShoppingList)
             dataHelper.saveGsonToLocalStorage(shoppingList.getJson());
 
-        if(mainServiceBound) {
+        if(mainServiceBound && mainService.postIsValidFirebaseConnection()) {
                 mainService.postSyncTaskFromActivity(shoppingList, MainController.this, activity);
         }
         else{
@@ -152,12 +149,14 @@ public class MainController implements ISynchronizeInterface {
         }
     }
 
-    public void connect(){
+    public void connect(boolean reconnect){
         FSLog.verbose(log_tag, "MainController connect");
 
         if(mainServiceBound) {
-            mainService.postReconnectToFirebaseTaskFromActivity(activity);
-            mainService.postSyncTaskFromActivity(shoppingList, MainController.this, activity);
+            if(reconnect)
+                mainService.postReconnectToFirebaseTaskFromActivity(activity);
+            else
+                mainService.postConnectToFirebaseTaskFromActivity();
         }
     }
 
@@ -184,16 +183,16 @@ public class MainController implements ISynchronizeInterface {
         mainControllerHandler.post(new Runnable() {
             @Override
             public void run() {
-            final String localFile = dataHelper.loadGsonFromLocalStorage().trim();
-            if(!localFile.isEmpty()) {
-                mainUIHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        shoppingList.loadShoppingList(localFile, log_tag);
-                        shoppingListAdapter.notifyDataSetChanged();
-                    }
-                });
-            }
+                final String localFile = dataHelper.loadGsonFromLocalStorage().trim();
+                if (!localFile.isEmpty()) {
+                    mainUIHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            shoppingList.loadShoppingList(localFile, log_tag);
+                            shoppingListAdapter.notifyDataSetChanged();
+                        }
+                    });
+                }
 
             }
         });
@@ -209,11 +208,7 @@ public class MainController implements ISynchronizeInterface {
 
         return shoppingListAdapter;
     }
-    public void clearShoppingListFromLocalStorage(){
-        FSLog.verbose(log_tag, "MainController clearShoppingListFromLocalStorage");
 
-        dataHelper.saveGsonToLocalStorage(new ShoppingList(MainController.master_shopping_list_name).getJson());
-    }
     public void notifyFileChanged(NotificationEvents occuredNotifications, ShoppingList mergedList){
         FSLog.verbose(log_tag, "MainController notifyFileChanged");
 
@@ -236,15 +231,17 @@ public class MainController implements ISynchronizeInterface {
     }
 
     public void firebaseConnected(){
-        if(mainServiceBound) {
-            if(mainService.postIsValidFirebaseConnection()){
-                mainUIHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
+        FSLog.verbose(log_tag, "MainController firebaseConnected");
+
+        if(mainServiceBound && mainService.postIsValidFirebaseConnection()){
+            mainService.postSyncTaskFromActivity(shoppingList, MainController.this, activity);
+            mainUIHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    if(mainService.postIsValidFirebaseConnection())
                         Toast.makeText(activity.getApplicationContext(), "Firebase connected", Toast.LENGTH_SHORT).show();
-                    }
-                });
-            }
+                }
+            });
         }
     }
 

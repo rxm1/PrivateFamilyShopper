@@ -66,6 +66,9 @@ public class SettingsActivity extends AppCompatActivity {
                 bindPreferenceSummaryToValue(findPreference(Settings.Notification_Events_Name));
                 bindPreferenceSummaryToValue(findPreference(Settings.Color_Theme_Name));
                 bindPreferenceSummaryToValue(findPreference(Settings.screen_orientation_name));
+                bindPreferenceSummaryToValue(findPreference(Settings.firebase_authentication_name));
+                bindPreferenceSummaryToValue(findPreference(Settings.firebase_email_name));
+                bindPreferenceSummaryToValue(findPreference(Settings.firebase_password_name));
             }catch (Exception e){
                 FSLog.error(MainActivity.activity_log_tag, "MyPreferenceFragment onCreate", e);
                 Settings.clearSettings(getActivity(), MainActivity.activity_log_tag);
@@ -112,15 +115,22 @@ public class SettingsActivity extends AppCompatActivity {
                         && !Settings.getFirebaseURL().equals(stringValue));
             }
             if(preference.getKey().equals(Settings.Color_Theme_Name)) {
-                if(!Settings.getColorThemeString().equals(stringValue)){
+                Settings.setRestartActivity(!Settings.getColorThemeString().equals(stringValue));
+            }
+            if(preference.getKey().equals(Settings.screen_orientation_name)) {
+                if (!Settings.isPortraitOrientation() && stringValue.equals("true")
+                        || Settings.isPortraitOrientation() && stringValue.equals("false")) {
                     Settings.setRestartActivity(true);
                 }
             }
-            if(preference.getKey().equals(Settings.screen_orientation_name)) {
-                if(!Settings.isPortraitOrientation() && stringValue.equals("true")
-                        || Settings.isPortraitOrientation() && stringValue.equals("false")){
-                    Settings.setRestartActivity(true);
-                }
+            if(preference.getKey().equals(Settings.firebase_authentication_name)) {
+                Settings.setReconnectToFirebase(Settings.getFirebaseAuthentication() != (Settings.FirebaseAuthentication.values()[Integer.parseInt(stringValue)]));
+            }
+            if(preference.getKey().equals(Settings.firebase_email_name)) {
+                Settings.setReconnectToFirebase(!Settings.getFirebaseEmail().equals(stringValue));
+            }
+            if(preference.getKey().equals(Settings.firebase_password_name)) {
+                Settings.setReconnectToFirebase(!Settings.getFirebasePassword().equals(stringValue));
             }
 
             /*if (preference instanceof ListPreference) {

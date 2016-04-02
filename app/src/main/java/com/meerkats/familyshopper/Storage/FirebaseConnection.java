@@ -11,6 +11,7 @@ import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
+import com.firebase.security.token.TokenGenerator;
 import com.meerkats.familyshopper.DataHelper;
 import com.meerkats.familyshopper.MainController;
 import com.meerkats.familyshopper.MainService;
@@ -21,16 +22,19 @@ import com.meerkats.familyshopper.util.Diagnostics;
 import com.meerkats.familyshopper.util.FSLog;
 
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by Rez on 29/03/2016.
  */
 public class FirebaseConnection {
-    private static boolean isValidFirebaseURL = false;
-    private static boolean isFirebaseAuthenticated = false;
-    private static Firebase myFirebaseRef = null;
+    private boolean isValidFirebaseURL = false;
+    private boolean isFirebaseAuthenticated = false;
+    private Firebase myFirebaseRef = null;
+    ValueEventListener firebaseListeners;
+    private boolean ignoreFirebaseListenerErrors = true;
 
-    public synchronized Firebase instanciateFirebase(Context context) {
+    public synchronized Firebase instanciateFirebase(Context context, final DataHelper dataHelper, final MainService.ServiceHandler serviceHandler, final MainService mainService) {
         FSLog.verbose(MainService.service_log_tag, "FirebaseConnection instanciateFirebase");
 
         try {
@@ -39,8 +43,16 @@ public class FirebaseConnection {
                     Settings.isIntegrateFirebase() && firebaseURL != null && !firebaseURL.trim().isEmpty()) {
 
                 myFirebaseRef = new Firebase(firebaseURL);
-                checkFirebaseURL(context);
-                authenticateFirebase(context);
+                if(myFirebaseRef != null) {
+                    ignoreFirebaseListenerErrors = true;
+                    myFirebaseRef.unauth();
+                }
+                if(Settings.getFirebaseAuthentication() == Settings.FirebaseAuthentication.None){
+                    checkFirebaseURL(context, dataHelper, serviceHandler, mainService);
+                }
+                else {
+                    authenticateFirebase(context, dataHelper, serviceHandler, mainService);
+                }
             }
         }
         catch (Exception ex){
@@ -49,25 +61,61 @@ public class FirebaseConnection {
 
         return myFirebaseRef;
     }
-    private synchronized void authenticateFirebase(final Context context){
-        isFirebaseAuthenticated = false;
-        myFirebaseRef.unauth();
-        myFirebaseRef.authWithPassword("rez@rez.com", "rezwana", new Firebase.AuthResultHandler() {
-            @Override
-            public void onAuthenticated(AuthData authData) {
-                isFirebaseAuthenticated = true;
-                Intent intent = new Intent(MainService.firebase_connected_action);
-                LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
-            }
+    private synchronized void authenticateFirebase(final Context context, final DataHelper dataHelper, final MainService.ServiceHandler serviceHandler, final MainService mainService){
+        FSLog.verbose(MainService.service_log_tag, "FirebaseConnection authenticateFirebase");
 
-            @Override
-            public void onAuthenticationError(FirebaseError firebaseError) {
-                isFirebaseAuthenticated = true;
-                FSLog.error(MainService.service_log_tag, "FirebaseConnection onAuthenticationError", firebaseError.toException());
-            }
-        });
+        isFirebaseAuthenticated = false;
+        isValidFirebaseURL = false;
+
+        switch (Settings.getFirebaseAuthentication()) {
+            case Anonymous:
+                myFirebaseRef.authAnonymously(new Firebase.AuthResultHandler() {
+                    @Override
+                    public void onAuthenticated(AuthData authData) {
+                        addFirebaseListeners(dataHelper, mainService, serviceHandler, context);
+                        authenticated(context, dataHelper, serviceHandler, mainService);
+                    }
+
+                    @Override
+                    public void onAuthenticationError(FirebaseError firebaseError) {
+                        FSLog.error(MainService.service_log_tag, "FirebaseConnection onAuthenticationError anonymous", firebaseError.toException());
+
+                        sendToast(context, "Firebase Authentication Error");
+                    }
+                });
+                break;
+            case EmailAndPassword:
+                myFirebaseRef.authWithPassword(Settings.getFirebaseEmail(), Settings.getFirebasePassword(), new Firebase.AuthResultHandler() {
+                    @Override
+                    public void onAuthenticated(AuthData authData) {
+                        addFirebaseListeners(dataHelper, mainService, serviceHandler, context);
+                        authenticated(context, dataHelper, serviceHandler, mainService);
+                    }
+
+                    @Override
+                    public void onAuthenticationError(FirebaseError firebaseError) {
+                        FSLog.error(MainService.service_log_tag, "FirebaseConnection onAuthenticationError userAndEmail", firebaseError.toException());
+
+                        sendToast(context, "Firebase Authentication Error");
+                    }
+                });
+                break;
+        }
+
     }
-    private synchronized void checkFirebaseURL(final Context context) {
+    private void authenticated(Context context, DataHelper dataHelper, MainService.ServiceHandler serviceHandler, MainService mainService){
+        isFirebaseAuthenticated = true;
+        isValidFirebaseURL = true;
+        Intent intent = new Intent(MainService.firebase_connected_action);
+        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+        //addFirebaseListeners(dataHelper, mainService, serviceHandler, context);
+    }
+    private void sendToast(Context context, String toast){
+        Intent intent = new Intent(MainService.show_toast_action);
+        intent.putExtra("Toast", toast);
+        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+    }
+    private synchronized void checkFirebaseURL(final Context context, final DataHelper dataHelper, final MainService.ServiceHandler serviceHandler, final MainService mainService) {
         FSLog.verbose(MainService.service_log_tag, "FirebaseConnection checkFirebaseURL");
 
         isValidFirebaseURL = false;
@@ -78,12 +126,20 @@ public class FirebaseConnection {
                             @Override
                             public void onDataChange(DataSnapshot snapshot) {
                                 isValidFirebaseURL = true;
+                                addFirebaseListeners(dataHelper, mainService, serviceHandler, context);
                                 Intent intent = new Intent(MainService.firebase_connected_action);
                                 LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
                             }
 
                             @Override
-                            public void onCancelled(FirebaseError firebaseError) {}
+                            public void onCancelled(FirebaseError firebaseError) {
+                                FSLog.error(MainService.service_log_tag, "checkFirebaseURL onCancelled", firebaseError.toException());
+
+                                if(firebaseError.getCode() == FirebaseError.PERMISSION_DENIED)
+                                    sendToast(context, "Firebase Authentication Error");
+                                else
+                                    sendToast(context, "Error connecting to Firebase URL");
+                            }
 
                         });
             } catch (Exception e) {
@@ -92,7 +148,57 @@ public class FirebaseConnection {
             }
         }
     }
-    public synchronized void removeFirebaseListeners(ValueEventListener firebaseListeners) {
+
+    public synchronized void addFirebaseListeners(final DataHelper dataHelper, final MainService mainService, final Handler serviceHandler, final Context context){
+        FSLog.verbose(MainService.service_log_tag, "FirebaseConnection addFirebaseListeners");
+
+        ignoreFirebaseListenerErrors=false;
+        if(myFirebaseRef != null) {
+            firebaseListeners = myFirebaseRef.addValueEventListener(new ValueEventListener() {
+                Synchronize synchronize = new Synchronize(mainService, myFirebaseRef, MainService.service_log_tag, dataHelper);
+                @Override
+                public void onDataChange(final DataSnapshot snapshot) {
+                    serviceHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            HashMap<String, String> map = (HashMap<String, String>) snapshot.getValue();
+                            if (map != null) {
+                                final ShoppingList remoteList = new ShoppingList(MainController.master_shopping_list_name, map.get("masterList"), MainService.service_log_tag);
+                                final ShoppingList localList = new ShoppingList(MainController.master_shopping_list_name, dataHelper.loadGsonFromLocalStorage(), MainService.service_log_tag);
+                                Diagnostics.saveLastSyncedBy(context, remoteList);
+                                synchronize.doSynchronize(mainService, localList, remoteList);
+                            }
+                        }
+                    });
+                }
+
+                @Override
+                public void onCancelled(FirebaseError firebaseError) {
+                    FSLog.error(MainService.service_log_tag, "addFirebaseListeners onCancelled", firebaseError.toException());
+
+                    if(ignoreFirebaseListenerErrors==false) {
+                        if (firebaseError.getCode() == FirebaseError.PERMISSION_DENIED)
+                            sendToast(context, "Firebase Authentication Error");
+                        else
+                            sendToast(context, "Error connecting to Firebase");
+                        isValidFirebaseURL = false;
+                        isFirebaseAuthenticated = false;
+                    }
+                }
+            });
+        }
+    }
+
+    public void disconnect(){
+        FSLog.verbose(MainService.service_log_tag, "FirebaseConnection disconnect");
+
+        myFirebaseRef = null;
+        isFirebaseAuthenticated = false;
+        isValidFirebaseURL = false;
+        removeFirebaseListeners();
+        firebaseListeners = null;
+    }
+    public synchronized void removeFirebaseListeners() {
         FSLog.verbose(MainService.service_log_tag, "FirebaseConnection removeFirebaseListeners");
 
         if (myFirebaseRef == null){
@@ -106,47 +212,8 @@ public class FirebaseConnection {
             }
         }
     }
-    public synchronized ValueEventListener addFirebaseListeners(final DataHelper dataHelper, final MainService context, final Handler serviceHandler){
-        FSLog.verbose(MainService.service_log_tag, "MainService addFirebaseListeners");
-        ValueEventListener firebaseListeners = null;
-        if(myFirebaseRef != null) {
-            firebaseListeners = myFirebaseRef.addValueEventListener(new ValueEventListener() {
-                Synchronize synchronize = new Synchronize(context, myFirebaseRef, MainService.service_log_tag, dataHelper);
-                @Override
-                public void onDataChange(final DataSnapshot snapshot) {
-                    serviceHandler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            if(isValidFirebaseConnection(myFirebaseRef)) {
-                                HashMap<String, String> map = (HashMap<String, String>) snapshot.getValue();
-                                if (map != null) {
-                                    final ShoppingList remoteList = new ShoppingList(MainController.master_shopping_list_name, map.get("masterList"), MainService.service_log_tag);
-                                    final ShoppingList localList = new ShoppingList(MainController.master_shopping_list_name, dataHelper.loadGsonFromLocalStorage(), MainService.service_log_tag);
-                                    Diagnostics.saveLastSyncedBy(context, remoteList);
-                                    synchronize.doSynchronize(context, localList, remoteList);
-                                }
-                            }
-                        }
-                    });
-                }
-
-                @Override
-                public void onCancelled(FirebaseError firebaseError) {
-                    FSLog.error(MainService.service_log_tag, "MainService addFirebaseListeners", firebaseError.toException());
-                }
-            });
-        }
-        return firebaseListeners;
-    }
-
-    public static void disconnect(){
-        myFirebaseRef = null;
-        isFirebaseAuthenticated = false;
-        isValidFirebaseURL = false;
-    }
-
-    public synchronized boolean isValidFirebaseConnection(Firebase myFirebaseRef){
-        return Settings.isIntegrateFirebase() && myFirebaseRef != null && isValidFirebaseURL && isFirebaseAuthenticated;
+    public synchronized boolean isValidFirebaseConnection(){
+        return Settings.isIntegrateFirebase() && myFirebaseRef != null && isValidFirebaseURL && (isFirebaseAuthenticated || Settings.getFirebaseAuthentication()== Settings.FirebaseAuthentication.None);
     }
 
 

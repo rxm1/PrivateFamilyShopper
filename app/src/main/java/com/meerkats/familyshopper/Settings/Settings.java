@@ -21,10 +21,26 @@ import java.util.Set;
  * Created by Rez on 24/01/2016.
  */
 public class Settings {
+    public enum FirebaseAuthentication{
+        Empty(0),
+        None(1),
+        Anonymous(2),
+        EmailAndPassword(3),
+        FirebaseSecret(4);
+
+        private final int value;
+        private FirebaseAuthentication(int value) {
+            this.value = value;
+        }
+
+        public int getValue() {
+            return value;
+        }
+    }
+
     public static final String screen_orientation_name = "screenOrientation";
     public static final String sort_by_name = "sortBy";
     public static final String crossed_off_items_at_bottom_name = "crossedOffItems";
-    private static final String logging_name = "logging";
     public static final String Firebase_URL_Name = "FirebaseURLName";
     public static final String Integrate_With_Firebase_Name = "IntegrateFirebase";
     public static final String Notification_Frequency_Name = "notificationFrequency";
@@ -32,6 +48,11 @@ public class Settings {
     public static final String Push_Batch_Time_Name = "pushBatchTime";
     public static final String Color_Theme_Name = "colorTheme";
     public static final String Last_Synced_Name = "LastSyncedName";
+    public static final String logging_name = "logging";
+    public static final String firebase_authentication_name = "authentication";
+    public static final String firebase_email_name = "FirebaseEmail";
+    public static final String firebase_password_name = "FirebaseEmailPassword";
+    public static final String firebase_secret_name = "FirebaseSecret";
 
     private static NotificationEvents userSelectedNotificationEvents = new NotificationEvents();
     private static String firebaseURL = "";
@@ -44,6 +65,10 @@ public class Settings {
     private static String colorTheme="1";
     private static long lastSynced = 0;
     private static String sortBy="gray";
+    private static int firebaseAuthentication = 1;
+    private static String firebaseEmail="";
+    private static String firebasePassword="";
+    private static String firebaseSecret="";
 
     private static boolean connectToFirebase = false;
     private static boolean reconnectToFirebase = false;
@@ -84,6 +109,11 @@ public class Settings {
             }
 
             loggingLevel = Integer.parseInt(settings.getString(logging_name, "1"));
+            firebaseAuthentication = Integer.parseInt(settings.getString(firebase_authentication_name, "1"));
+            firebaseEmail = settings.getString(firebase_email_name, "").trim();
+            firebasePassword = settings.getString(firebase_password_name, "").trim();
+            firebaseSecret = settings.getString(firebase_secret_name, "").trim();
+
         }catch (Exception e){
             FSLog.error(logTag, "Settings loadSettings", e);
             Handler handler = new Handler(Looper.getMainLooper());
@@ -181,5 +211,21 @@ public class Settings {
     }
     public static void setRestartActivity(boolean restartActivitySet){
         restartActivity = restartActivitySet;
+    }
+    public static Settings.FirebaseAuthentication getFirebaseAuthentication()
+    {
+        return (FirebaseAuthentication.values())[firebaseAuthentication];
+    }
+    public static String getFirebaseEmail()
+    {
+        return firebaseEmail;
+    }
+    public static String getFirebasePassword()
+    {
+        return firebasePassword;
+    }
+    public static String getFirebaseSecret()
+    {
+        return firebaseSecret;
     }
 }

@@ -45,12 +45,13 @@ public class MainService extends Service implements ISynchronizeInterface {
     private ServiceHandler mServiceHandler;
     public static final String service_log_tag = "meerkats_MainService";
     Firebase myFirebaseRef;
-    ValueEventListener firebaseListeners;
+
     private final IBinder mBinder = new LocalBinder();
     private static Object batchDelayObject = new Object();
     private static Object pushNotificationsObject = new Object();
     public static final String service_updated_file_action = "com.meerkats.familyshopper.MainService.FileChanged";
     public static final String firebase_connected_action = "com.meerkats.familyshopper.MainService.FirebaseConnected";
+    public static final String show_toast_action = "com.meerkats.familyshopper.MainService.ShowToast";
     public static final int firebaseConnectionWhat = 7357;
 
     public class LocalBinder extends Binder {
@@ -59,7 +60,7 @@ public class MainService extends Service implements ISynchronizeInterface {
             return MainService.this;
         }
     }
-    private final class ServiceHandler extends Handler {
+    public final class ServiceHandler extends Handler {
         public ServiceHandler(Looper looper) {
             super(looper);
             FSLog.verbose(service_log_tag, "ServiceHandler constructor");
@@ -76,24 +77,29 @@ public class MainService extends Service implements ISynchronizeInterface {
     private void disconnect(){
         FSLog.verbose(service_log_tag, "MainService disconnect");
 
-        firebaseConnection.removeFirebaseListeners(firebaseListeners);
         firebaseConnection.disconnect();
     }
     private void connect(){
         FSLog.verbose(service_log_tag, "MainService connect");
 
+        if(!Settings.isIntegrateFirebase())
+            return;
+
         if(!mServiceHandler.hasMessages(firebaseConnectionWhat)) {
             Message message = Message.obtain(mServiceHandler, new Runnable() {
                 @Override
                 public void run() {
-                    myFirebaseRef = firebaseConnection.instanciateFirebase(getApplicationContext());
-                    firebaseListeners = firebaseConnection.addFirebaseListeners(dataHelper, MainService.this, mServiceHandler);
+                    Intent intent = new Intent(MainService.show_toast_action);
+                    intent.putExtra("Toast", "Connecting to Firebase...");
+                    LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+
+                    myFirebaseRef = firebaseConnection.instanciateFirebase(getApplicationContext(), dataHelper, mServiceHandler, MainService.this);
+
                 }
             });
             message.what = firebaseConnectionWhat;
             mServiceHandler.dispatchMessage(message);
         }
-
     }
     @Override
     public void onCreate() {
@@ -126,7 +132,7 @@ public class MainService extends Service implements ISynchronizeInterface {
     public void postSyncTaskFromActivity(final ShoppingList localList, final ISynchronizeInterface synchronizeInterface, final Activity activity){
         FSLog.verbose(service_log_tag, "MainService postSyncTaskFromActivity");
 
-        if(!firebaseConnection.isValidFirebaseConnection(myFirebaseRef))
+        if(!firebaseConnection.isValidFirebaseConnection())
             return;
 
         if(Settings.getPushBatchDelay()>0) {
@@ -154,13 +160,17 @@ public class MainService extends Service implements ISynchronizeInterface {
                                 });
                             }
                             @Override
-                            public void onCancelled(FirebaseError firebaseError) {
+                            public void onCancelled(final FirebaseError firebaseError) {
                                 FSLog.error(MainActivity.activity_log_tag, "MainService postTaskFromActivity", firebaseError.toException());
+
                                 Handler uiHandler = new Handler(Looper.getMainLooper());
                                 uiHandler.post(new Runnable() {
                                     @Override
                                     public void run() {
-                                        Toast.makeText(activity.getApplicationContext(), "Firebase not connected", Toast.LENGTH_SHORT).show();
+                                        if(firebaseError.getCode() == FirebaseError.PERMISSION_DENIED)
+                                            Toast.makeText(activity.getApplicationContext(), "Firebase Authentication Error", Toast.LENGTH_SHORT).show();
+                                        else
+                                            Toast.makeText(activity.getApplicationContext(), "Firebase connection error", Toast.LENGTH_SHORT).show();
 
                                     }
                                 });
@@ -174,13 +184,13 @@ public class MainService extends Service implements ISynchronizeInterface {
     public void postConnectToFirebaseTaskFromActivity(){
         FSLog.verbose(service_log_tag, "MainService postConnectToFirebaseTaskFromActivity");
 
-        if(!firebaseConnection.isValidFirebaseConnection(myFirebaseRef))
-            connect();
+        connect();
     }
     public void postReconnectToFirebaseTaskFromActivity(Context context) {
         FSLog.verbose(service_log_tag, "MainService postReconnectToFirebaseTaskFromActivity");
 
         Settings.loadSettings(context, service_log_tag);
+        dataHelper.saveGsonToLocalStorage(new ShoppingList(MainController.master_shopping_list_name).getJson());
         disconnect();
         connect();
     }
@@ -201,7 +211,7 @@ public class MainService extends Service implements ISynchronizeInterface {
         });
     }
     public boolean postIsValidFirebaseConnection(){
-        return firebaseConnection.isValidFirebaseConnection(myFirebaseRef);
+        return firebaseConnection.isValidFirebaseConnection();
     }
 
     public void notifyFileChanged(final NotificationEvents occuredNotifications, ShoppingList mergedList){

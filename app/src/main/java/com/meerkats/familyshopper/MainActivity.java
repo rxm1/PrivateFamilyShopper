@@ -23,6 +23,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.meerkats.familyshopper.Settings.SettingsActivity;
 import com.meerkats.familyshopper.dialogs.ContextMenuDialog;
@@ -38,6 +39,7 @@ public class MainActivity extends AppCompatActivity {
     MainController mainController;
     ShoppingListChangedReceiver shoppingListChangedReceiver = new ShoppingListChangedReceiver();
     FirebaseConnectedReceiver firebaseConnectedReceiver = new FirebaseConnectedReceiver();
+    ShowToastFromServiceReceiver showToastFromReceiver = new ShowToastFromServiceReceiver();
     HandlerThread handlerThread = new HandlerThread("MainActivity.HandlerThread");;
     public static final int SETTINGS_RESULT = 1;
     private boolean isEditing = false;
@@ -52,6 +54,14 @@ public class MainActivity extends AppCompatActivity {
             FSLog.verbose(activity_log_tag, "FirebaseConnectedReceiver onReceive");
 
             mainController.firebaseConnected();
+        }
+    }
+    public class ShowToastFromServiceReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            FSLog.verbose(activity_log_tag, "ShowToastFromServiceReceiver onReceive");
+
+            Toast.makeText(context, intent.getStringExtra("Toast"), Toast.LENGTH_SHORT).show();
         }
     }
     public class ShoppingListChangedReceiver extends BroadcastReceiver {
@@ -152,11 +162,7 @@ public class MainActivity extends AppCompatActivity {
                     mainController.disconnect();
                 }
                 else if (Settings.reconnectToFirebase() || (Settings.connectToFirebase())){
-                    if (Settings.reconnectToFirebase()) {
-                        mainController.clearShoppingListFromLocalStorage();
-                    }
-
-                    mainController.connect();
+                    mainController.connect(Settings.reconnectToFirebase());
                 }
 
                 Settings.setDisconnectFromFirebase(false);
@@ -231,6 +237,8 @@ public class MainActivity extends AppCompatActivity {
         LocalBroadcastManager.getInstance(this).registerReceiver(shoppingListChangedReceiver, shoppingListChangedFilter);
         IntentFilter firebaseConnectedFilter = new IntentFilter(MainService.firebase_connected_action);
         LocalBroadcastManager.getInstance(this).registerReceiver(firebaseConnectedReceiver, firebaseConnectedFilter);
+        IntentFilter firebaseAuthErrorFilter = new IntentFilter(MainService.show_toast_action);
+        LocalBroadcastManager.getInstance(this).registerReceiver(showToastFromReceiver, firebaseAuthErrorFilter);
 
         mainController.loadLocalShoppingList();
     }
@@ -241,6 +249,7 @@ public class MainActivity extends AppCompatActivity {
 
         LocalBroadcastManager.getInstance(this).unregisterReceiver(shoppingListChangedReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(firebaseConnectedReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(showToastFromReceiver);
     }
 
     @Override

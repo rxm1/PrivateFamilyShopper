@@ -3,6 +3,7 @@
     xmlns:anandroid="http://schemas.android.com/apk/res/android"
     xmlns:style="http://schemas.android.com/apk/res-auto"
     style="?preferenceDialog">
+    <PreferenceCategory android:title="Firebase">
         <CheckBoxPreference android:title="Integrate with Firebase"
             android:defaultValue="false"
             android:summary="Turns on syncing with Firebase."
@@ -13,6 +14,33 @@
             android:summary="Please provide the firebase URL"
             android:defaultValue=""
             style="?preferenceDialog" />
+        <ListPreference
+            android:title="Authentication"
+            android:key="authentication"
+            android:summary="Select the type of authentication with Firebase."
+            android:entries="@array/authListArray"
+            android:entryValues="@array/authListValues"
+            android:defaultValue="1"
+            style="?preferenceDialog"/>
+        <EditTextPreference android:title="Email (Optional)"
+            android:key="FirebaseEmail"
+            android:summary="Please provide the Firebase email"
+            android:defaultValue=""
+            style="?preferenceDialog" />
+        <EditTextPreference android:title="Email Password (Optional)"
+            android:key="FirebaseEmailPassword"
+            android:summary="Please provide the Firebase email password"
+            android:defaultValue=""
+            android:password="true"
+            style="?preferenceDialog" />
+        <!--EditTextPreference android:title="Firebase Secret (Optional)"
+            android:key="FirebaseSecret"
+            android:summary="Please provide the Firebase secret"
+            android:defaultValue=""
+            android:password="true"
+            style="?preferenceDialog" /-->
+    </PreferenceCategory>
+    <PreferenceCategory android:title="Sync">
         <EditTextPreference android:inputType="number"
             android:title="Notification Delay (seconds)"
             android:key="notificationFrequency"
@@ -33,6 +61,8 @@
             android:defaultValue="3"
             android:summary="Batches up changes to push. Increase delay to reduce data usage."
             style="?preferenceDialog" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="Miscellaneous">
         <ListPreference
             android:title="Sort By"
             android:key="sortBy"
@@ -59,4 +89,5 @@
             android:entryValues="@array/themeColorsListValues"
             android:defaultValue="1"
             style="?preferenceDialog"/>
+    </PreferenceCategory>
 </PreferenceScreen>

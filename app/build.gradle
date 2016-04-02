@@ -29,6 +29,10 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:23.1.1'
     compile files('libs/gson-2.5.jar')
-    compile 'com.firebase:firebase-client-android:2.5.0+'
+    compile 'com.firebase:firebase-client-android:2.5.0'
     compile 'com.android.support:design:23.1.1'
+    compile 'com.firebase:firebase-token-generator:2.0.0'
+    compile files('libs/commons-codec-1.7.jar')
+    compile 'org.json:json:20090211'
+
 }

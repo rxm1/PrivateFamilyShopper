@@ -51,6 +51,10 @@
         </receiver>
         <receiver android:name=".MainActivity$FirebaseConnectedReceiver" >
         </receiver>
+        <receiver android:name=".MainActivity$SettingsChangedReceiver" >
+        </receiver>
+        <receiver android:name=".MainActivity$ShowToastFromServiceReceiver" >
+        </receiver>
     </application>
 
 </manifest>

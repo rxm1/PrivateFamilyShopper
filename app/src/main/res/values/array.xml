@@ -49,4 +49,18 @@
         <item>DateEnteredAsc</item>
         <item>DateEnteredDesc</item>
     </string-array>
+
+
+    <string-array name="authListArray">
+        <item>None</item>
+        <item>Anonymous</item>
+        <item>Email and Password</item>
+        <!--item>Firebase Secret</item-->
+    </string-array>
+    <string-array name="authListValues">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <!--item>4</item-->
+    </string-array>
 </resources>
