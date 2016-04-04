@@ -33,12 +33,6 @@
             android:defaultValue=""
             android:password="true"
             style="?preferenceDialog" />
-        <!--EditTextPreference android:title="Firebase Secret (Optional)"
-            android:key="FirebaseSecret"
-            android:summary="Please provide the Firebase secret"
-            android:defaultValue=""
-            android:password="true"
-            style="?preferenceDialog" /-->
     </PreferenceCategory>
     <PreferenceCategory android:title="Sync">
         <EditTextPreference android:inputType="number"
@@ -87,6 +81,14 @@
             android:summary="Change the theme color."
             android:entries="@array/themeColorsListArray"
             android:entryValues="@array/themeColorsListValues"
+            android:defaultValue="1"
+            style="?preferenceDialog"/>
+        <ListPreference
+            android:title="Vibration"
+            android:key="vibration"
+            android:summary="Select vibration level."
+            android:entries="@array/vibrateListArray"
+            android:entryValues="@array/vibrateListValues"
             android:defaultValue="1"
             style="?preferenceDialog"/>
     </PreferenceCategory>

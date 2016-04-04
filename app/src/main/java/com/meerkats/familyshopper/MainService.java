@@ -16,6 +16,7 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
 import android.os.SystemClock;
+import android.os.Vibrator;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.content.LocalBroadcastManager;
@@ -280,8 +281,14 @@ public class MainService extends Service implements ISynchronizeInterface {
                         PendingIntent.FLAG_UPDATE_CURRENT
                 );
         mBuilder.setContentIntent(resultPendingIntent)
-                .setAutoCancel(true)
-                .setDefaults(Notification.DEFAULT_ALL);
+                .setAutoCancel(true);
+
+        if(Settings.getVibration()== Settings.Vibration.Never)
+            mBuilder.setDefaults(Notification.DEFAULT_LIGHTS|Notification.DEFAULT_SOUND)
+                    .setVibrate(new long[]{0});
+        else
+            mBuilder.setDefaults(Notification.DEFAULT_ALL);
+
         NotificationManager mNotificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         // mId allows you to update the notification later on.

@@ -37,6 +37,20 @@ public class Settings {
             return value;
         }
     }
+    public enum Vibration{
+        Empty(0),
+        SystemDefault(1),
+        Never(2);
+
+        private final int value;
+        private Vibration(int value) {
+            this.value = value;
+        }
+
+        public int getValue() {
+            return value;
+        }
+    }
 
     public static final String screen_orientation_name = "screenOrientation";
     public static final String sort_by_name = "sortBy";
@@ -53,6 +67,7 @@ public class Settings {
     public static final String firebase_email_name = "FirebaseEmail";
     public static final String firebase_password_name = "FirebaseEmailPassword";
     public static final String firebase_secret_name = "FirebaseSecret";
+    public static final String vibration_name = "vibration";
 
     private static NotificationEvents userSelectedNotificationEvents = new NotificationEvents();
     private static String firebaseURL = "";
@@ -66,6 +81,7 @@ public class Settings {
     private static long lastSynced = 0;
     private static String sortBy="gray";
     private static int firebaseAuthentication = 1;
+    private static int vibration = 1;
     private static String firebaseEmail="";
     private static String firebasePassword="";
     private static String firebaseSecret="";
@@ -109,6 +125,7 @@ public class Settings {
             }
 
             loggingLevel = Integer.parseInt(settings.getString(logging_name, "1"));
+            vibration = Integer.parseInt(settings.getString(vibration_name, "1"));
             firebaseAuthentication = Integer.parseInt(settings.getString(firebase_authentication_name, "1"));
             firebaseEmail = settings.getString(firebase_email_name, "").trim();
             firebasePassword = settings.getString(firebase_password_name, "").trim();
@@ -212,10 +229,13 @@ public class Settings {
     public static void setRestartActivity(boolean restartActivitySet){
         restartActivity = restartActivitySet;
     }
-    public static Settings.FirebaseAuthentication getFirebaseAuthentication()
-    {
+    public static Settings.FirebaseAuthentication getFirebaseAuthentication(){
         return (FirebaseAuthentication.values())[firebaseAuthentication];
     }
+    public static Settings.Vibration getVibration(){
+        return (Vibration.values())[vibration];
+    }
+
     public static String getFirebaseEmail()
     {
         return firebaseEmail;
