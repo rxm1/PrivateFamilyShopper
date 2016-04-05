@@ -120,6 +120,10 @@ public class SettingsActivity extends AppCompatActivity {
                 newValue = newValue.equals("https://.com")||newValue.equals("") ? "Please enter the Firebase URL.":newValue;
             if(preference.getKey().equals(Settings.firebase_email_name))
                 newValue = newValue .equals("") ? "Please enter the Firebase email.":newValue;
+            if(preference.getKey().equals(Settings.Push_Batch_Time_Name))
+                newValue=newValue.toString()+"s. Batches up changes to push. Increase delay to reduce data usage.";
+            if(preference.getKey().equals(Settings.Notification_Frequency_Name))
+                newValue=newValue.toString()+"s. Increase value to reduce notification frequency.";
 
             if (preference instanceof ListPreference) {
                 // For list preferences, look up the correct display value in the preference's 'entries' list (since they have separate labels/values).
