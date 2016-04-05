@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.Looper;
+import android.preference.Preference;
 import android.preference.PreferenceManager;
 import android.widget.Toast;
 
@@ -79,37 +80,44 @@ public class Settings {
     private static int loggingLevel = 1;
     private static String colorTheme="1";
     private static long lastSynced = 0;
-    private static String sortBy="gray";
+    private static int sortBy=1;
     private static int firebaseAuthentication = 1;
     private static int vibration = 1;
     private static String firebaseEmail="";
     private static String firebasePassword="";
     private static String firebaseSecret="";
+    private static Set<String> notificationEventsSettings;
 
     private static boolean connectToFirebase = false;
     private static boolean reconnectToFirebase = false;
     private static boolean disconnectFromFirebase = false;
     private static boolean restartActivity = false;
 
+    private static Context settingsContext = null;
 
     public static void loadSettings(final Context context, String logTag){
         try {
+            settingsContext = context;
             SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
 
-            String temp = settings.getString(Push_Batch_Time_Name, "0").trim();
-            int pushBatchTime = temp == "" ? 1 : Integer.valueOf(temp);
-            pushBatchDelay = 1000 * (pushBatchTime < 1 ? 1 : pushBatchTime);
-            temp = settings.getString(Notification_Frequency_Name, "0");
-            notificationDelay = 1000 * (temp == "" ? 0 : Integer.valueOf(temp));
+            String temp = settings.getString(Push_Batch_Time_Name, "3").trim();
+            int pushBatchTime = temp == "" ? 0 : Integer.valueOf(temp);
+            pushBatchDelay = pushBatchTime;
+            temp = settings.getString(Notification_Frequency_Name, "60");
+            notificationDelay = temp == "" ? 0 : Integer.valueOf(temp);
             //to do: check for permissions
             firebaseURL = formatFirebaseURL(settings.getString(Firebase_URL_Name, null), logTag);
             integrateFirebase = settings.getBoolean(Integrate_With_Firebase_Name, false);
             crossedOffItemsAtBottom = settings.getBoolean(crossed_off_items_at_bottom_name, false);
             portraitOrientation = settings.getBoolean(screen_orientation_name, false);
             colorTheme = settings.getString(Color_Theme_Name, "1");
-            sortBy = settings.getString(sort_by_name, "1");
+            sortBy = Integer.parseInt(settings.getString(sort_by_name, "1"));
 
-            Set<String> notificationEventsSettings = settings.getStringSet(Notification_Events_Name, new HashSet<String>());
+            HashSet<String> defaultEvents = new HashSet<String>();
+            defaultEvents.add("Additions");
+            defaultEvents.add("Modifications");
+            defaultEvents.add("Deletions");
+            notificationEventsSettings = settings.getStringSet(Notification_Events_Name, defaultEvents);
             for (String events : notificationEventsSettings) {
                 switch (events) {
                     case "additions":
@@ -153,13 +161,18 @@ public class Settings {
     }
     private static String formatFirebaseURL(String firebaseURL, String logTag){
         try {
-            if (firebaseURL == null) return "";
+            if (firebaseURL == null || firebaseURL.equals("")) return "";
 
 
             if (!firebaseURL.startsWith("https://"))
                 firebaseURL = "https://" + firebaseURL;
             if (!firebaseURL.endsWith(".com"))
                 firebaseURL += ".com";
+
+            SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(settingsContext);
+            SharedPreferences.Editor editor = settings.edit();
+            editor.putString(Firebase_URL_Name, firebaseURL);
+            editor.commit();
         }catch (Exception e) {
             FSLog.error(logTag, "Settings formatFirebaseURL", e);
         }
@@ -175,14 +188,25 @@ public class Settings {
     }
     public static long getLastSynced(){return lastSynced;}
     public static NotificationEvents getUserSelectedNotificationEvents(){return userSelectedNotificationEvents;}
-    public static int getNotificationDelay(){return notificationDelay;}
+    public static int getNotificationDelay(){return notificationDelay*1000;}
     public static boolean isIntegrateFirebase(){return integrateFirebase;}
     public static boolean crossedOffItemsAtBottom(){return crossedOffItemsAtBottom;}
     public static boolean isPortraitOrientation(){return portraitOrientation;}
     public static String getFirebaseURL(){return firebaseURL;}
-    public static int getPushBatchDelay(){return pushBatchDelay;}
+    public static int getPushBatchDelay(){return pushBatchDelay*1000;}
     public static String getSortBy(){
-        return sortBy;
+        switch (sortBy){
+            case 1:
+                return "AlphabetAsc";
+            case 2:
+                return "AlphabetDesc";
+            case 3:
+                return "DateEnteredAsc";
+            case 4:
+                return "DateEnteredDesc";
+            default:
+                return "AlphabetAsc";
+        }
     }
     public static int getColorTheme(){
         switch (colorTheme){
@@ -247,5 +271,38 @@ public class Settings {
     public static String getFirebaseSecret()
     {
         return firebaseSecret;
+    }
+
+    public static Object getPreferenceKey(Preference preference){
+        switch (preference.getKey()){
+            case Integrate_With_Firebase_Name:
+                return integrateFirebase;
+            case Firebase_URL_Name:
+                return firebaseURL;
+            case firebase_authentication_name:
+                return firebaseAuthentication;
+            case firebase_email_name:
+                return firebaseEmail;
+            case firebase_password_name:
+                return firebasePassword;
+            case Notification_Frequency_Name:
+                return notificationDelay;
+            case Notification_Events_Name:
+                return notificationEventsSettings;
+            case Push_Batch_Time_Name:
+                return pushBatchDelay;
+            case sort_by_name:
+                return sortBy;
+            case crossed_off_items_at_bottom_name:
+                return crossedOffItemsAtBottom;
+            case screen_orientation_name:
+                return portraitOrientation;
+            case Color_Theme_Name:
+                return colorTheme;
+            case vibration_name:
+                return vibration;
+            default:
+                return "";
+        }
     }
 }

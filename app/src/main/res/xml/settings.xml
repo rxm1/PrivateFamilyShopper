@@ -63,7 +63,7 @@
             android:summary="Select the sorting order."
             android:entries="@array/sortByListArray"
             android:entryValues="@array/sortByListValues"
-            android:defaultValue="AlphabetAsc"
+            android:defaultValue="1"
             style="?preferenceDialog"/>
         <CheckBoxPreference android:title="Crossed-off items"
             android:defaultValue="true"
