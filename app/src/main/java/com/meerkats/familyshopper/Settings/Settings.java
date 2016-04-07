@@ -101,10 +101,10 @@ public class Settings {
             SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
 
             String temp = settings.getString(Push_Batch_Time_Name, "3").trim();
-            int pushBatchTime = temp == "" ? 0 : Integer.valueOf(temp);
+            int pushBatchTime = temp.equals("") ? 0 : Integer.valueOf(temp);
             pushBatchDelay = pushBatchTime;
             temp = settings.getString(Notification_Frequency_Name, "60");
-            notificationDelay = temp == "" ? 0 : Integer.valueOf(temp);
+            notificationDelay = temp.equals("") ? 0 : Integer.valueOf(temp);
             //to do: check for permissions
             firebaseURL = formatFirebaseURL(settings.getString(Firebase_URL_Name, null), logTag);
             integrateFirebase = settings.getBoolean(Integrate_With_Firebase_Name, false);
@@ -120,13 +120,13 @@ public class Settings {
             notificationEventsSettings = settings.getStringSet(Notification_Events_Name, defaultEvents);
             for (String events : notificationEventsSettings) {
                 switch (events) {
-                    case "additions":
+                    case "Additions":
                         userSelectedNotificationEvents.remoteAdditions = true;
                         break;
-                    case "modifications":
+                    case "Modifications":
                         userSelectedNotificationEvents.modifications = true;
                         break;
-                    case "deletions":
+                    case "Deletions":
                         userSelectedNotificationEvents.deletions = true;
                         break;
                 }
