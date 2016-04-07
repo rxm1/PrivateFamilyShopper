@@ -222,9 +222,7 @@ public class MainService extends Service implements ISynchronizeInterface {
         if (occuredNotifications.forService().isTrue()) {
             boolean recieversAvailable = LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
             if (!recieversAvailable) {
-                if(Settings.getNotificationDelay() > 0) {
-                    mServiceHandler.removeCallbacksAndMessages(pushNotificationsObject);
-                }
+                mServiceHandler.removeCallbacksAndMessages(pushNotificationsObject);
                 Runnable fileChangedRunnable = new Runnable() {
                     @Override
                     public void run() {
